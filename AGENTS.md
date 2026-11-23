@@ -7,3 +7,16 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Estándares permanentes de SkyCast
+
+- Utilizar exclusivamente pnpm y mantener TypeScript estricto.
+- Mantener Server Components por defecto; usar Client Components solo cuando la interactividad lo requiera.
+- Aplicar Clean Code y separación de responsabilidades, con nombres descriptivos y sin duplicación ni dependencias innecesarias.
+- No generar código comprimido en una sola línea. Mantener el formato con Prettier, UTF-8, dos espacios y finales de línea LF.
+- Escribir la documentación en español correctamente acentuado y preservar las configuraciones existentes salvo justificación.
+- Registrar cada prompt del proyecto en `VIBE_CODING.md` con su texto original, acciones, archivos, decisiones, problemas, pruebas reales y estado final. No inventar resultados ni prompts anteriores que no estén disponibles.
+- Ejecutar las comprobaciones pertinentes con pnpm y documentar sus resultados reales.
+- Utilizar Conventional Commits con el tipo en inglés y la descripción en español. No realizar commits ni push sin autorización.
+- No incluir secretos en el repositorio; mantener `.env.example` actualizado con las variables necesarias y sin valores secretos.
+- Tras cada modificación, comprobar el contenido real y ejecutar `pnpm.cmd encoding:check` para detectar caracteres españoles dañados y UTF-8 inválido. No canalizar texto no ASCII a procesos nativos desde PowerShell sin comprobar la codificación de salida; preferir escritura explícita UTF-8 y verificar el resultado.
