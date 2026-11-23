@@ -37,8 +37,8 @@ export default async function Home() {
         Ver pronóstico completo
       </Link>
       <p className="text-xs leading-5 text-slate-600">
-        Fuente: Open-Meteo. Las horas del proveedor usan el desplazamiento UTC vigente al consultar;
-        pueden diferir durante un cambio de horario de verano.
+        Fuente: Open-Meteo. Los valores diarios usan el desplazamiento vigente al consultar y pueden
+        abarcar horas distintas del día local durante un cambio de horario de verano.
       </p>
     </div>
   );

@@ -11,6 +11,7 @@ export type Clima = {
   zonaHoraria: string;
   desfaseUtcSegundos: number;
   unidades: { temperatura: "°C"; viento: "km/h"; humedad: "%"; precipitacion: "%" };
+  // Los instantes son ISO 8601 en UTC; las fechas diarias son etiquetas YYYY-MM-DD.
   actual: {
     hora: string | null;
     temperatura: number | null;

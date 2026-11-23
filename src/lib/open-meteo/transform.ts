@@ -28,9 +28,19 @@ function series(source: Record<string, unknown>, key: string, length: number): (
   if (!Array.isArray(value) || value.length !== length) return invalid();
   return value.map(optionalNumber);
 }
-function times(source: Record<string, unknown>): string[] {
+function times(source: Record<string, unknown>): number[] {
   if (!Array.isArray(source.time)) return invalid();
-  return source.time.map(text);
+  return source.time.map(number);
+}
+function instant(value: unknown): string {
+  const milliseconds = number(value) * 1000;
+  const date = new Date(milliseconds);
+  if (!Number.isFinite(date.getTime())) return invalid();
+  return date.toISOString();
+}
+function dailyDate(value: number, offset: number): string {
+  // Open-Meteo define las fechas diarias con el desplazamiento fijo de la respuesta.
+  return instant(value + offset).slice(0, 10);
 }
 
 export function transformarCiudades(data: unknown): Ciudad[] {
@@ -55,6 +65,13 @@ export function transformarCiudades(data: unknown): Ciudad[] {
 
 export function transformarClima(data: unknown): Clima {
   const root = object(data);
+  const timezone = text(root.timezone);
+  try {
+    new Intl.DateTimeFormat("es", { timeZone: timezone });
+  } catch {
+    return invalid();
+  }
+  const offset = number(root.utc_offset_seconds);
   const hourly = object(root.hourly);
   const daily = object(root.daily);
   const hourTimes = times(hourly);
@@ -70,12 +87,12 @@ export function transformarClima(data: unknown): Clima {
   const dayValue = current ? optionalNumber(current.is_day) : null;
   if (dayValue !== null && dayValue !== 0 && dayValue !== 1) return invalid();
   return {
-    zonaHoraria: text(root.timezone),
-    desfaseUtcSegundos: number(root.utc_offset_seconds),
+    zonaHoraria: timezone,
+    desfaseUtcSegundos: offset,
     unidades: { temperatura: "°C", viento: "km/h", humedad: "%", precipitacion: "%" },
     actual: current
       ? {
-          hora: optionalText(current.time),
+          hora: current.time == null ? null : instant(current.time),
           temperatura: optionalNumber(current.temperature_2m),
           sensacionTermica: optionalNumber(current.apparent_temperature),
           humedad: optionalNumber(current.relative_humidity_2m),
@@ -84,14 +101,16 @@ export function transformarClima(data: unknown): Clima {
           esDeDia: dayValue === null ? null : dayValue === 1,
         }
       : null,
-    horas: hourTimes.map((hora, index) => ({
-      hora,
-      temperatura: temperatures[index],
-      probabilidadPrecipitacion: precipitation[index],
-      codigoMeteorologico: hourCodes[index],
-    })),
+    horas: hourTimes
+      .map((hora, index) => ({
+        hora: instant(hora),
+        temperatura: temperatures[index],
+        probabilidadPrecipitacion: precipitation[index],
+        codigoMeteorologico: hourCodes[index],
+      }))
+      .sort((a, b) => Date.parse(a.hora) - Date.parse(b.hora)),
     dias: dayTimes.map((fecha, index) => ({
-      fecha,
+      fecha: dailyDate(fecha, offset),
       temperaturaMaxima: highs[index],
       temperaturaMinima: lows[index],
       probabilidadPrecipitacionMaxima: dayPrecipitation[index],

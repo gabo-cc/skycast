@@ -12,7 +12,7 @@ const weather = {
   timezone: "America/El_Salvador",
   utc_offset_seconds: -21600,
   current: {
-    time: "2026-01-01T12:00",
+    time: Date.parse("2026-01-01T18:00:00Z") / 1000,
     temperature_2m: 25,
     apparent_temperature: 26,
     relative_humidity_2m: 70,
@@ -21,13 +21,13 @@ const weather = {
     is_day: 1,
   },
   hourly: {
-    time: ["2026-01-01T12:00"],
+    time: [Date.parse("2026-01-01T18:00:00Z") / 1000],
     temperature_2m: [25],
     precipitation_probability: [null],
     weather_code: [2],
   },
   daily: {
-    time: ["2026-01-01"],
+    time: [Date.parse("2026-01-01T06:00:00Z") / 1000],
     temperature_2m_max: [29],
     temperature_2m_min: [20],
     precipitation_probability_max: [40],
@@ -93,6 +93,7 @@ test("clima transforma horas locales y valores ausentes sin inventarlos", async 
   globalThis.fetch = async (url) => {
     assert.equal(url.hostname, "api.open-meteo.com");
     assert.equal(url.searchParams.get("timezone"), "auto");
+    assert.equal(url.searchParams.get("timeformat"), "unixtime");
     assert.equal(url.searchParams.get("forecast_days"), "7");
     return Response.json(weather);
   };
@@ -102,7 +103,8 @@ test("clima transforma horas locales y valores ausentes sin inventarlos", async 
   assert.equal(response.headers.get("cache-control"), "no-store");
   assert.equal(body.zonaHoraria, "America/El_Salvador");
   assert.equal(body.actual.esDeDia, true);
-  assert.equal(body.horas[0].hora, "2026-01-01T12:00");
+  assert.equal(body.horas[0].hora, "2026-01-01T18:00:00.000Z");
+  assert.equal(body.dias[0].fecha, "2026-01-01");
   assert.equal(body.horas[0].probabilidadPrecipitacion, null);
   assert.equal(body.dias[0].temperaturaMaxima, 29);
 });

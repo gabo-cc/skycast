@@ -1683,3 +1683,132 @@ Las páginas son componentes de servidor y llaman directamente al servicio sin c
 ### Pruebas y estado
 
 Las 15 pruebas automatizadas pasaron e incluyen códigos, valores faltantes, fechas, parámetros, navegación con identidad y pruebas existentes de errores y datos incompletos del proveedor. `pnpm.cmd format:check`, `pnpm.cmd lint`, `pnpm.cmd build` y `pnpm.cmd encoding:check` terminaron correctamente. La compilación reconoce Inicio y Pronóstico como rutas con contenido dinámico transmitido bajo Cache Components. No se realizó prueba de navegador ni se validó la presentación visual. Queda pendiente la precisión durante transiciones de horario de verano indicada arriba; no se realizaron commits ni push.
+
+## 10. Corrección de zonas horarias de la Iteración 04
+
+### Prompt completo
+
+```text
+Actúa como ingeniero senior especializado en Next.js 16, TypeScript, APIs meteorológicas, manejo de fechas y zonas horarias.
+
+Estamos desarrollando SkyCast mediante Vibe Coding.
+
+La Iteración 04 ya implementó el clima actual y los pronósticos reales, pero Codex identificó una limitación al manejar transiciones de horario de verano.
+
+OBJETIVO:
+
+Corregir el tratamiento de fechas y zonas horarias para que SkyCast muestre correctamente las horas locales de cada ciudad, incluso cuando el pronóstico atraviese una transición de horario de verano.
+
+## 1. Diagnóstico
+
+Antes de modificar código:
+
+- Lee AGENTS.md.
+- Inspecciona el servicio de Open-Meteo.
+- Revisa las transformaciones de fechas.
+- Identifica cómo se utiliza zonaHoraria y desfaseUtcSegundos.
+- Comprueba cómo se construyen y formatean las fechas ISO.
+- Revisa las páginas Inicio y Pronóstico.
+
+La documentación oficial de Open-Meteo indica que utc_offset_seconds representa un desplazamiento fijo y puede ignorar transiciones DST dentro del período solicitado.
+
+No asumas que ese desplazamiento es válido para todas las fechas futuras.
+
+## 2. Corrección
+
+Implementa una estrategia robusta que:
+
+- Utilice la zona horaria IANA de la ubicación.
+- Respete las transiciones de horario de verano.
+- Mantenga correctamente los instantes del pronóstico.
+- Evite aplicar un desplazamiento UTC fijo a todas las fechas.
+- Distinga entre fechas locales, instantes UTC y etiquetas de calendario.
+- Evite conversiones dobles.
+- Utilice Intl.DateTimeFormat con timeZone cuando corresponda.
+- Evite depender de la zona horaria del navegador.
+
+Evalúa utilizar el formato unixtime de Open-Meteo para los instantes horarios, manteniendo la zona horaria IANA para presentarlos.
+
+Para fechas diarias, respeta el calendario local de la ubicación y la semántica documentada por Open-Meteo.
+
+No agregues bibliotecas de fechas si las herramientas nativas permiten resolver correctamente el problema.
+
+## 3. Pruebas
+
+Agregar pruebas automatizadas que cubran:
+
+- San Salvador, sin cambio de horario de verano.
+- Nueva York, durante una transición de primavera.
+- Nueva York, durante una transición de otoño.
+- Madrid, durante una transición de horario de verano.
+- Cambio de fecha local.
+- Datos incompletos.
+- Formato de hora de 12 y 24 horas cuando corresponda.
+
+Verificar que el pronóstico horario mantenga un orden temporal correcto y que las fechas mostradas correspondan a la ciudad consultada.
+
+No depender únicamente de la fecha actual para ejecutar las pruebas.
+
+## 4. Interfaz
+
+Eliminar cualquier advertencia temporal sobre limitaciones de horario de verano únicamente si la corrección queda técnicamente validada.
+
+No modificar innecesariamente el diseño.
+
+No introducir nuevas funcionalidades.
+
+## 5. Calidad y documentación
+
+Cumplir AGENTS.md.
+
+Registrar este prompt completo en VIBE_CODING.md como una corrección de la Iteración 04.
+
+Documentar:
+
+- Problema encontrado.
+- Causa técnica.
+- Estrategia aplicada.
+- Archivos modificados.
+- Pruebas realizadas.
+- Resultados reales.
+- Limitaciones que permanezcan.
+
+Mantener UTF-8, Clean Code, TypeScript estricto y uso exclusivo de pnpm.
+
+## 6. Validaciones
+
+Ejecutar:
+
+pnpm.cmd format:check\
+pnpm.cmd lint\
+pnpm.cmd build\
+pnpm.cmd encoding:check
+
+Ejecutar todas las pruebas automatizadas.
+
+No afirmar que se realizaron pruebas visuales si no se ejecutaron.
+
+## 7. Restricciones
+
+- No implementar favoritos.
+- No implementar comparación de ciudades.
+- No agregar base de datos.
+- No modificar componentes ajenos al problema sin justificación.
+- No realizar commits ni push automáticamente.
+
+Al finalizar, proporcionar el diagnóstico, las correcciones y los resultados de todas las pruebas.
+
+No avanzar a la Iteración 05.
+```
+
+### Diagnóstico y estrategia
+
+El servicio usaba ISO local con un desplazamiento fijo y la interfaz comparaba cadenas locales; al cambiar el horario de verano podía mostrar horas incorrectas y confundir horas repetidas. Ahora solicita `unixtime`, conserva instantes horarios y actuales como ISO UTC explícito y los presenta con `Intl.DateTimeFormat` y la zona IANA. Se ordenan y filtran por instante y se muestra el desplazamiento de cada hora para distinguir las repetidas. Las fechas diarias son etiquetas de calendario obtenidas según el desplazamiento de la respuesta, no instantes de medianoche reinterpretados como hora local.
+
+### Archivos, pruebas y limitaciones
+
+Se modificaron el servicio, la transformación y los tipos de `src/lib/open-meteo/`, `src/lib/weather-display.ts`, `src/components/weather-view.tsx`, ambas páginas, `tests/open-meteo.test.mjs`, `tests/weather-display.test.mjs` y esta bitácora. Las 17 pruebas automatizadas pasaron, con casos de San Salvador, primavera y otoño en Nueva York, Madrid, cambio de fecha, horas de 12 y 24, datos incompletos y orden temporal. Una consulta real a Open-Meteo para Nueva York devolvió 168 horas, siete días y la zona `America/New_York`. La documentación del proveedor indica que los límites de agregación diarios usan el desplazamiento vigente al consultar y pueden no coincidir con los días locales durante una transición; la interfaz mantiene esa advertencia. No se realizaron pruebas visuales.
+
+### Estado final
+
+`pnpm.cmd format:check`, `pnpm.cmd lint`, `pnpm.cmd build`, `pnpm.cmd encoding:check` y `pnpm.cmd test` finalizaron correctamente. Los instantes horarios quedan corregidos y probados; permanece la limitación de los límites de agregación diaria del proveedor indicada arriba. No se realizaron commits ni push.

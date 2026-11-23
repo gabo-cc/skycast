@@ -1,6 +1,6 @@
 import { Icon } from "@/components/icon";
 import { SectionHeading } from "@/components/ui";
-import { condicion, fechaLocal, valor } from "@/lib/weather-display";
+import { condicion, fechaLocal, instanteLocal, valor } from "@/lib/weather-display";
 import type { Ciudad, Clima } from "@/lib/open-meteo/types";
 
 export function CurrentWeather({ city, weather }: { city: Ciudad; weather: Clima }) {
@@ -20,7 +20,8 @@ export function CurrentWeather({ city, weather }: { city: Ciudad; weather: Clima
             {city.nombre}
           </h2>
           <p className="mt-2 text-xs text-slate-600">
-            Hora del dato: {fechaLocal(current?.hora ?? null, true)} · {weather.zonaHoraria}
+            Hora del dato: {instanteLocal(current?.hora ?? null, weather.zonaHoraria)} ·{" "}
+            {weather.zonaHoraria}
           </p>
         </div>
         <Icon name={condition.icono} className="size-12 shrink-0 text-sky-700" />
@@ -55,8 +56,11 @@ export function CurrentWeather({ city, weather }: { city: Ciudad; weather: Clima
 
 export function HourlyForecast({ weather }: { weather: Clima }) {
   const now = weather.actual?.hora;
+  const currentHour = now ? Math.floor(Date.parse(now) / 3_600_000) * 3_600_000 : null;
   const hours = (
-    now ? weather.horas.filter((hour) => hour.hora >= now.slice(0, 13)) : weather.horas
+    currentHour !== null
+      ? weather.horas.filter((hour) => Date.parse(hour.hora) >= currentHour)
+      : weather.horas
   ).slice(0, 24);
   return (
     <section className="space-y-5">
@@ -78,7 +82,9 @@ export function HourlyForecast({ weather }: { weather: Clima }) {
                 key={hour.hora}
                 className="w-36 shrink-0 rounded-2xl border border-slate-200 bg-white p-4"
               >
-                <p className="text-xs text-slate-600">{fechaLocal(hour.hora, true)}</p>
+                <p className="text-xs text-slate-600">
+                  {instanteLocal(hour.hora, weather.zonaHoraria)}
+                </p>
                 <Icon name={condition.icono} className="my-4 size-7 text-sky-700" />
                 <p className="text-xl font-semibold">{valor(hour.temperatura, "°C")}</p>
                 <p className="mt-2 text-xs text-slate-600">{condition.descripcion}</p>

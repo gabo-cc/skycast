@@ -41,7 +41,7 @@ export function condicion(
 export function valor(value: number | null, unit: string): string {
   return value === null ? "No disponible" : `${value}${unit}`;
 }
-// El proveedor entrega fechas locales sin sufijo UTC; se formatean sus partes sin convertirlas.
+// Las fechas diarias son etiquetas de calendario y no representan instantes.
 export function fechaLocal(value: string | null, includeTime = false): string {
   if (!value) return "No disponible";
   const match = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?$/.exec(value);
@@ -63,4 +63,25 @@ export function fechaLocal(value: string | null, includeTime = false): string {
     year: "numeric",
   }).format(date);
   return includeTime ? `${formatted}, ${hour}:${minute}` : formatted;
+}
+
+export function instanteLocal(value: string | null, timeZone: string, hour12 = false): string {
+  if (!value || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value))
+    return "No disponible";
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return "No disponible";
+  try {
+    return new Intl.DateTimeFormat("es", {
+      timeZone,
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12,
+      timeZoneName: "shortOffset",
+    }).format(date);
+  } catch {
+    return "No disponible";
+  }
 }

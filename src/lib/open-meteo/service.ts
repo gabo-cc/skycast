@@ -39,6 +39,7 @@ export async function obtenerClima(latitud: number, longitud: number) {
     latitude: String(latitud),
     longitude: String(longitud),
     timezone: "auto",
+    timeformat: "unixtime",
     forecast_days: "7",
     temperature_unit: "celsius",
     wind_speed_unit: "kmh",
