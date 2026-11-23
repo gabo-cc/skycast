@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Icon } from "@/components/icon";
 import { esBusquedaValida, iniciarBusqueda, type SearchResult } from "@/lib/city-search";
 import type { Ciudad } from "@/lib/open-meteo/types";
+import { forecastUrl } from "@/lib/forecast-location";
 
 type SearchState = { status: "initial" | "loading" } | SearchResult;
 
@@ -65,13 +66,6 @@ export function CitySearch() {
     setSelected(null);
     setState({ status: esBusquedaValida(value) ? "loading" : "initial" });
   }
-
-  const forecastParams = selected
-    ? new URLSearchParams({
-        latitud: String(selected.latitud),
-        longitud: String(selected.longitud),
-      })
-    : null;
 
   return (
     <div className="space-y-8">
@@ -155,7 +149,7 @@ export function CitySearch() {
           </ul>
         )}
       </section>
-      {selected && forecastParams && (
+      {selected && (
         <section
           aria-labelledby="seleccion-titulo"
           className="rounded-2xl border border-sky-200 bg-sky-50 p-5 sm:p-6"
@@ -168,14 +162,11 @@ export function CitySearch() {
               "Ubicación no disponible"}{" "}
             · Latitud {selected.latitud}, longitud {selected.longitud}
           </p>
-          <p className="mt-2 text-sm leading-6 text-slate-700">
-            La página de pronóstico todavía muestra datos de ejemplo y no utiliza esta ubicación.
-          </p>
           <Link
-            href={`/pronostico?${forecastParams}`}
+            href={forecastUrl(selected)}
             className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white hover:bg-sky-800"
           >
-            Ver diseño del pronóstico <Icon name="arrow" className="size-4" />
+            Ver pronóstico <Icon name="arrow" className="size-4" />
           </Link>
         </section>
       )}

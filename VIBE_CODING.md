@@ -1473,3 +1473,213 @@ La página permanece como Server Component y el componente interactivo usa el ti
 ### Pruebas y estado final
 
 Las pruebas automatizadas de la lógica cubren términos, respuesta válida con homónimos e IDs distintos, resultados vacíos, error, cancelación y respuesta tardía; no comprueban la selección mediante eventos de navegador. Las 11 pruebas pasaron, así como ESLint, build y la comprobación de codificación. La primera comprobación de formato detectó la bitácora recién ampliada y se corrigió con Prettier. El ejecutor de Node mostró el aviso de detección de módulo ya existente. No se realizó una comprobación visual ni funcional en navegador, que queda pendiente. No se realizaron commits ni push.
+
+## 9. Iteración 04: condiciones y pronóstico reales
+
+### Prompt completo
+
+```text
+Actúa como ingeniero frontend senior especializado en Next.js 16, React 19, TypeScript, Tailwind CSS 4, APIs REST, accesibilidad y Clean Code.
+
+Estamos desarrollando SkyCast mediante Vibe Coding.
+
+ESTADO ACTUAL:
+
+- Seis rutas con App Router.
+- API interna de Open-Meteo implementada.
+- Búsqueda interactiva de ciudades funcional.
+- TypeScript estricto.
+- Prettier, ESLint y validación UTF-8.
+- Uso exclusivo de pnpm.
+- Documentación del proceso en VIBE_CODING.md.
+
+Antes de modificar archivos, lee AGENTS.md e inspecciona los tipos y componentes existentes.
+
+OBJETIVO:
+
+Implementar la Iteración 04: mostrar condiciones meteorológicas actuales y pronósticos reales mediante la API interna de SkyCast.
+
+## 1. Página de inicio
+
+Modificar la ruta / para mostrar el clima real de una ciudad predeterminada.
+
+Utilizar inicialmente San Salvador, El Salvador.
+
+Mostrar:
+
+- Nombre y país.
+- Temperatura actual.
+- Sensación térmica.
+- Humedad.
+- Velocidad del viento.
+- Estado meteorológico.
+- Hora de actualización.
+- Pronóstico resumido.
+
+Los valores deben proceder de /api/clima o de la misma capa de servicios de servidor existente.
+
+No utilizar datos meteorológicos ficticios como si fueran reales.
+
+## 2. Página de pronóstico
+
+Conectar /pronostico con la API meteorológica existente.
+
+La página debe admitir las coordenadas seleccionadas desde /buscar mediante parámetros de URL.
+
+Validar los parámetros antes de consultar información.
+
+Si no existen parámetros válidos, mostrar una ciudad predeterminada o un mensaje claro.
+
+Mostrar:
+
+- Ciudad seleccionada.
+- Condiciones actuales.
+- Pronóstico por horas.
+- Pronóstico de siete días.
+- Temperaturas máximas y mínimas.
+- Probabilidad de precipitación.
+- Iconos y descripciones meteorológicas.
+
+No identificar ciudades únicamente por sus coordenadas si se dispone de ID y nombre.
+
+## 3. Condiciones meteorológicas
+
+Crear una utilidad compartida que transforme los códigos meteorológicos de Open-Meteo en:
+
+- Descripciones en español.
+- Iconos adecuados.
+- Estados visuales de día y noche cuando corresponda.
+
+No asumir que todos los códigos son iguales.
+
+Manejar códigos desconocidos sin provocar errores.
+
+## 4. Fechas y zonas horarias
+
+La API proporciona una zona horaria para cada ubicación.
+
+Mostrar fechas y horas respetando la zona horaria de la ciudad consultada.
+
+No aplicar automáticamente la zona horaria del navegador.
+
+No interpretar incorrectamente las fechas locales como UTC.
+
+Evitar errores al cambiar de día.
+
+## 5. Arquitectura Next.js
+
+Mantener Server Components para composición y consultas iniciales cuando corresponda.
+
+Utilizar Client Components únicamente para interacciones que lo requieran.
+
+Reutilizar la capa de servicios de Open-Meteo.
+
+Evitar duplicar lógica de transformación.
+
+No realizar solicitudes HTTP al propio Route Handler desde un Server Component si puede utilizarse directamente el servicio de servidor.
+
+Respetar las convenciones de Next.js 16 y la configuración existente de Cache Components.
+
+## 6. Estados de carga y errores
+
+Implementar:
+
+- loading.tsx en las rutas apropiadas.
+- error.tsx como Client Component para errores de renderizado.
+- Estados vacíos y de datos incompletos.
+- Mensajes claros cuando Open-Meteo no esté disponible.
+- Opciones de reintento cuando corresponda.
+
+No mostrar información desactualizada como si fuera actual.
+
+No ocultar errores con datos demostrativos.
+
+## 7. Diseño responsive
+
+Mantener el diseño profesional de SkyCast.
+
+- Tarjetas proporcionadas.
+- Iconos con dimensiones correctas.
+- Diseño mobile-first.
+- Pronóstico horario con navegación horizontal controlada cuando corresponda.
+- Sin desplazamiento horizontal de toda la página.
+- Buena legibilidad.
+- Accesibilidad mediante teclado.
+- Estados de foco visibles.
+
+No volver a introducir los problemas de SVG gigantes o tarjetas desbordadas.
+
+## 8. Pruebas
+
+Agregar pruebas automatizadas para:
+
+- Conversión de códigos meteorológicos.
+- Valores ausentes.
+- Parámetros válidos e inválidos.
+- Fechas y zonas horarias.
+- Datos incompletos.
+- Errores del proveedor.
+- Navegación desde la búsqueda.
+- Presentación correcta de datos disponibles.
+
+No afirmar que se realizaron pruebas de navegador si no se ejecutaron.
+
+## 9. Documentación
+
+Registrar este prompt completo en VIBE_CODING.md dentro de la Iteración 04.
+
+Documentar:
+
+- Objetivo.
+- Prompt original.
+- Archivos creados o modificados.
+- Decisiones técnicas.
+- Problemas y soluciones.
+- Pruebas ejecutadas.
+- Resultados reales.
+- Estado final.
+
+No inventar información.
+
+## 10. Validaciones
+
+Ejecutar:
+
+pnpm.cmd format:check
+pnpm.cmd lint
+pnpm.cmd build
+pnpm.cmd encoding:check
+
+Ejecutar también las pruebas automatizadas.
+
+Corregir los errores introducidos.
+
+## 11. Restricciones
+
+- No implementar favoritos todavía.
+- No implementar comparación meteorológica.
+- No agregar base de datos.
+- No modificar innecesariamente los endpoints.
+- No realizar commits ni push automáticamente.
+- No implementar funcionalidades fuera de esta iteración.
+
+RESULTADO ESPERADO:
+
+Las páginas Inicio y Pronóstico deben mostrar información meteorológica real de Open-Meteo, correctamente formateada y adaptable a dispositivos móviles y escritorio.
+
+Al finalizar, proporcionar un resumen de los cambios y resultados de pruebas.
+
+No avances a la Iteración 05.
+```
+
+### Objetivo y archivos
+
+Mostrar datos reales en Inicio y Pronóstico utilizando el servicio existente. Se modificaron `src/app/page.tsx`, `src/app/pronostico/page.tsx`, `src/components/city-search.tsx` y `src/components/icon.tsx`. Se crearon `src/components/weather-view.tsx`, `weather-loading.tsx`, `weather-error.tsx`, las convenciones `loading.tsx` y `error.tsx` en ambas rutas, `src/lib/weather-display.ts`, `src/lib/forecast-location.ts` y `tests/weather-display.test.mjs`.
+
+### Decisiones, problemas y soluciones
+
+Las páginas son componentes de servidor y llaman directamente al servicio sin caché; muestran errores con opción de reintento, valores ausentes explícitos y estados vacíos. La búsqueda transmite ID, nombre, región, país y coordenadas validadas. Los códigos meteorológicos se traducen según la tabla de Open-Meteo; los datos desconocidos no se inventan. Las fechas ISO se presentan tal como las entrega el proveedor, sin aplicar la zona del navegador. La documentación oficial señala que Open-Meteo usa el desplazamiento UTC vigente al solicitar fechas ISO y no ajusta cambios de horario de verano dentro del intervalo; se advierte esta limitación en la interfaz. Para una corrección completa durante esas transiciones sería necesario adaptar el servicio a marcas Unix y revisar los límites diarios. No se modificaron los endpoints.
+
+### Pruebas y estado
+
+Las 15 pruebas automatizadas pasaron e incluyen códigos, valores faltantes, fechas, parámetros, navegación con identidad y pruebas existentes de errores y datos incompletos del proveedor. `pnpm.cmd format:check`, `pnpm.cmd lint`, `pnpm.cmd build` y `pnpm.cmd encoding:check` terminaron correctamente. La compilación reconoce Inicio y Pronóstico como rutas con contenido dinámico transmitido bajo Cache Components. No se realizó prueba de navegador ni se validó la presentación visual. Queda pendiente la precisión durante transiciones de horario de verano indicada arriba; no se realizaron commits ni push.

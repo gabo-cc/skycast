@@ -12,8 +12,19 @@ type IconName =
   | "heart"
   | "compare"
   | "spark"
-  | "clock";
+  | "clock"
+  | "moon"
+  | "snow"
+  | "storm";
 const paths: Record<IconName, ReactNode> = {
+  moon: <path d="M20 15.5A8 8 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z" />,
+  snow: <path d="M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M9 4l3 3 3-3M9 20l3-3 3 3" />,
+  storm: (
+    <>
+      <path d="M7 15h10a4 4 0 0 0 .4-7.98A5.5 5.5 0 0 0 7 6a4.5 4.5 0 0 0 0 9Z" />
+      <path d="m13 13-3 5h3l-2 4" />
+    </>
+  ),
   sun: (
     <>
       <circle cx="12" cy="12" r="4" />
