@@ -2006,3 +2006,264 @@ Se incorporó la gestión local de favoritos desde la búsqueda y la página de 
 ### Pruebas y estado
 
 Las pruebas de funciones de almacenamiento cubren alta, baja, duplicados, homónimos, recuperación, datos inválidos, errores y selección de eventos relevantes. Las 22 pruebas automatizadas pasaron, al igual que `pnpm.cmd format:check`, `pnpm.cmd lint`, `pnpm.cmd build` y `pnpm.cmd encoding:check`. Node emitió el aviso existente de detección de módulo durante las pruebas. No se verificaron eventos reales ni interacciones en navegador, por lo que quedan pendientes la comprobación visual y la sincronización efectiva entre pestañas. No se realizaron commits ni push.
+
+## 12. Iteración 06: comparación de ciudades
+
+### Prompt completo
+
+```text
+Actúa como ingeniero frontend senior especializado en Next.js 16, React 19, TypeScript, Tailwind CSS 4, APIs REST, experiencia de usuario, accesibilidad y Clean Code.
+
+Estamos desarrollando SkyCast mediante Vibe Coding con OpenAI Codex en VS Code.
+
+ESTADO ACTUAL:
+
+- Seis rutas implementadas con Next.js App Router.
+- API interna de Open-Meteo.
+- Búsqueda interactiva de ciudades.
+- Condiciones meteorológicas y pronósticos reales.
+- Conversión horaria mediante zona horaria IANA.
+- Gestión de favoritos con localStorage.
+- TypeScript estricto.
+- Validación mediante Prettier, ESLint, build y UTF-8.
+- Documentación en VIBE_CODING.md.
+
+Antes de trabajar, lee AGENTS.md e inspecciona los servicios, tipos, componentes y páginas existentes.
+
+OBJETIVO:
+
+Implementar la Iteración 06: comparación meteorológica real entre dos ciudades utilizando la infraestructura existente.
+
+No utilizar datos meteorológicos simulados.
+
+## 1. Página /comparar
+
+Convertir la página en una herramienta interactiva y funcional.
+
+El usuario debe poder:
+
+- Buscar la primera ciudad.
+- Buscar la segunda ciudad.
+- Seleccionar ciudades de distintos países.
+- Distinguir ciudades con nombres idénticos.
+- Comparar ambas ubicaciones.
+- Cambiar cualquiera de las ciudades.
+- Intercambiar la posición de las dos ciudades.
+- Consultar el pronóstico individual de cualquiera de ellas.
+
+No iniciar la comparación hasta tener dos ubicaciones válidas.
+
+## 2. Selección de ciudades
+
+Reutilizar la lógica de búsqueda y los tipos existentes.
+
+Evitar duplicar el código del buscador.
+
+Permitir buscar ciudades directamente desde /comparar.
+
+Cada selección debe conservar:
+
+- ID.
+- Nombre.
+- País.
+- Región.
+- Latitud.
+- Longitud.
+
+Identificar cada ciudad por su ID, no por su nombre.
+
+Evitar comparar accidentalmente la misma ciudad consigo misma.
+
+Permitir seleccionar ciudades favoritas si puede integrarse reutilizando el hook existente sin incrementar innecesariamente la complejidad.
+
+## 3. Datos meteorológicos
+
+Consultar /api/clima para ambas ciudades.
+
+Mostrar una comparación de:
+
+- Temperatura actual.
+- Sensación térmica.
+- Humedad.
+- Velocidad del viento.
+- Condición meteorológica.
+- Temperatura máxima del día.
+- Temperatura mínima del día.
+- Probabilidad máxima de precipitación.
+
+Usar únicamente valores presentes en la respuesta real.
+
+Si algún dato no está disponible, mostrar «No disponible».
+
+Nunca sustituir valores ausentes por cero.
+
+## 4. Comparación visual
+
+Crear una presentación clara que permita distinguir ambas ciudades.
+
+En escritorio:
+
+- Mostrar las ciudades en dos columnas.
+- Alinear las mismas métricas.
+- Utilizar tarjetas proporcionadas y fáciles de comparar.
+
+En móvil:
+
+- Adaptar el contenido a una columna o a una presentación compacta.
+- Evitar tablas que desborden horizontalmente.
+- Conservar etiquetas claras para cada valor.
+
+Incluir diferencias numéricas únicamente cuando tengan sentido.
+
+Por ejemplo, mostrar la diferencia de temperatura en grados Celsius.
+
+No afirmar que una ciudad tiene mejores condiciones únicamente por presentar valores mayores o menores.
+
+No inventar recomendaciones meteorológicas.
+
+## 5. Estado y solicitudes
+
+Utilizar React Hooks correctamente.
+
+- useState.
+- useEffect cuando corresponda.
+- AbortController para cancelar solicitudes obsoletas.
+- Manejo independiente de errores por ciudad.
+- Estado de carga durante la consulta.
+- Evitar condiciones de carrera.
+- No realizar llamadas repetidas innecesariamente.
+
+Gestionar correctamente el caso en que una ciudad cambie mientras se está consultando el clima.
+
+## 6. Fechas y zonas horarias
+
+Las ciudades pueden tener diferentes zonas horarias.
+
+Mostrar claramente la hora local de cada ciudad.
+
+Utilizar la infraestructura de fechas existente.
+
+No asumir que ambas ciudades están en el mismo día.
+
+No utilizar un desplazamiento UTC fijo para convertir los instantes horarios.
+
+Respetar las limitaciones documentadas del proveedor sobre agregados diarios durante transiciones de horario de verano.
+
+## 7. Estados de interfaz
+
+Implementar:
+
+- Estado inicial sin ciudades.
+- Estado con una ciudad seleccionada.
+- Estado de consulta en progreso.
+- Comparación completada.
+- Error de una ciudad.
+- Error de ambas ciudades.
+- Opción para reintentar.
+- Datos incompletos.
+
+Los errores de una ciudad no deben ocultar innecesariamente los datos válidos de la otra.
+
+## 8. Accesibilidad y diseño
+
+Mantener la identidad visual de SkyCast.
+
+- Diseño responsive mobile-first.
+- Tamaños correctos de SVG.
+- Etiquetas accesibles.
+- Navegación mediante teclado.
+- Indicadores de foco visibles.
+- Mensajes de estado accesibles.
+- Botones de intercambio con nombres claros.
+- Buen contraste.
+- Sin desbordamientos horizontales.
+
+## 9. Pruebas
+
+Agregar pruebas automatizadas que cubran:
+
+- Selección de dos ciudades distintas.
+- Ciudades homónimas.
+- Intento de seleccionar la misma ciudad dos veces.
+- Intercambio de ciudades.
+- Cálculo correcto de diferencias.
+- Valores null.
+- Error de una consulta.
+- Error de ambas consultas.
+- Cancelación de solicitudes obsoletas.
+- Ciudades en zonas horarias diferentes.
+- Navegación hacia el pronóstico individual.
+
+Utilizar mocks para evitar depender de Open-Meteo en las pruebas automatizadas.
+
+Indicar claramente si no se realizaron pruebas reales de interacción en navegador.
+
+## 10. Arquitectura
+
+- Reutilizar tipos y servicios.
+- Evitar duplicar el buscador.
+- Evitar duplicar transformaciones meteorológicas.
+- Mantener Server Components cuando corresponda.
+- Utilizar Client Components para la interacción.
+- No introducir una nueva API externa.
+- No introducir una base de datos.
+- Evitar dependencias innecesarias.
+
+## 11. Documentación Vibe Coding
+
+Registrar este prompt completo en VIBE_CODING.md como Iteración 06.
+
+Incluir:
+
+- Objetivo.
+- Prompt original.
+- Archivos creados o modificados.
+- Decisiones técnicas.
+- Problemas encontrados.
+- Soluciones.
+- Pruebas realizadas.
+- Resultados verificables.
+- Estado final.
+
+No inventar pruebas ni resultados.
+
+## 12. Validaciones obligatorias
+
+Ejecutar:
+
+pnpm.cmd format:check
+pnpm.cmd lint
+pnpm.cmd build
+pnpm.cmd encoding:check
+
+Ejecutar además todas las pruebas automatizadas.
+
+Corregir los errores introducidos.
+
+## 13. Restricciones
+
+- No modificar innecesariamente las funcionalidades existentes.
+- No implementar autenticación.
+- No agregar base de datos.
+- No modificar la configuración de despliegue.
+- No realizar commits ni push automáticamente.
+- No avanzar a la siguiente iteración.
+
+RESULTADO ESPERADO:
+
+Una página /comparar completamente funcional que permita seleccionar dos ciudades y comparar condiciones meteorológicas reales de forma clara, accesible y responsive.
+
+Al finalizar, proporcionar un resumen de cambios, pruebas y limitaciones pendientes.
+```
+
+### Objetivo, acciones y archivos
+
+Conectar `/comparar` a las APIs internas para comparar dos ubicaciones. Se modificaron `src/app/comparar/page.tsx` y esta bitácora; se crearon `src/components/comparison.tsx`, `src/components/comparison-selector.tsx`, `src/lib/comparison.ts` y `tests/comparison.test.mjs`.
+
+### Decisiones y problemas
+
+La página sigue siendo Server Component y el estado interactivo está en componentes de cliente. Los selectores reutilizan la lógica de búsqueda existente y el hook de favoritos; se rechaza la misma ciudad por ID. Las solicitudes se cancelan al desmontar o cambiar la ciudad, se gestionan por separado y pueden reintentarse individualmente. El intercambio conserva los paneles identificados por ID. Las métricas no disponibles se muestran como tales; el día se determina con la zona IANA de cada ciudad y se mantiene el aviso sobre los agregados diarios del proveedor. El prompt se guardó con escritura explícita UTF-8. No se añadieron dependencias ni se modificaron endpoints.
+
+### Pruebas y estado
+
+Las pruebas automatizadas con mocks cubren selección, homónimos, duplicados, intercambio, diferencias, valores ausentes, zonas, navegación, fallos de una y ambas consultas y propagación de cancelación. Pasaron las 27 pruebas, `pnpm.cmd format:check`, `pnpm.cmd lint`, `pnpm.cmd build` y `pnpm.cmd encoding:check`. Node emitió el aviso existente de detección de módulo. No se probaron interacciones reales ni el diseño responsive en navegador; esa comprobación queda pendiente. No se realizaron commits ni push.
