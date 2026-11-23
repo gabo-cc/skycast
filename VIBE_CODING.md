@@ -283,3 +283,722 @@ Se restauró la primera entrada usando el prompt disponible, se añadió esta en
 La escritura y lectura mediante Node.js con UTF-8 explícito devolvió exactamente `Bitácora de Vibe Coding. Configuración, código, español, pronóstico, búsqueda, ¿Cómo estás? ¡Excelente!`; se eliminó el archivo temporal. Una prueba con los cuatro patrones solicitados y U+FFFD detectó las cinco líneas; otra aceptó operadores ternario, encadenamiento opcional y fusión nula de TypeScript. Ambos archivos de prueba se eliminaron. El primer ensayo del detector señaló sus propios ejemplos; se corrigió y la comprobación posterior pasó.
 
 Validaciones finales: `pnpm.cmd format:check`, `pnpm.cmd lint`, `pnpm.cmd build` y `pnpm.cmd encoding:check` terminaron correctamente. La compilación incluyó TypeScript y generación estática. Estado: completado; no se modificaron funcionalidades ni configuraciones globales y no se realizaron commits ni push.
+
+## 3. Iteración 01: diseño responsive y navegación
+
+**Objetivo:** implementar la estructura visual responsive, las seis rutas y la navegación compartida de SkyCast.
+
+### Prompt completo
+
+```text
+Actúa como desarrollador senior especializado en Next.js 16, React 19, TypeScript, Tailwind CSS 4 y diseño UI/UX.
+
+Estamos desarrollando SkyCast mediante Vibe Coding.
+
+La Iteración 00 ya está completada y hemos establecido las reglas de calidad, documentación y codificación del proyecto.
+
+Lee y respeta las instrucciones de AGENTS.md antes de modificar archivos.
+
+Utiliza exclusivamente pnpm.
+
+OBJETIVO:\
+Implementar la Iteración 01: diseño responsive, estructura de páginas y navegación de SkyCast.
+
+## 1. Rutas
+
+Crear seis rutas utilizando App Router:
+
+- / — Inicio.
+- /buscar — Búsqueda de ciudades.
+- /pronostico — Pronóstico meteorológico.
+- /favoritos — Ciudades favoritas.
+- /comparar — Comparación de ciudades.
+- /acerca-de — Información del proyecto.
+
+## 2. Diseño
+
+Implementar una interfaz meteorológica moderna, coherente y profesional.
+
+Requisitos:
+
+- Diseño responsive.
+- Navegación compartida.
+- Interfaz adaptable a móviles, tabletas y escritorio.
+- Tarjetas meteorológicas reutilizables.
+- Tipografía legible.
+- Iconografía consistente.
+- Buen contraste.
+- Estados de foco visibles.
+- HTML semántico.
+- Estilos organizados mediante Tailwind CSS.
+
+## 3. Contenido
+
+Inicio:\
+Presentación de SkyCast y una tarjeta meteorológica principal.
+
+Buscar:\
+Interfaz visual de búsqueda de ciudades y resultados de demostración.
+
+Pronóstico:\
+Tarjetas y secciones preparadas para mostrar pronósticos horarios y diarios.
+
+Favoritos:\
+Interfaz para mostrar ciudades favoritas y un estado vacío.
+
+Comparar:\
+Estructura visual para comparar condiciones de dos ciudades.
+
+Acerca de:\
+Información del proyecto, tecnologías y metodología Vibe Coding.
+
+## 4. Arquitectura
+
+- Server Components por defecto.
+- Client Components solo cuando exista interactividad real.
+- Componentes reutilizables.
+- Separación de responsabilidades.
+- Datos de demostración separados de la presentación.
+- No implementar API ni persistencia todavía.
+
+Los datos demostrativos deben estar identificados claramente y no presentarse como datos meteorológicos actuales.
+
+## 5. Calidad
+
+Cumplir todas las reglas de AGENTS.md.
+
+- Código legible y organizado.
+- Prettier.
+- TypeScript estricto.
+- UTF-8.
+- Español correctamente acentuado.
+- Sin archivos comprimidos en una sola línea.
+- Sin dependencias innecesarias.
+
+## 6. Documentación
+
+Registrar este prompt completo en VIBE_CODING.md.
+
+Documentar:
+
+- Objetivo.
+- Acciones realizadas.
+- Archivos modificados.
+- Decisiones técnicas.
+- Problemas y soluciones.
+- Pruebas ejecutadas.
+- Estado final.
+
+No inventar resultados.
+
+## 7. Validaciones obligatorias
+
+Ejecutar:
+
+pnpm.cmd format:check\
+pnpm.cmd lint\
+pnpm.cmd build\
+pnpm.cmd encoding:check
+
+Corregir cualquier error detectado.
+
+Verificar que las seis rutas estén presentes en el resultado de compilación.
+
+No afirmar que la interfaz fue revisada visualmente si no se verificó en un navegador.
+
+## 8. Restricciones
+
+- No integrar Open-Meteo todavía.
+- No implementar funcionalidades fuera de esta iteración.
+- No crear commits ni ejecutar push.
+- No modificar archivos externos al proyecto.
+
+Al finalizar, proporcionar un resumen de los cambios, componentes utilizados y resultados de las pruebas.
+
+No avanzar a la siguiente iteración.
+```
+
+### Acciones y archivos modificados
+
+Se creó la navegación compartida y se implementaron las seis vistas responsive. Se modificaron `src/app/layout.tsx`, `src/app/globals.css`, `src/app/page.tsx` y esta bitácora; se crearon los archivos `page.tsx` de `buscar`, `pronostico`, `favoritos`, `comparar` y `acerca-de`, los componentes `icon.tsx`, `site-header.tsx`, `ui.tsx` y los datos `src/lib/demo-weather.ts`.
+
+### Decisiones técnicas
+
+Las páginas y componentes son Server Components; los enlaces utilizan `Link`. Los ejemplos se separaron de la presentación y están señalados como ilustrativos. La búsqueda y la selección de ciudades son representaciones visuales, y el estado vacío explica que los favoritos estarán disponibles más adelante. No se añadieron dependencias, API ni persistencia.
+
+### Problemas y soluciones
+
+La primera aplicación del parche de archivos intentó borrar y crear el mismo archivo en una sola operación, lo que la herramienta rechazó sin aplicar cambios; se dividió en operaciones separadas. Se ejecutó la comprobación de codificación tras las modificaciones.
+
+### Pruebas y estado final
+
+`pnpm.cmd format:check`, `pnpm.cmd lint`, `pnpm.cmd build` y `pnpm.cmd encoding:check` finalizaron correctamente. La compilación confirmó las seis rutas `/`, `/buscar`, `/pronostico`, `/favoritos`, `/comparar` y `/acerca-de` como contenido estático. No se realizó una revisión visual en navegador. Estado: iteración 01 completada; sin commits ni push.
+
+## 4. Corrección visual de la Iteración 01
+
+### Prompt completo
+
+```text
+Actúa como ingeniero frontend senior especializado en Next.js 16, React 19, Tailwind CSS 4, diseño responsive, accesibilidad y depuración de interfaces.
+
+PROBLEMA:
+
+La Iteración 01 de SkyCast compila correctamente, pero la interfaz presenta errores visuales graves al abrirla en el navegador.
+
+Se han observado los siguientes problemas reales:
+
+1. Iconos SVG extremadamente grandes que ocupan gran parte de la pantalla.
+2. Tarjetas meteorológicas desproporcionadas.
+3. Elementos desalineados.
+4. Espacios vacíos excesivos.
+5. Navegación con una distribución incorrecta.
+6. Textos demasiado próximos a los bordes.
+7. Componentes que parecen desbordarse de sus contenedores.
+8. Falta de coherencia visual entre secciones.
+
+OBJETIVO:
+
+Diagnosticar y corregir integralmente el diseño de SkyCast para conseguir una interfaz profesional, responsive, consistente y visualmente equilibrada.
+
+Esta tarea corresponde a una corrección de la Iteración 01, no a una nueva funcionalidad.
+
+## 1. Diagnóstico obligatorio
+
+Antes de modificar código:
+
+- Inspecciona src/app/globals.css.
+- Inspecciona src/app/layout.tsx.
+- Inspecciona src/components/icon.tsx.
+- Inspecciona src/components/ui.tsx.
+- Inspecciona src/components/site-header.tsx.
+- Inspecciona las seis páginas existentes.
+- Revisa la configuración de Tailwind CSS 4.
+- Comprueba si los estilos utilitarios se están aplicando correctamente.
+- Revisa las dimensiones de los SVG, sus atributos width, height y viewBox.
+- Comprueba que las clases recibidas mediante className se apliquen correctamente.
+- Revisa si existen reglas CSS globales que alteren el tamaño de iconos, tarjetas o contenedores.
+- Investiga si algún componente utiliza clases dinámicas de Tailwind que no estén siendo detectadas.
+
+No soluciones los problemas únicamente ocultando elementos o agregando overflow-hidden indiscriminadamente.
+
+Identifica y corrige la causa real de cada problema.
+
+## 2. Corrección de iconos SVG
+
+Todos los iconos deben tener dimensiones controladas.
+
+Requisitos:
+
+- Definir tamaños predeterminados razonables.
+- Permitir personalizar dimensiones mediante className.
+- Evitar que los SVG ocupen el ancho completo de sus contenedores.
+- Utilizar viewBox correctamente.
+- Mantener proporciones.
+- Evitar duplicaciones innecesarias.
+- Comprobar el funcionamiento de todos los iconos disponibles.
+
+## 3. Corrección de layout y componentes
+
+Revisar y corregir:
+
+- Ancho máximo de contenedores.
+- Márgenes y paddings.
+- Distribución mediante Grid y Flexbox.
+- Alineación vertical y horizontal.
+- Tamaños de tarjetas.
+- Espaciado entre secciones.
+- Jerarquía tipográfica.
+- Dimensiones de botones.
+- Distribución de navegación.
+- Proporciones de iconos y textos.
+
+Evitar alturas fijas innecesarias y espacios vacíos exagerados.
+
+Los componentes deben adaptarse al contenido sin provocar desbordamientos.
+
+## 4. Diseño profesional
+
+Mantener una identidad visual meteorológica moderna.
+
+Utilizar:
+
+- Colores inspirados en el cielo.
+- Tarjetas equilibradas.
+- Bordes y sombras sutiles.
+- Tipografía consistente.
+- Botones correctamente dimensionados.
+- Iconografía proporcionada.
+- Espaciado uniforme.
+- Interfaz intuitiva.
+- Navegación clara.
+
+No agregar elementos decorativos gigantes que perjudiquen la experiencia de usuario.
+
+## 5. Responsive
+
+Verificar el comportamiento de las seis rutas en:
+
+- Móvil: 375 px.
+- Tableta: 768 px.
+- Escritorio: 1440 px.
+
+Requisitos:
+
+- Sin scroll horizontal inesperado.
+- Tarjetas correctamente distribuidas.
+- Navegación adaptable.
+- Textos legibles.
+- Botones utilizables.
+- Iconos proporcionados.
+- Contenido dentro de los contenedores.
+
+## 6. Alcance de la corrección
+
+Aplicar las correcciones necesarias a todas las rutas:
+
+- /
+- /buscar
+- /pronostico
+- /favoritos
+- /comparar
+- /acerca-de
+
+No limitarte a corregir únicamente la página principal.
+
+No modificar las funcionalidades previstas ni integrar todavía Open-Meteo.
+
+## 7. Clean Code
+
+Cumplir AGENTS.md.
+
+Mantener:
+
+- TypeScript estricto.
+- Componentes reutilizables.
+- Separación de responsabilidades.
+- Prettier.
+- UTF-8.
+- Textos correctamente escritos en español.
+- JSX legible.
+- Sin archivos comprimidos en una sola línea.
+- Sin dependencias innecesarias.
+
+## 8. Documentación
+
+Registrar este prompt completo en VIBE_CODING.md como una corrección visual de la Iteración 01.
+
+Documentar:
+
+- Problemas detectados.
+- Causas identificadas.
+- Archivos modificados.
+- Soluciones implementadas.
+- Decisiones técnicas.
+- Pruebas ejecutadas.
+- Resultados reales.
+
+No inventar verificaciones visuales ni resultados.
+
+## 9. Validaciones obligatorias
+
+Ejecutar:
+
+pnpm.cmd format:check
+pnpm.cmd lint
+pnpm.cmd build
+pnpm.cmd encoding:check
+
+Además, si dispones de una herramienta de navegador, inspecciona visualmente las seis páginas en los tamaños indicados.
+
+Si no tienes acceso al navegador, informa expresamente que la revisión visual sigue pendiente.
+
+## 10. Restricciones
+
+- No implementar nuevas funcionalidades.
+- No integrar la API meteorológica.
+- No agregar persistencia.
+- No modificar archivos fuera de SkyCast.
+- No realizar commits ni push automáticamente.
+- No ocultar errores visuales mediante soluciones superficiales.
+- No declarar la corrección completada sin comprobar las causas y ejecutar las validaciones disponibles.
+
+Al finalizar, proporciona un resumen de las causas identificadas, correcciones aplicadas, archivos modificados y resultados de las verificaciones.
+
+No avances a la Iteración 02.
+```
+
+## 5. Corrección integral de la Iteración 01
+
+### Prompt completo
+
+```text
+Actúa como ingeniero frontend senior especializado en Next.js 16, React 19, TypeScript, Tailwind CSS 4, diseño UI/UX, Responsive Web Design, accesibilidad y Clean Code.
+
+Estamos desarrollando SkyCast, una aplicación web meteorológica mediante Vibe Coding.
+
+He revisado visualmente la aplicación en el navegador y he confirmado que TODAS las páginas presentan problemas importantes de diseño y responsividad.
+
+OBJETIVO PRINCIPAL:
+
+Realizar una auditoría, corrección y mejora integral de toda la interfaz de SkyCast para conseguir una aplicación moderna, profesional, completamente responsive, accesible y visualmente consistente.
+
+No quiero correcciones superficiales ni modificaciones aisladas. Necesito que identifiques las causas raíz y soluciones los problemas globalmente, respetando las buenas prácticas de Next.js y Tailwind CSS.
+
+## 1. Diagnóstico obligatorio
+
+Antes de modificar archivos, inspecciona toda la estructura del frontend, especialmente:
+
+- src/app/globals.css
+- src/app/layout.tsx
+- src/app/page.tsx
+- src/app/buscar/page.tsx
+- src/app/pronostico/page.tsx
+- src/app/favoritos/page.tsx
+- src/app/comparar/page.tsx
+- src/app/acerca-de/page.tsx
+- src/components/icon.tsx
+- src/components/ui.tsx
+- src/components/site-header.tsx
+- src/lib/demo-weather.ts
+- Configuración de Tailwind CSS 4.
+- Configuración de Next.js.
+- Configuración de Prettier.
+
+Investiga especialmente:
+
+1. Si Tailwind CSS 4 está cargando correctamente.
+2. Si las clases utilitarias están presentes en el CSS generado.
+3. Si las clases de Grid y Flexbox funcionan como se espera.
+4. Si los SVG reciben dimensiones correctas.
+5. Si los componentes compartidos respetan sus propiedades className.
+6. Si existen estilos globales que afectan negativamente la interfaz.
+7. Si hay elementos que exceden el tamaño de sus contenedores.
+8. Si existen anchos, alturas o márgenes que provocan desbordamientos.
+9. Si la navegación está diseñada correctamente para móviles y escritorio.
+10. Si las reglas responsive se aplican realmente en los puntos de ruptura correspondientes.
+
+No asumas que toda la causa está en los iconos. Diagnostica también la configuración y aplicación real de los estilos.
+
+## 2. Corrección del sistema de iconos
+
+El componente Icon actualmente no define dimensiones predeterminadas en su elemento SVG.
+
+Corrige este problema.
+
+Requisitos:
+
+- Todos los iconos deben tener un tamaño predeterminado razonable, por ejemplo 24 × 24 píxeles.
+- Permitir personalizar el tamaño mediante propiedades o clases.
+- Mantener correctamente el viewBox.
+- Evitar deformaciones.
+- Evitar iconos que ocupen todo el ancho disponible.
+- Aplicar correctamente las clases recibidas.
+- Mantener accesibilidad y uso semántico apropiado.
+- Revisar todas las instancias donde se utiliza Icon.
+
+No reemplaces los SVG originales salvo que exista una justificación técnica.
+
+## 3. Corrección global del layout
+
+Revisa y mejora:
+
+- Contenedor principal.
+- Header.
+- Navegación.
+- Footer.
+- Secciones.
+- Tarjetas.
+- Avisos informativos.
+- Botones.
+- Tipografía.
+- Espaciados.
+- Iconografía.
+- Distribución de contenido.
+
+Requisitos:
+
+- Ancho máximo coherente para el contenido.
+- Márgenes horizontales adecuados.
+- Espaciado vertical consistente.
+- Tarjetas proporcionadas.
+- Textos correctamente alineados.
+- Elementos visualmente equilibrados.
+- Sin espacios vacíos excesivos.
+- Sin componentes gigantes.
+- Sin desbordamientos horizontales.
+- Sin contenido cortado.
+- Sin elementos superpuestos.
+
+Evita utilizar medidas fijas innecesarias que afecten la adaptación del diseño.
+
+No utilices overflow-hidden para ocultar errores estructurales.
+
+## 4. Diseño responsive obligatorio
+
+La aplicación debe adaptarse correctamente a:
+
+Móviles:
+- 320 px.
+- 375 px.
+- 430 px.
+
+Tabletas:
+- 768 px.
+- 1024 px.
+
+Escritorio:
+- 1280 px.
+- 1440 px.
+- 1920 px.
+
+Aplicar un enfoque mobile-first.
+
+En móviles:
+
+- Navegación mediante menú adaptable y accesible.
+- Tarjetas organizadas en una columna cuando corresponda.
+- Textos legibles.
+- Botones fáciles de utilizar.
+- Márgenes adecuados.
+- Iconos proporcionados.
+- Sin desplazamiento horizontal inesperado.
+
+En tabletas:
+
+- Distribución equilibrada.
+- Tarjetas adaptadas al espacio disponible.
+- Navegación funcional.
+- Uso eficiente del espacio.
+
+En escritorio:
+
+- Navegación horizontal bien alineada.
+- Uso adecuado de Grid y Flexbox.
+- Tarjetas distribuidas en columnas.
+- Contenedores con ancho máximo.
+- Jerarquía visual profesional.
+
+Los componentes deben responder correctamente al cambio de resolución sin deformarse.
+
+## 5. Mejorar las seis páginas
+
+Revisa y corrige individualmente las siguientes rutas después de solucionar los componentes compartidos:
+
+### Inicio (/)
+
+- Hero equilibrado.
+- Tarjeta principal meteorológica proporcionada.
+- Botones bien posicionados.
+- Distribución coherente entre texto e información meteorológica.
+- Sin iconos gigantes ni espacios vacíos excesivos.
+
+### Buscar (/buscar)
+
+- Encabezado correctamente espaciado.
+- Área de búsqueda proporcionada.
+- Tarjetas de ciudades organizadas.
+- Diseño preparado para resultados reales.
+- Sin elementos que se desborden.
+
+### Pronóstico (/pronostico)
+
+- Secciones para pronóstico horario y diario.
+- Tarjetas meteorológicas proporcionadas.
+- Distribución responsive.
+- Información legible.
+- Sin columnas excesivamente estrechas.
+
+### Favoritos (/favoritos)
+
+- Estado vacío centrado y correctamente dimensionado.
+- Tarjetas preparadas para ciudades favoritas.
+- Botones con tamaños adecuados.
+- Diseño responsive.
+
+### Comparar (/comparar)
+
+- Distribución adecuada para comparar ciudades.
+- Una columna en móviles y dos columnas cuando exista espacio.
+- Tarjetas de dimensiones coherentes.
+- Información alineada para facilitar la comparación.
+- Sin iconos desproporcionados.
+
+### Acerca de (/acerca-de)
+
+- Tarjetas informativas equilibradas.
+- Iconos pequeños y proporcionados.
+- Distribución responsive.
+- Texto legible.
+- Sección de tecnologías organizada.
+
+## 6. Identidad visual
+
+Mantén SkyCast como una aplicación meteorológica moderna.
+
+Utiliza:
+
+- Paleta coherente de azules, tonos cielo y colores neutros.
+- Tarjetas con bordes o sombras sutiles.
+- Tipografía moderna y legible.
+- Jerarquía visual clara.
+- Espaciado uniforme.
+- Botones consistentes.
+- Iconos apropiados.
+- Estados hover y focus.
+- Transiciones discretas cuando aporten valor.
+
+Evita elementos decorativos exagerados.
+
+No es necesario instalar bibliotecas UI adicionales si Tailwind CSS permite resolver correctamente el diseño.
+
+## 7. Accesibilidad
+
+Verifica:
+
+- HTML semántico.
+- Navegación mediante teclado.
+- Estados de foco visibles.
+- Contraste adecuado.
+- Botones y enlaces con nombres accesibles.
+- Tamaños táctiles razonables.
+- Iconos decorativos correctamente ocultos a lectores de pantalla.
+- Etiquetas para futuros formularios.
+- Respeto por preferencias de movimiento reducido cuando corresponda.
+
+## 8. Clean Code y arquitectura
+
+Respeta todas las reglas de AGENTS.md.
+
+- TypeScript estricto.
+- Server Components por defecto.
+- Client Components solamente cuando exista una necesidad real.
+- Componentes reutilizables.
+- Separación de responsabilidades.
+- Evitar duplicación.
+- Evitar sobreingeniería.
+- Identificadores descriptivos.
+- Código JSX legible.
+- Prettier.
+- UTF-8.
+- Español correctamente acentuado.
+- Sin código comprimido en una sola línea.
+- Utilizar exclusivamente pnpm.
+
+## 9. Validación visual
+
+No consideres el trabajo finalizado únicamente porque el código compile.
+
+Si tienes disponible un navegador o herramienta de automatización, realiza pruebas visuales reales en las seis rutas y las resoluciones indicadas.
+
+Comprueba especialmente:
+
+- Dimensiones de SVG.
+- Tamaños de tarjetas.
+- Alineación.
+- Comportamiento responsive.
+- Navegación.
+- Desbordamiento horizontal.
+- Legibilidad del contenido.
+
+Si no tienes acceso al navegador, indica claramente que la validación visual queda pendiente y proporciona instrucciones concretas para realizarla manualmente.
+
+No inventes resultados visuales.
+
+## 10. Documentación Vibe Coding
+
+Registra este prompt completo y original en VIBE_CODING.md dentro de la Iteración 01, como corrección integral del diseño y responsividad.
+
+Documenta:
+
+- Número consecutivo del prompt.
+- Objetivo.
+- Problemas encontrados.
+- Causas identificadas.
+- Archivos modificados.
+- Soluciones implementadas.
+- Decisiones técnicas.
+- Pruebas ejecutadas.
+- Resultados reales.
+- Estado de la corrección.
+
+Conserva los registros anteriores.
+
+No inventes información ni dupliques prompts.
+
+## 11. Validaciones técnicas
+
+Ejecuta:
+
+pnpm.cmd format:check
+pnpm.cmd lint
+pnpm.cmd build
+pnpm.cmd encoding:check
+
+Si alguna verificación falla, corrige el problema y vuelve a ejecutarla.
+
+## 12. Restricciones
+
+- No implementar funcionalidades meteorológicas nuevas.
+- No integrar todavía Open-Meteo.
+- No modificar la lógica de datos demostrativos.
+- No implementar persistencia.
+- No modificar archivos fuera del proyecto.
+- No instalar dependencias innecesarias.
+- No realizar commits ni push automáticamente.
+- No declarar que el diseño está validado sin una comprobación visual real.
+
+RESULTADO ESPERADO:
+
+SkyCast debe tener una interfaz coherente y profesional en las seis rutas, con iconos de tamaños correctos, tarjetas equilibradas, navegación responsive y componentes reutilizables.
+
+Al finalizar, proporciona un informe que incluya:
+
+1. Causas raíz identificadas.
+2. Archivos corregidos.
+3. Mejoras visuales realizadas.
+4. Resultados de las validaciones técnicas.
+5. Resultados de las pruebas visuales, si se realizaron.
+6. Aspectos pendientes de comprobar.
+
+No avances a la Iteración 02 hasta completar esta corrección.
+```
+
+## 6. Propuesta de tamaño para Icon
+
+**Objetivo:** aplicar dimensiones predeterminadas a los SVG. El usuario envió el siguiente fragmento entre las dos solicitudes anteriores:
+
+```tsx
+export function Icon({
+  name,
+  width = 24,
+  height = 24,
+  ...props
+}: SVGProps<SVGSVGElement> & { name: IconName }) {
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      {...props}
+    >
+      {paths[name]}
+    </svg>
+  );
+}
+```
+
+### Diagnóstico, acciones y decisiones para las entradas 4–6
+
+El CSS de producción y el servido por el servidor de desarrollo contienen utilidades de Tailwind para flex, grid, tamaño y espaciado; no se confirmó un fallo de compilación de Tailwind. El componente `Icon` propagaba `className` y tenía `viewBox`, pero carecía de dimensiones intrínsecas de respaldo. Las páginas utilizan clases literales, sin clases dinámicas de Tailwind identificadas. El diseño tenía navegación móvil horizontal desplazable, espacios mínimos fijos y elementos que podían competir por el ancho en pantallas pequeñas; la causa concreta de todos los síntomas observados por el usuario requiere validación visual.
+
+Se aplicó la propuesta de 24 × 24 píxeles con tamaños personalizables, un menú móvil nativo con `details` y enlaces de teclado, disposición flexible de tarjetas y búsqueda, y se retiraron el círculo decorativo gigante y alturas mínimas innecesarias. Los datos demostrativos y las configuraciones de Tailwind y Next.js se conservaron. Se modificaron `src/components/icon.tsx`, `src/components/site-header.tsx`, `src/components/ui.tsx`, `src/app/layout.tsx`, `src/app/page.tsx`, `src/app/buscar/page.tsx`, `src/app/favoritos/page.tsx` y esta bitácora.
+
+### Pruebas y estado
+
+`pnpm.cmd format:check` detectó inicialmente formato pendiente en esta bitácora; se aplicó Prettier y la comprobación posterior pasó. `pnpm.cmd lint`, `pnpm.cmd build` y `pnpm.cmd encoding:check` finalizaron correctamente; el build incluyó las seis rutas. Se compararon ambos prompts adjuntos con el contenido guardado y coincidieron íntegramente. El intento de iniciar Edge en modo automatizado no produjo un navegador accesible, por lo que no se comprobó visualmente ninguna resolución. Estado: correcciones de código y validaciones técnicas completadas; revisión visual y confirmación de los síntomas originales pendientes.
