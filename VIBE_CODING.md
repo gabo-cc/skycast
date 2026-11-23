@@ -1002,3 +1002,273 @@ Se aplicó la propuesta de 24 × 24 píxeles con tamaños personalizables, un me
 ### Pruebas y estado
 
 `pnpm.cmd format:check` detectó inicialmente formato pendiente en esta bitácora; se aplicó Prettier y la comprobación posterior pasó. `pnpm.cmd lint`, `pnpm.cmd build` y `pnpm.cmd encoding:check` finalizaron correctamente; el build incluyó las seis rutas. Se compararon ambos prompts adjuntos con el contenido guardado y coincidieron íntegramente. El intento de iniciar Edge en modo automatizado no produjo un navegador accesible, por lo que no se comprobó visualmente ninguna resolución. Estado: correcciones de código y validaciones técnicas completadas; revisión visual y confirmación de los síntomas originales pendientes.
+
+## 7. Iteración 02: integración con Open-Meteo
+
+### Prompt completo
+
+```text
+Actúa como ingeniero de software senior especializado en Next.js 16, React 19, TypeScript, APIs REST, seguridad, Clean Code y testing.
+
+Estamos desarrollando SkyCast mediante Vibe Coding con OpenAI Codex en VS Code.
+
+ESTADO ACTUAL:
+- Next.js 16.4.6 con App Router.
+- React 19.3.0.
+- TypeScript estricto.
+- Tailwind CSS 4.
+- pnpm como único gestor de paquetes.
+- Seis rutas implementadas.
+- Configuración de Prettier y UTF-8.
+- AGENTS.md y VIBE_CODING.md.
+- Iteración 01 completada.
+
+Antes de trabajar, lee AGENTS.md e inspecciona la arquitectura existente.
+
+OBJETIVO:
+Implementar exclusivamente la Iteración 02: integración de Open-Meteo mediante Route Handlers de Next.js.
+
+No modificar todavía la interfaz visual.
+
+## 1. Integración con Open-Meteo
+
+Utilizar la documentación oficial:
+
+Geocoding API:
+https://open-meteo.com/en/docs/geocoding-api
+
+Forecast API:
+https://open-meteo.com/en/docs
+
+Implementar dos endpoints internos:
+
+GET /api/ciudades?nombre=San%20Salvador
+
+GET /api/clima?latitud=13.69&longitud=-89.19
+
+La API de ciudades debe consultar el servicio de geocodificación de Open-Meteo.
+
+La API del clima debe consultar el servicio meteorológico de Open-Meteo.
+
+## 2. API de ciudades
+
+Implementar:
+
+- Búsqueda por nombre.
+- Validación de parámetros.
+- Longitud mínima de búsqueda de dos caracteres.
+- Límite razonable de longitud.
+- Manejo de resultados vacíos.
+- Manejo de ciudades con nombres repetidos.
+- Identificación mediante ID, país, región, latitud y longitud.
+- Respuestas tipadas.
+- Mensajes de error claros.
+- Idioma español cuando la API permita traducciones.
+
+No asumir que el nombre de una ciudad es único.
+
+## 3. API meteorológica
+
+Consultar los siguientes datos cuando estén disponibles:
+
+Condiciones actuales:
+- Temperatura.
+- Sensación térmica.
+- Humedad relativa.
+- Velocidad del viento.
+- Código meteorológico.
+- Estado de día o noche.
+- Hora de actualización.
+
+Pronóstico por horas:
+- Fecha y hora.
+- Temperatura.
+- Probabilidad de precipitación.
+- Código meteorológico.
+
+Pronóstico diario:
+- Fecha.
+- Temperatura máxima.
+- Temperatura mínima.
+- Probabilidad máxima de precipitación.
+- Código meteorológico.
+
+Utilizar pronósticos de siete días.
+
+Configurar correctamente la zona horaria de cada ubicación utilizando los parámetros admitidos por Open-Meteo.
+
+No confundir horas UTC con horas locales de las ciudades.
+
+No inventar valores cuando la API devuelva datos incompletos.
+
+## 4. Arquitectura
+
+Separar responsabilidades entre:
+
+- Route Handlers.
+- Servicios de consulta a Open-Meteo.
+- Tipos de datos.
+- Validaciones.
+- Transformación de respuestas.
+- Manejo de errores.
+
+Mantener las credenciales y configuraciones de servidor fuera del navegador cuando corresponda.
+
+No introducir una base de datos.
+
+No exponer detalles internos de errores en las respuestas públicas.
+
+Evitar lógica duplicada.
+
+## 5. Validación y seguridad
+
+Validar:
+
+- Latitud entre -90 y 90.
+- Longitud entre -180 y 180.
+- Números finitos.
+- Parámetros ausentes.
+- Búsquedas demasiado cortas o largas.
+- Respuestas HTTP no satisfactorias.
+- Errores de conexión.
+- Tiempo de espera de solicitudes.
+- Respuestas JSON malformadas.
+- Estructuras inesperadas de la API externa.
+
+Construir las solicitudes únicamente hacia los dominios oficiales esperados de Open-Meteo.
+
+No permitir que los parámetros del usuario controlen libremente la URL del servidor externo.
+
+Utilizar códigos HTTP coherentes, por ejemplo:
+
+400: solicitud inválida.
+502: respuesta inválida del proveedor.
+503: servicio temporalmente no disponible.
+504: tiempo de espera agotado.
+
+## 6. Next.js 16
+
+El proyecto tiene activados cacheComponents y partialPrefetching.
+
+Revisar las convenciones actuales de Route Handlers y su comportamiento de caché.
+
+Evitar técnicas obsoletas de versiones anteriores.
+
+Definir una estrategia razonable de actualización de datos meteorológicos, sin presentar información antigua como actual.
+
+No modificar innecesariamente next.config.ts.
+
+## 7. Pruebas
+
+Implementar pruebas automatizadas para las validaciones y transformaciones principales, utilizando mocks del servicio externo cuando corresponda.
+
+Verificar:
+
+- Búsqueda válida.
+- Búsqueda inválida.
+- Resultados vacíos.
+- Coordenadas válidas.
+- Coordenadas inválidas.
+- Respuesta meteorológica correcta.
+- Error HTTP del proveedor.
+- Datos malformados.
+- Tiempo de espera agotado.
+
+Evitar pruebas que dependan permanentemente de la disponibilidad de Internet.
+
+Si el entorno tiene acceso a Internet, realizar también una prueba real de integración y documentarla separadamente.
+
+No afirmar que se realizaron solicitudes reales si no se ejecutaron.
+
+## 8. Variables de entorno
+
+Utilizar las variables de configuración necesarias.
+
+Actualizar .env.example sin incluir secretos.
+
+No crear una API key ficticia.
+
+No utilizar NEXT_PUBLIC_ para información sensible.
+
+## 9. Calidad obligatoria
+
+Cumplir AGENTS.md.
+
+- Clean Code.
+- TypeScript estricto.
+- UTF-8.
+- Español correctamente acentuado.
+- Prettier.
+- Código legible y organizado.
+- Componentes y servicios con responsabilidades claras.
+- Sin dependencias innecesarias.
+- Utilizar exclusivamente pnpm.cmd.
+
+## 10. Documentación
+
+Registrar este prompt completo en VIBE_CODING.md como Iteración 02.
+
+Documentar:
+
+- Objetivo.
+- Prompt original.
+- Archivos creados.
+- Archivos modificados.
+- Decisiones técnicas justificadas.
+- Errores encontrados.
+- Soluciones aplicadas.
+- Pruebas ejecutadas.
+- Resultados reales.
+- Estado de la iteración.
+
+No inventar resultados.
+
+## 11. Validaciones finales
+
+Ejecutar:
+
+pnpm.cmd format:check
+pnpm.cmd lint
+pnpm.cmd build
+pnpm.cmd encoding:check
+
+Ejecutar también las pruebas automatizadas incorporadas.
+
+Corregir los errores introducidos antes de finalizar.
+
+## 12. Restricciones
+
+- No modificar el diseño de las seis páginas.
+- No implementar todavía la búsqueda interactiva.
+- No implementar favoritos.
+- No implementar comparación visual.
+- No agregar autenticación ni base de datos.
+- No crear commits ni realizar push.
+- No modificar archivos externos al proyecto.
+
+RESULTADO ESPERADO:
+
+Una API interna funcional, tipada y comprobable para consultar ciudades y datos meteorológicos reales desde Open-Meteo.
+
+Al finalizar, proporcionar ejemplos de URLs locales para probar los endpoints y un resumen de las validaciones realizadas.
+
+No avances a la Iteración 03.
+```
+
+### Objetivo y acciones
+
+Implementar dos Route Handlers internos para geocodificación y pronóstico, sin modificar la interfaz. Se crearon `src/app/api/ciudades/route.ts`, `src/app/api/clima/route.ts`, los módulos de `src/lib/open-meteo/` para tipos, validación, errores, servicio y transformación, y `tests/open-meteo.test.mjs`.
+
+### Decisiones y archivos modificados
+
+Se modificaron `package.json` para incorporar las pruebas, `tsconfig.json` para permitir importaciones explícitas de TypeScript compatibles con el ejecutor nativo de Node, `.env.example` para aclarar que no se necesita clave y `scripts/check-encoding.mjs` para evitar que el detector confunda rutas con parámetros de consulta con palabras dañadas. Esta bitácora conserva el prompt. Se usaron dominios fijos, un límite de ocho segundos, sin caché, parámetros de zona horaria automática y valores `null` para datos ausentes. Las fechas y horas devueltas son locales a la zona indicada; el desplazamiento UTC se proporciona como metadato del proveedor. Las respuestas públicas no exponen excepciones internas. No se agregaron dependencias ni se cambió `next.config.ts`.
+
+### Problemas, pruebas y resultados
+
+Las seis pruebas automatizadas con respuestas simuladas pasaron; cubren búsquedas válidas e inválidas, homónimos, resultados vacíos, coordenadas inválidas, transformación, JSON y estructuras inválidas, fallo HTTP, conexión y timeout. Node 22 emitió un aviso de detección de módulo al ejecutar las pruebas, sin afectar el resultado. La primera consulta real falló por la restricción de red; con acceso autorizado, la geocodificación devolvió 10 resultados y el pronóstico del primero devolvió zona `America/El_Salvador`, 168 horas y siete días. El detector de codificación señaló inicialmente las URLs del prompt como falsos positivos; se ajustó para distinguir rutas con parámetros de texto dañado.
+
+Las comprobaciones `pnpm.cmd format:check`, `pnpm.cmd lint`, `pnpm.cmd build`, `pnpm.cmd encoding:check` y `pnpm.cmd test` terminaron correctamente. El build muestra ambas rutas API dinámicas y las seis páginas; las seis pruebas automatizadas pasaron.
+
+### Estado final
+
+Iteración 02 completada. No se modificó la interfaz ni se realizaron commits o push.

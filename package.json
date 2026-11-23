@@ -10,7 +10,8 @@
     "lint": "eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "encoding:check": "node scripts/check-encoding.mjs"
+    "encoding:check": "node scripts/check-encoding.mjs",
+    "test": "node --disable-warning=ExperimentalWarning --experimental-strip-types --test tests/*.test.mjs"
   },
   "dependencies": {
     "next": "16.4.6",

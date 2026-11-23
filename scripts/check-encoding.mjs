@@ -5,7 +5,7 @@ import { TextDecoder } from "node:util";
 const excluded = new Set([".git", ".next", "node_modules", "coverage", "build", "out"]);
 const extensions = /\.(?:md|json|[cm]?[jt]sx?|css|ya?ml|html|txt|ps1)$/i;
 const words = /(?:bit\?cora|configuraci\?n|espa\?ol|c\?digo|est\?ndares)/iu;
-const prose = /\b[a-záéíóúñü]{3,}\?[a-záéíóúñü]{2,}\b/iu;
+const prose = /(?<![\p{L}/])[a-záéíóúñü]{3,}\?[a-záéíóúñü]{2,}\b/iu;
 const quotedExamples = new Set([
   '- "Bit\u003fcora" en lugar de "Bitácora".',
   '- "Configuraci\u003fn" en lugar de "Configuración".',
