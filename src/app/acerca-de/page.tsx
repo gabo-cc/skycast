@@ -18,12 +18,12 @@ export default function AcercaDePage() {
             Hecho para mirar hacia arriba
           </h2>
           <p className="mt-4 leading-7 text-slate-600">
-            SkyCast es una aplicación meteorológica en construcción. Esta primera vista establece
-            las páginas y el lenguaje visual del proyecto con datos ilustrativos.
+            SkyCast es una aplicación meteorológica que consulta datos de Open-Meteo para mostrar
+            condiciones actuales y pronósticos.
           </p>
           <p className="mt-4 leading-7 text-slate-600">
-            La búsqueda, los favoritos y la información meteorológica real se desarrollarán en
-            etapas posteriores.
+            Puedes buscar ciudades, guardar favoritos en este navegador y comparar las condiciones
+            de dos ubicaciones. La disponibilidad de los datos depende del proveedor meteorológico.
           </p>
         </section>
         <section className="rounded-3xl bg-slate-900 p-7 text-white sm:p-9">

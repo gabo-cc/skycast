@@ -5,7 +5,7 @@ const VERSION = 1;
 
 export class FavoritesError extends Error {}
 
-function validCity(value: unknown): value is Ciudad {
+export function esCiudadValida(value: unknown): value is Ciudad {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   const city = value as Record<string, unknown>;
   const optionalText = (item: unknown) =>
@@ -39,7 +39,7 @@ export function leerFavoritos(storage: Pick<Storage, "getItem">): Ciudad[] {
     if (
       record.version !== VERSION ||
       !Array.isArray(record.ciudades) ||
-      !record.ciudades.every(validCity)
+      !record.ciudades.every(esCiudadValida)
     )
       throw new Error();
     const cities = record.ciudades as Ciudad[];
@@ -65,7 +65,7 @@ export function actualizarFavoritos(
   action: "agregar" | "eliminar",
 ): Ciudad[] {
   const current = leerFavoritos(storage);
-  if (!validCity(city))
+  if (!esCiudadValida(city))
     throw new FavoritesError("La ciudad no tiene datos válidos para guardarse.");
   const exists = current.some((item) => item.id === city.id);
   if ((action === "agregar" && exists) || (action === "eliminar" && !exists)) return current;

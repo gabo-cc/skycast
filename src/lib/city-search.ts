@@ -1,4 +1,5 @@
 import type { Ciudad } from "./open-meteo/types.ts";
+import { esCiudadValida } from "./favorites-storage.ts";
 
 export type SearchResult =
   { status: "success"; ciudades: Ciudad[] } | { status: "error"; message: string };
@@ -13,10 +14,16 @@ export async function consultarCiudades(nombre: string, signal: AbortSignal): Pr
   const response = await fetch(`/api/ciudades?${params}`, { signal });
   if (!response.ok) throw new Error("No fue posible buscar ciudades. Inténtalo de nuevo.");
   const data: unknown = await response.json();
-  if (!data || typeof data !== "object" || !("ciudades" in data) || !Array.isArray(data.ciudades)) {
+  if (
+    !data ||
+    typeof data !== "object" ||
+    !("ciudades" in data) ||
+    !Array.isArray(data.ciudades) ||
+    !data.ciudades.every(esCiudadValida)
+  ) {
     throw new Error("La respuesta de búsqueda no es válida. Inténtalo de nuevo.");
   }
-  return data.ciudades as Ciudad[];
+  return data.ciudades;
 }
 
 export function iniciarBusqueda(

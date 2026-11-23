@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Icon } from "@/components/icon";
 
@@ -39,6 +41,9 @@ export function SiteHeader() {
                 <li key={href}>
                   <Link
                     href={href}
+                    onClick={(event) =>
+                      event.currentTarget.closest("details")?.removeAttribute("open")
+                    }
                     className="block rounded-lg px-3 py-3 text-sm font-medium text-slate-700 hover:bg-sky-50 hover:text-sky-800"
                   >
                     {label}

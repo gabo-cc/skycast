@@ -1,4 +1,5 @@
 import type { Ciudad, Clima } from "./open-meteo/types.ts";
+export type ClimaComparable = Pick<Clima, "zonaHoraria" | "actual" | "dias">;
 
 export function seleccionarCiudad(
   cities: [Ciudad | null, Ciudad | null],
@@ -41,16 +42,66 @@ export function fechaEnZona(instant: string | null | undefined, zone: string): s
     return null;
   }
 }
-export function datosDelDia(weather: Clima) {
+export function datosDelDia(weather: ClimaComparable) {
   const date = fechaEnZona(weather.actual?.hora, weather.zonaHoraria);
   return date ? (weather.dias.find((day) => day.fecha === date) ?? null) : null;
 }
-export async function consultarClima(city: Ciudad, signal: AbortSignal): Promise<Clima> {
+export async function consultarClima(city: Ciudad, signal: AbortSignal): Promise<ClimaComparable> {
   const params = new URLSearchParams({
     latitud: String(city.latitud),
     longitud: String(city.longitud),
   });
   const response = await fetch(`/api/clima?${params}`, { signal });
   if (!response.ok) throw new Error("No se pudo consultar el clima de esta ciudad.");
-  return (await response.json()) as Clima;
+  const data: unknown = await response.json();
+  if (!esClimaComparable(data)) throw new Error("La respuesta meteorológica no es válida.");
+  return data;
+}
+
+function esClimaComparable(value: unknown): value is ClimaComparable {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const data = value as Record<string, unknown>;
+  if (typeof data.zonaHoraria !== "string" || !data.zonaHoraria.trim() || !Array.isArray(data.dias))
+    return false;
+  try {
+    new Intl.DateTimeFormat("es", { timeZone: data.zonaHoraria });
+  } catch {
+    return false;
+  }
+  const validNumber = (item: unknown) =>
+    item === null || (typeof item === "number" && Number.isFinite(item));
+  const current = data.actual;
+  if (current !== null) {
+    if (!current || typeof current !== "object" || Array.isArray(current)) return false;
+    const item = current as Record<string, unknown>;
+    if (
+      !(
+        item.hora === null ||
+        (typeof item.hora === "string" && Number.isFinite(Date.parse(item.hora)))
+      ) ||
+      ![
+        item.temperatura,
+        item.sensacionTermica,
+        item.humedad,
+        item.viento,
+        item.codigoMeteorologico,
+      ].every(validNumber) ||
+      ![true, false, null].includes(item.esDeDia as boolean | null)
+    )
+      return false;
+  }
+  return data.dias.every((day: unknown) => {
+    if (!day || typeof day !== "object" || Array.isArray(day)) return false;
+    const item = day as Record<string, unknown>;
+    return (
+      typeof item.fecha === "string" &&
+      /^\d{4}-\d{2}-\d{2}$/.test(item.fecha) &&
+      [
+        item.temperaturaMaxima,
+        item.temperaturaMinima,
+        item.probabilidadPrecipitacionMaxima,
+        item.codigoMeteorologico,
+      ].every(validNumber)
+    );
+  });
 }

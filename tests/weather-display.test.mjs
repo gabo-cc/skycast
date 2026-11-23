@@ -83,3 +83,19 @@ test("transformación ordena instantes y conserva fechas diarias del proveedor",
   assert.equal(result.dias[0].fecha, "2026-11-01");
   assert.equal(result.dias[0].temperaturaMaxima, null);
 });
+test("las fechas diarias se ordenan sin separar sus métricas", () => {
+  const start = Date.parse("2026-01-01T06:00:00Z") / 1000;
+  const result = transformarClima({
+    timezone: "America/El_Salvador",
+    utc_offset_seconds: -21600,
+    hourly: { time: [] },
+    daily: { time: [start + 86400, start], temperature_2m_max: [20, 30] },
+  });
+  assert.deepEqual(
+    result.dias.map((day) => [day.fecha, day.temperaturaMaxima]),
+    [
+      ["2026-01-01", 30],
+      ["2026-01-02", 20],
+    ],
+  );
+});

@@ -89,3 +89,14 @@ test("la cancelación se transmite a la consulta", async () => {
   controller.abort();
   await assert.rejects(pending);
 });
+test("rechaza respuestas meteorológicas incompletas o malformadas", async () => {
+  const controller = new AbortController();
+  for (const body of [
+    {},
+    { zonaHoraria: "America/New_York", actual: {}, dias: [] },
+    { zonaHoraria: "Europe/Madrid", actual: null, dias: [null] },
+  ]) {
+    globalThis.fetch = async () => Response.json(body);
+    await assert.rejects(consultarClima(first, controller.signal));
+  }
+});

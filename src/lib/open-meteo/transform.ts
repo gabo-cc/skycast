@@ -109,12 +109,14 @@ export function transformarClima(data: unknown): Clima {
         codigoMeteorologico: hourCodes[index],
       }))
       .sort((a, b) => Date.parse(a.hora) - Date.parse(b.hora)),
-    dias: dayTimes.map((fecha, index) => ({
-      fecha: dailyDate(fecha, offset),
-      temperaturaMaxima: highs[index],
-      temperaturaMinima: lows[index],
-      probabilidadPrecipitacionMaxima: dayPrecipitation[index],
-      codigoMeteorologico: dayCodes[index],
-    })),
+    dias: dayTimes
+      .map((fecha, index) => ({
+        fecha: dailyDate(fecha, offset),
+        temperaturaMaxima: highs[index],
+        temperaturaMinima: lows[index],
+        probabilidadPrecipitacionMaxima: dayPrecipitation[index],
+        codigoMeteorologico: dayCodes[index],
+      }))
+      .sort((a, b) => a.fecha.localeCompare(b.fecha)),
   };
 }

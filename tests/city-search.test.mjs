@@ -47,6 +47,8 @@ test("maneja resultados vacíos y errores de API", async () => {
   assert.deepEqual(await consultarCiudades("zz", new AbortController().signal), []);
   globalThis.fetch = async () => new Response(null, { status: 503 });
   await assert.rejects(consultarCiudades("San", new AbortController().signal));
+  globalThis.fetch = async () => Response.json({ ciudades: [{ nombre: "San Salvador" }] });
+  await assert.rejects(consultarCiudades("San", new AbortController().signal));
 });
 
 test("cancelación anterior aborta la solicitud y descarta respuestas obsoletas", async () => {

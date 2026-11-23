@@ -11,20 +11,21 @@ import {
   diferencia,
   intercambiar,
   seleccionarCiudad,
+  type ClimaComparable,
 } from "@/lib/comparison";
 import { forecastUrl } from "@/lib/forecast-location";
-import type { Ciudad, Clima } from "@/lib/open-meteo/types";
+import type { Ciudad } from "@/lib/open-meteo/types";
 import { condicion, fechaLocal, instanteLocal, valor } from "@/lib/weather-display";
 
 type WeatherState =
-  { status: "loading" } | { status: "error" } | { status: "ready"; weather: Clima };
+  { status: "loading" } | { status: "error" } | { status: "ready"; weather: ClimaComparable };
 
 function WeatherPanel({
   city,
   onResult,
 }: {
   city: Ciudad;
-  onResult: (id: number, weather: Clima | null) => void;
+  onResult: (id: number, weather: ClimaComparable | null) => void;
 }) {
   const [state, setState] = useState<WeatherState>({ status: "loading" });
   const [attempt, setAttempt] = useState(0);
@@ -86,7 +87,7 @@ function WeatherPanel({
   );
 }
 
-function WeatherMetrics({ weather }: { weather: Clima }) {
+function WeatherMetrics({ weather }: { weather: ClimaComparable }) {
   const current = weather.actual;
   const daily = datosDelDia(weather);
   const condition = condicion(current?.codigoMeteorologico ?? null, current?.esDeDia ?? null);
@@ -129,10 +130,10 @@ function WeatherMetrics({ weather }: { weather: Clima }) {
 
 export function Comparison() {
   const [cities, setCities] = useState<[Ciudad | null, Ciudad | null]>([null, null]);
-  const [weather, setWeather] = useState<Record<number, Clima | null>>({});
+  const [weather, setWeather] = useState<Record<number, ClimaComparable | null>>({});
   const [error, setError] = useState<string | null>(null);
   const favorites = useFavorites();
-  const handleWeather = useCallback((id: number, result: Clima | null) => {
+  const handleWeather = useCallback((id: number, result: ClimaComparable | null) => {
     setWeather((previous) => ({ ...previous, [id]: result }));
   }, []);
   function choose(index: 0 | 1, city: Ciudad) {

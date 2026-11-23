@@ -2267,3 +2267,295 @@ La página sigue siendo Server Component y el estado interactivo está en compon
 ### Pruebas y estado
 
 Las pruebas automatizadas con mocks cubren selección, homónimos, duplicados, intercambio, diferencias, valores ausentes, zonas, navegación, fallos de una y ambas consultas y propagación de cancelación. Pasaron las 27 pruebas, `pnpm.cmd format:check`, `pnpm.cmd lint`, `pnpm.cmd build` y `pnpm.cmd encoding:check`. Node emitió el aviso existente de detección de módulo. No se probaron interacciones reales ni el diseño responsive en navegador; esa comprobación queda pendiente. No se realizaron commits ni push.
+
+## 13. Iteración 07: auditoría de calidad
+
+### Prompt completo
+
+```text
+Actúa como ingeniero de aseguramiento de calidad (QA), desarrollador senior de Next.js 16, especialista en React 19, TypeScript, accesibilidad web, responsive design y Clean Code.
+
+Estamos desarrollando SkyCast como proyecto académico mediante Vibe Coding con OpenAI Codex.
+
+ESTADO ACTUAL:
+
+- Next.js 16 con App Router.
+- React 19.
+- TypeScript estricto.
+- Tailwind CSS 4.
+- API interna conectada a Open-Meteo.
+- Búsqueda interactiva de ciudades.
+- Clima actual y pronósticos reales.
+- Gestión de favoritos mediante localStorage.
+- Comparación meteorológica de dos ciudades.
+- Seis páginas implementadas.
+- 27 pruebas automatizadas reportadas como correctas.
+- Documentación de iteraciones en VIBE_CODING.md.
+
+Antes de empezar, lee AGENTS.md, revisa VIBE_CODING.md e inspecciona la estructura completa del proyecto.
+
+OBJETIVO:
+
+Realizar una auditoría integral de SkyCast, encontrar errores, corregir defectos verificables y asegurar que la aplicación esté preparada para su despliegue público.
+
+No desarrollar nuevas funcionalidades.
+
+## 1. Auditoría de las seis páginas
+
+Revisar:
+
+- /
+- /buscar
+- /pronostico
+- /favoritos
+- /comparar
+- /acerca-de
+
+Verificar que:
+
+- Cada página cumpla su propósito.
+- Los enlaces funcionen.
+- La navegación sea coherente.
+- No existan botones decorativos que aparenten ejecutar acciones.
+- No haya información demostrativa presentada como real.
+- No existan textos desactualizados que afirmen que una funcionalidad sigue pendiente.
+- No existan componentes sin utilizar.
+- No haya errores de consola o de renderizado verificables.
+
+La página Acerca de debe describir correctamente las tecnologías y características reales de SkyCast.
+
+## 2. Pruebas de integración
+
+Revisar los flujos completos:
+
+FLUJO A:
+Buscar San Salvador → seleccionar ciudad → abrir pronóstico → comprobar datos de esa ubicación.
+
+FLUJO B:
+Buscar Madrid → agregar favorito → abrir Favoritos → abrir pronóstico → recargar → verificar persistencia.
+
+FLUJO C:
+Guardar San Salvador y Madrid → abrir Comparar → seleccionarlos → consultar clima → intercambiarlos.
+
+FLUJO D:
+Eliminar favorito → comprobar que desaparezca de la lista y se actualice su estado en Buscar.
+
+FLUJO E:
+Abrir la aplicación sin favoritos → verificar que el estado vacío funcione y ofrezca navegación útil.
+
+FLUJO F:
+Simular errores de red y respuestas inválidas → verificar mensajes, reintentos y recuperación.
+
+## 3. Revisión de datos meteorológicos
+
+Verificar:
+
+- Que la ciudad seleccionada corresponda a los datos consultados.
+- Que no se confundan ciudades homónimas.
+- Que la temperatura no se sustituya por valores ficticios.
+- Que los valores null se muestren como no disponibles.
+- Que las unidades sean correctas.
+- Que los códigos meteorológicos tengan descripciones apropiadas.
+- Que los siete días de pronóstico estén correctamente ordenados.
+- Que las horas respeten la zona horaria IANA.
+- Que el pronóstico horario no mezcle horas locales e instantes UTC.
+
+Conservar documentada la limitación de los agregados diarios de Open-Meteo durante transiciones de horario de verano.
+
+No inventar una solución a una limitación del proveedor.
+
+## 4. Auditoría responsive
+
+Revisar las siguientes anchuras:
+
+- 320 px.
+- 375 px.
+- 430 px.
+- 768 px.
+- 1024 px.
+- 1440 px.
+- 1920 px.
+
+Inspeccionar especialmente:
+
+- Navegación principal.
+- Menú móvil.
+- Buscador de ciudades.
+- Tarjetas meteorológicas.
+- Pronóstico por horas.
+- Favoritos.
+- Comparación de ciudades.
+- Formularios y botones.
+- Pie de página.
+
+Corregir:
+
+- Desbordamientos horizontales no deseados.
+- Iconos SVG gigantes.
+- Texto recortado.
+- Tarjetas desproporcionadas.
+- Problemas de alineación.
+- Botones difíciles de utilizar en móviles.
+- Espacios vacíos excesivos.
+
+No rediseñar completamente la aplicación; conservar la identidad visual existente.
+
+## 5. Accesibilidad
+
+Revisar:
+
+- Navegación mediante teclado.
+- Orden lógico del foco.
+- Etiquetas de formularios.
+- Nombres accesibles de botones.
+- Contraste de texto.
+- Estados de focus visibles.
+- Mensajes de carga y error.
+- Uso correcto de encabezados.
+- Semántica de enlaces y botones.
+- Navegación móvil.
+- Ausencia de elementos interactivos anidados incorrectamente.
+
+Corregir problemas reales sin introducir dependencias innecesarias.
+
+## 6. Persistencia y estado
+
+Revisar:
+
+- Lectura y escritura de localStorage.
+- Recuperación después de recargar.
+- Prevención de duplicados.
+- Manejo de datos corruptos.
+- Sincronización entre pestañas.
+- Errores de almacenamiento.
+- Hidratación entre servidor y cliente.
+- Cancelación de solicitudes obsoletas.
+- Cambios rápidos de ciudades durante consultas.
+
+No eliminar datos guardados por el usuario como solución a errores.
+
+## 7. Calidad del código
+
+Auditar:
+
+- Tipos TypeScript.
+- Componentes innecesariamente grandes.
+- Duplicación de código.
+- Dependencias sin utilizar.
+- Manejo de errores.
+- Validaciones de entradas.
+- Separación entre Server y Client Components.
+- Uso correcto de React Hooks.
+- Consultas innecesarias a Open-Meteo.
+- Seguridad de los Route Handlers.
+
+Priorizar correcciones que mejoren la estabilidad y mantenibilidad.
+
+Evitar refactorizaciones masivas sin beneficio verificable.
+
+## 8. Pruebas automatizadas
+
+Revisar las pruebas existentes.
+
+Añadir o corregir pruebas para los defectos detectados.
+
+Priorizar pruebas de integración de flujos críticos.
+
+Si existe un navegador automatizable disponible, ejecutar pruebas de interacción reales.
+
+Si no existe, documentar exactamente qué pruebas quedan pendientes de ejecutar manualmente.
+
+No confundir mocks con comprobaciones reales en navegador.
+
+No inventar resultados.
+
+## 9. Rendimiento
+
+Revisar:
+
+- Solicitudes duplicadas.
+- Renderizados innecesarios.
+- Carga inicial.
+- Recursos excesivos.
+- Imágenes e iconos.
+- Tiempos de espera.
+- Manejo de consultas paralelas.
+
+No sacrificar funcionalidad ni accesibilidad por optimizaciones prematuras.
+
+## 10. Documentación
+
+Registrar este prompt completo en VIBE_CODING.md como Iteración 07.
+
+Documentar:
+
+- Objetivo.
+- Prompt original.
+- Hallazgos.
+- Severidad de cada defecto.
+- Archivos afectados.
+- Correcciones implementadas.
+- Pruebas realizadas.
+- Resultados verificables.
+- Limitaciones pendientes.
+
+Distinguir claramente entre errores corregidos y recomendaciones futuras.
+
+## 11. Validaciones obligatorias
+
+Ejecutar:
+
+pnpm.cmd format:check
+pnpm.cmd lint
+pnpm.cmd build
+pnpm.cmd encoding:check
+
+Ejecutar todas las pruebas automatizadas.
+
+Corregir cualquier error introducido.
+
+## 12. Restricciones
+
+- No introducir nuevas funcionalidades.
+- No agregar base de datos.
+- No implementar autenticación.
+- No cambiar de gestor de paquetes.
+- No instalar dependencias sin justificación.
+- No modificar el diseño global innecesariamente.
+- No crear commits ni realizar push.
+- No avanzar todavía al despliegue.
+
+RESULTADO ESPERADO:
+
+SkyCast debe quedar revisado técnicamente, con sus defectos corregidos y sus seis páginas listas para una última comprobación funcional antes del despliegue.
+
+ENTREGA FINAL:
+
+Proporciona:
+
+1. Resumen de la auditoría.
+2. Defectos encontrados y corregidos.
+3. Defectos o limitaciones pendientes.
+4. Archivos modificados.
+5. Resultado de pruebas automatizadas.
+6. Resultado de las cuatro validaciones.
+7. Pruebas de navegador realmente ejecutadas.
+8. Checklist de pruebas manuales pendientes.
+
+No afirmar que SkyCast está completamente validado si quedan pruebas sin ejecutar.
+```
+
+### Objetivo, hallazgos y correcciones
+
+Auditar las rutas y flujos sin añadir funcionalidades ni desplegar. Defectos corregidos:
+
+- **Alta:** las respuestas incompletas de búsqueda y comparación se aceptaban sin validar, con riesgo de fallos de renderizado. Se validan los campos utilizados y se muestran errores existentes.
+- **Media:** el menú móvil permanecía abierto al navegar porque el layout compartido conserva estado. Se cierra al elegir un enlace.
+- **Media:** el orden del pronóstico diario dependía del proveedor. Se ordenan las fechas preservando sus métricas.
+- **Baja:** Acerca de y README describían funcionalidades antiguas y gestores de paquetes no utilizados. Se actualizaron y se retiraron componentes y datos demostrativos sin referencias.
+
+Archivos modificados: `src/app/acerca-de/page.tsx`, `src/components/site-header.tsx`, `src/components/ui.tsx`, `src/lib/city-search.ts`, `src/lib/comparison.ts`, `src/lib/favorites-storage.ts`, `src/lib/open-meteo/transform.ts`, `README.md`, las pruebas `city-search`, `comparison`, `weather-display` y esta bitácora. Se creó `tests/critical-flows.test.mjs` y se eliminó `src/lib/demo-weather.ts`, que no tenía consumidores.
+
+### Pruebas y limitaciones
+
+La prueba de integración de búsqueda, favoritos, pronóstico, intercambio y eliminación usa un proveedor simulado; no representa interacciones de navegador. El servidor local devolvió HTTP 200 para las seis páginas y HTTP 400 para parámetros inválidos de ambas API. Se intentó iniciar Edge en modo automatizado, pero falló por acceso denegado a sus archivos de perfil; no hubo pruebas visuales ni de interacción en navegador. Quedan pendientes los flujos A–F solicitados, comprobaciones de teclado, consola, persistencia y pestañas, y las siete anchuras indicadas. Se mantiene la limitación documentada de agregados diarios de Open-Meteo durante cambios de horario de verano. Pasaron las 30 pruebas automatizadas y `pnpm.cmd format:check`, `pnpm.cmd lint`, `pnpm.cmd build` y `pnpm.cmd encoding:check`. Node emitió el aviso existente de detección de módulo. La auditoría técnica está realizada, pero la aplicación no está completamente validada para despliegue hasta completar las pruebas de navegador pendientes. No se realizaron commits ni push.
