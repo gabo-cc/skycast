@@ -1812,3 +1812,197 @@ Se modificaron el servicio, la transformación y los tipos de `src/lib/open-mete
 ### Estado final
 
 `pnpm.cmd format:check`, `pnpm.cmd lint`, `pnpm.cmd build`, `pnpm.cmd encoding:check` y `pnpm.cmd test` finalizaron correctamente. Los instantes horarios quedan corregidos y probados; permanece la limitación de los límites de agregación diaria del proveedor indicada arriba. No se realizaron commits ni push.
+
+## 11. Iteración 05: ciudades favoritas
+
+### Prompt completo
+
+```text
+Actúa como ingeniero frontend senior especializado en Next.js 16, React 19, TypeScript, Tailwind CSS 4, React Hooks, persistencia local, accesibilidad y Clean Code.
+
+Estamos desarrollando SkyCast mediante Vibe Coding con OpenAI Codex.
+
+La aplicación ya cuenta con búsqueda interactiva de ciudades, API interna de Open-Meteo, clima actual y pronósticos reales.
+
+Antes de modificar archivos, lee AGENTS.md, revisa VIBE_CODING.md e inspecciona los tipos y componentes existentes.
+
+OBJETIVO:
+
+Implementar la Iteración 05: gestión completa de ciudades favoritas mediante localStorage.
+
+## 1. Funcionalidades principales
+
+Permitir que el usuario:
+
+- Agregue ciudades a favoritos desde la página /buscar.
+- Consulte sus ciudades guardadas en /favoritos.
+- Elimine ciudades de favoritos.
+- Evite guardar ciudades duplicadas.
+- Conserve sus favoritos después de recargar el navegador.
+- Acceda al pronóstico real de cualquier ciudad favorita.
+
+No utilizar datos demostrativos como si fueran favoritos reales.
+
+## 2. Modelo de datos
+
+Reutilizar los tipos de ciudad existentes.
+
+Cada favorito debe conservar:
+
+- ID de la ciudad.
+- Nombre.
+- País.
+- Región, cuando esté disponible.
+- Latitud.
+- Longitud.
+
+Utilizar el ID para evitar duplicados.
+
+No identificar una ciudad únicamente por su nombre.
+
+## 3. Persistencia local
+
+Utilizar localStorage.
+
+Requisitos:
+
+- Acceder a localStorage únicamente desde el navegador.
+- Evitar errores de hidratación de Next.js.
+- Manejar datos JSON inválidos.
+- Validar los registros recuperados antes de utilizarlos.
+- Mantener una estructura de almacenamiento versionable.
+- Evitar escrituras innecesarias.
+- No sobrescribir los favoritos antes de terminar su carga inicial.
+- Manejar posibles errores de almacenamiento.
+- Sincronizar los cambios entre pestañas mediante el evento storage cuando corresponda.
+
+No agregar una base de datos ni autenticación.
+
+## 4. React Hooks
+
+Implementar una solución reutilizable para favoritos.
+
+Utilizar useState y useEffect cuando corresponda.
+
+Evitar duplicación de lógica entre páginas.
+
+No introducir bibliotecas globales de estado si React permite resolverlo de forma sencilla.
+
+Mantener una separación clara entre persistencia, estado y presentación.
+
+## 5. Interfaz de búsqueda
+
+Agregar a cada resultado una opción para:
+
+- Guardar en favoritos.
+- Quitar de favoritos si ya está guardado.
+
+Los botones deben reflejar correctamente su estado.
+
+Evitar que la acción de favoritos interfiera con la selección o navegación de la ciudad.
+
+Utilizar nombres accesibles para los botones.
+
+## 6. Página de favoritos
+
+Convertir /favoritos en una página funcional.
+
+Mostrar:
+
+- Lista de ciudades favoritas.
+- Nombre, país y región.
+- Opción para eliminar.
+- Enlace al pronóstico de cada ciudad.
+- Estado vacío cuando no existan favoritos.
+- Mensajes claros cuando ocurra un error de almacenamiento.
+
+No inventar temperaturas actuales.
+
+Si se muestran condiciones meteorológicas, deben consultarse realmente a la API.
+
+## 7. Diseño
+
+Respetar el diseño existente de SkyCast.
+
+- Responsive mobile-first.
+- Tarjetas proporcionadas.
+- Iconos con dimensiones correctas.
+- Botones accesibles.
+- Estados hover y focus.
+- Sin desplazamiento horizontal inesperado.
+- Sin romper la navegación existente.
+
+## 8. Pruebas
+
+Agregar pruebas automatizadas para:
+
+- Agregar favoritos.
+- Eliminar favoritos.
+- Evitar duplicados.
+- Persistencia y recuperación.
+- Datos JSON inválidos.
+- Registros incompletos.
+- Errores de almacenamiento.
+- Sincronización entre pestañas cuando corresponda.
+- Conservación de ciudades homónimas con ID diferente.
+
+No afirmar que se probaron eventos de navegador si solamente se probaron funciones de almacenamiento.
+
+## 9. Clean Code
+
+Cumplir AGENTS.md.
+
+- TypeScript estricto.
+- Componentes reutilizables.
+- Código legible.
+- Sin any injustificado.
+- Prettier.
+- UTF-8.
+- Español correctamente acentuado.
+- Uso exclusivo de pnpm.
+- Sin dependencias innecesarias.
+
+## 10. Documentación
+
+Registrar este prompt completo en VIBE_CODING.md como Iteración 05.
+
+Documentar los cambios, decisiones, problemas, soluciones, pruebas y resultados reales.
+
+No inventar información ni duplicar registros.
+
+## 11. Validaciones
+
+Ejecutar:
+
+pnpm.cmd format:check\
+pnpm.cmd lint\
+pnpm.cmd build\
+pnpm.cmd encoding:check
+
+Ejecutar las pruebas automatizadas.
+
+Corregir los errores introducidos.
+
+## 12. Restricciones
+
+- No implementar todavía la comparación de ciudades.
+- No introducir base de datos.
+- No agregar autenticación.
+- No modificar innecesariamente los endpoints.
+- No realizar commits ni push automáticamente.
+- No avanzar a la siguiente iteración.
+
+RESULTADO ESPERADO:
+
+Una gestión de ciudades favoritas funcional, persistente en el navegador, accesible y correctamente integrada con la búsqueda y los pronósticos reales.
+
+Al finalizar, proporcionar un resumen de archivos modificados, decisiones técnicas y resultados de las pruebas.
+```
+
+### Objetivo, archivos y decisiones
+
+Se incorporó la gestión local de favoritos desde la búsqueda y la página de favoritos. Se modificaron `src/components/city-search.tsx`, `src/app/favoritos/page.tsx` y esta bitácora; se crearon `src/components/favorite-cities.tsx`, `src/hooks/use-favorites.ts`, `src/lib/favorites-storage.ts` y `tests/favorites.test.mjs`. El almacenamiento usa una estructura versionada, valida todos los registros y evita escrituras mientras la lectura falla o no termina. Cada modificación vuelve a leer el almacenamiento y se escuchan eventos `storage` de otras pestañas. Los datos malformados no se sobrescriben automáticamente. No se añadieron dependencias ni se modificaron endpoints.
+
+### Pruebas y estado
+
+Las pruebas de funciones de almacenamiento cubren alta, baja, duplicados, homónimos, recuperación, datos inválidos, errores y selección de eventos relevantes. Las 22 pruebas automatizadas pasaron, al igual que `pnpm.cmd format:check`, `pnpm.cmd lint`, `pnpm.cmd build` y `pnpm.cmd encoding:check`. Node emitió el aviso existente de detección de módulo durante las pruebas. No se verificaron eventos reales ni interacciones en navegador, por lo que quedan pendientes la comprobación visual y la sincronización efectiva entre pestañas. No se realizaron commits ni push.

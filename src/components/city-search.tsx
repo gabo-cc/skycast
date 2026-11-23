@@ -6,6 +6,7 @@ import { Icon } from "@/components/icon";
 import { esBusquedaValida, iniciarBusqueda, type SearchResult } from "@/lib/city-search";
 import type { Ciudad } from "@/lib/open-meteo/types";
 import { forecastUrl } from "@/lib/forecast-location";
+import { useFavorites } from "@/hooks/use-favorites";
 
 type SearchState = { status: "initial" | "loading" } | SearchResult;
 
@@ -13,14 +14,20 @@ function CityResult({
   city,
   selected,
   onSelect,
+  favorite,
+  favoritesReady,
+  onToggleFavorite,
 }: {
   city: Ciudad;
   selected: boolean;
   onSelect: () => void;
+  favorite: boolean;
+  favoritesReady: boolean;
+  onToggleFavorite: () => void;
 }) {
   const location = [city.region, city.pais].filter(Boolean).join(", ") || "Ubicación no disponible";
   return (
-    <li>
+    <li className="rounded-2xl border border-slate-200 bg-white p-2">
       <button
         type="button"
         onClick={onSelect}
@@ -38,11 +45,23 @@ function CityResult({
           {selected ? "Seleccionada" : "Elegir"}
         </span>
       </button>
+      <button
+        type="button"
+        onClick={onToggleFavorite}
+        disabled={!favoritesReady}
+        aria-pressed={favorite}
+        aria-label={`${favorite ? "Quitar de favoritos" : "Guardar en favoritos"}: ${city.nombre}, ${location}`}
+        className="mt-2 inline-flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-semibold text-sky-800 hover:bg-sky-50 disabled:cursor-not-allowed disabled:text-slate-500"
+      >
+        <Icon name="heart" className="size-4" />{" "}
+        {favorite ? "Quitar de favoritos" : "Guardar en favoritos"}
+      </button>
     </li>
   );
 }
 
 export function CitySearch() {
+  const favorites = useFavorites();
   const [term, setTerm] = useState("");
   const [state, setState] = useState<SearchState>({ status: "initial" });
   const [selected, setSelected] = useState<Ciudad | null>(null);
@@ -101,6 +120,21 @@ export function CitySearch() {
         <h2 id="resultados-titulo" className="text-xl font-semibold text-slate-900">
           Resultados
         </h2>
+        {favorites.status === "error" && (
+          <div
+            role="alert"
+            className="mt-3 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950"
+          >
+            <p>{favorites.error}</p>
+            <button
+              type="button"
+              onClick={favorites.reload}
+              className="mt-2 min-h-11 font-semibold underline"
+            >
+              Reintentar acceso a favoritos
+            </button>
+          </div>
+        )}
         <div
           role="status"
           aria-live="polite"
@@ -144,6 +178,13 @@ export function CitySearch() {
                 city={city}
                 selected={selected?.id === city.id}
                 onSelect={() => setSelected(city)}
+                favorite={favorites.cities.some((item) => item.id === city.id)}
+                favoritesReady={favorites.status === "ready"}
+                onToggleFavorite={() =>
+                  favorites.cities.some((item) => item.id === city.id)
+                    ? favorites.remove(city)
+                    : favorites.add(city)
+                }
               />
             ))}
           </ul>
