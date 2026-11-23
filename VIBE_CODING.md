@@ -1272,3 +1272,204 @@ Las comprobaciones `pnpm.cmd format:check`, `pnpm.cmd lint`, `pnpm.cmd build`, `
 ### Estado final
 
 Iteración 02 completada. No se modificó la interfaz ni se realizaron commits o push.
+
+## 8. Iteración 03: búsqueda interactiva
+
+### Prompt completo
+
+```text
+Actúa como ingeniero frontend senior especializado en Next.js 16, React 19, TypeScript, Tailwind CSS 4, accesibilidad, APIs REST y Clean Code.
+
+Estamos desarrollando SkyCast mediante Vibe Coding con OpenAI Codex.
+
+La Iteración 02 ya implementó los siguientes endpoints:
+
+- GET /api/ciudades?nombre=...
+- GET /api/clima?latitud=...&longitud=...
+
+Antes de modificar archivos, lee AGENTS.md, inspecciona los tipos y servicios existentes y revisa VIBE_CODING.md.
+
+OBJETIVO:
+
+Implementar la Iteración 03: búsqueda interactiva de ciudades utilizando la API interna existente.
+
+No integrar todavía los pronósticos completos, favoritos ni comparación de ciudades.
+
+## 1. Búsqueda funcional
+
+Convertir /buscar en una página interactiva.
+
+El usuario debe poder:
+
+- Escribir el nombre de una ciudad.
+- Buscar ciudades de diferentes países.
+- Visualizar resultados reales desde /api/ciudades.
+- Distinguir ciudades que comparten nombre.
+- Consultar país y región cuando estén disponibles.
+- Seleccionar una ciudad.
+- Recibir información clara cuando no existan coincidencias.
+
+Utilizar los tipos reales de la API implementada anteriormente.
+
+No inventar datos meteorológicos ni utilizar resultados demostrativos como si fueran reales.
+
+## 2. React y Client Components
+
+Mantener la página como Server Component cuando sea apropiado y crear un Client Component para el buscador.
+
+Utilizar:
+
+- useState para término de búsqueda, resultados, loading, errores y selección.
+- useEffect para consultar la API cuando cambie la búsqueda.
+- AbortController para cancelar solicitudes anteriores.
+- Debounce aproximado de 350 ms para evitar solicitudes excesivas.
+
+Limpiar correctamente los efectos para evitar condiciones de carrera y actualizaciones obsoletas.
+
+No realizar consultas con términos vacíos o demasiado cortos.
+
+## 3. Estados de interfaz
+
+Implementar:
+
+- Estado inicial con instrucciones.
+- Estado de búsqueda en progreso.
+- Estado con resultados.
+- Estado sin resultados.
+- Estado de error.
+- Opción para reintentar.
+- Estado visual de ciudad seleccionada, cuando corresponda.
+
+No mostrar resultados anteriores como si correspondieran a una búsqueda nueva.
+
+No dejar indicadores de carga activos permanentemente.
+
+## 4. Diseño y responsividad
+
+Respetar la identidad visual de SkyCast.
+
+Requisitos:
+
+- Buscador moderno y fácil de utilizar.
+- Resultados presentados en tarjetas proporcionadas.
+- Diseño mobile-first.
+- Sin desbordamientos horizontales.
+- Iconos SVG correctamente dimensionados.
+- Espaciado uniforme.
+- Estados hover y focus visibles.
+- Navegación por teclado.
+- Etiqueta accesible para el campo de búsqueda.
+- Anuncios accesibles de carga, error y resultados.
+
+Verificar que la búsqueda funcione en móvil y escritorio.
+
+## 5. Selección de ciudades
+
+Al seleccionar una ciudad:
+
+- Conservar su ID cuando esté disponible.
+- Conservar nombre, país, región, latitud, longitud y zona horaria si la API la proporciona.
+- Evitar identificar ciudades únicamente por su nombre.
+- Preparar una navegación hacia /pronostico utilizando los datos de ubicación necesarios.
+
+Si modificas la navegación hacia /pronostico, utiliza parámetros de URL validados y compatibles con la API existente.
+
+No implementar todavía la consulta meteorológica dentro de /pronostico.
+
+No introducir almacenamiento persistente de favoritos en esta iteración.
+
+## 6. Clean Code
+
+Cumplir estrictamente AGENTS.md.
+
+- Utilizar TypeScript estricto.
+- No usar any injustificado.
+- Separar presentación y lógica de consulta.
+- Reutilizar componentes existentes.
+- No duplicar tipos de la API.
+- No crear componentes gigantes.
+- Evitar dependencias innecesarias.
+- Utilizar exclusivamente pnpm.
+- Mantener Prettier y ESLint.
+- Conservar UTF-8 y español correctamente acentuado.
+
+## 7. Pruebas funcionales
+
+Agregar pruebas automatizadas apropiadas para:
+
+- Búsqueda con término válido.
+- Término demasiado corto.
+- Resultados vacíos.
+- Error de la API.
+- Cancelación de solicitudes anteriores.
+- Selección de ciudades homónimas.
+- Manejo de respuestas obsoletas.
+
+Utiliza mocks cuando corresponda.
+
+No afirmar que se probaron interacciones en navegador si no se realizaron.
+
+## 8. Documentación
+
+Registrar este prompt completo en VIBE_CODING.md como Iteración 03.
+
+Documentar:
+
+- Objetivo.
+- Prompt original.
+- Archivos creados o modificados.
+- Decisiones técnicas.
+- Errores encontrados.
+- Soluciones aplicadas.
+- Pruebas ejecutadas.
+- Resultados reales.
+- Estado final.
+
+No duplicar registros ni inventar resultados.
+
+## 9. Validaciones obligatorias
+
+Ejecutar:
+
+pnpm.cmd format:check
+pnpm.cmd lint
+pnpm.cmd build
+pnpm.cmd encoding:check
+
+Ejecutar también las pruebas automatizadas correspondientes.
+
+Corregir cualquier error introducido.
+
+Si dispones de navegador, comprobar la búsqueda en resoluciones móviles y escritorio.
+
+Si no dispones de navegador, informar que la comprobación visual y funcional manual queda pendiente.
+
+## 10. Restricciones
+
+- No modificar innecesariamente los Route Handlers existentes.
+- No implementar todavía favoritos.
+- No implementar comparación meteorológica.
+- No añadir una base de datos.
+- No modificar funcionalidades fuera de /buscar y los componentes compartidos necesarios.
+- No realizar commits ni push automáticamente.
+
+RESULTADO ESPERADO:
+
+Una búsqueda de ciudades completamente funcional, responsive, accesible y conectada a la API interna de SkyCast.
+
+Al finalizar, proporciona un resumen de cambios, resultados de pruebas e instrucciones para comprobar manualmente la búsqueda.
+
+No avances a la Iteración 04.
+```
+
+### Objetivo, acciones y archivos
+
+Conectar `/buscar` a la API interna con una búsqueda interactiva. Se modificó `src/app/buscar/page.tsx`, se crearon `src/components/city-search.tsx`, `src/lib/city-search.ts` y `tests/city-search.test.mjs`, y se actualizó esta bitácora.
+
+### Decisiones técnicas y problemas
+
+La página permanece como Server Component y el componente interactivo usa el tipo `Ciudad` existente. La consulta espera 350 ms, cancela la solicitud previa y descarta resultados obsoletos; los estados de carga, error y resultados se anuncian de forma accesible. La selección conserva el objeto de la ciudad y se identifica por ID. La API actual no proporciona zona horaria. El enlace lleva coordenadas a `/pronostico` e informa expresamente de que esa página todavía muestra datos de ejemplo y no usa la ubicación. Se evita dejar la carga activa al editar espacios que no cambian el término efectivo. No se agregaron dependencias ni persistencia.
+
+### Pruebas y estado final
+
+Las pruebas automatizadas de la lógica cubren términos, respuesta válida con homónimos e IDs distintos, resultados vacíos, error, cancelación y respuesta tardía; no comprueban la selección mediante eventos de navegador. Las 11 pruebas pasaron, así como ESLint, build y la comprobación de codificación. La primera comprobación de formato detectó la bitácora recién ampliada y se corrigió con Prettier. El ejecutor de Node mostró el aviso de detección de módulo ya existente. No se realizó una comprobación visual ni funcional en navegador, que queda pendiente. No se realizaron commits ni push.
