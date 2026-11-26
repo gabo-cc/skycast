@@ -22,3 +22,13 @@ export function clasificarAmbiente(
   if ([3, 45, 48, 71, 73, 75, 77, 85, 86].includes(code)) return isDay ? "cloudy" : "cloudy-night";
   return "neutral";
 }
+
+export function capasAmbiente(kind: WeatherAtmosphereKind) {
+  return {
+    nubes: ["partly-cloudy", "cloudy", "cloudy-night", "drizzle", "rain", "storm"].includes(kind),
+    estrellas: kind === "clear-night",
+    luna: kind === "clear-night",
+    sol: kind === "sunny",
+    lluvia: kind === "drizzle" || kind === "rain" || kind === "storm" ? kind : null,
+  };
+}
