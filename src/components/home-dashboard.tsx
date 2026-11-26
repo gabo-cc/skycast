@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Icon } from "@/components/icon";
-import { CurrentWeather, HourlyForecast } from "@/components/weather-view";
+import { HomeSkyExperience } from "@/components/home-sky-experience";
 import { esBusquedaValida, iniciarBusqueda, type SearchResult } from "@/lib/city-search";
 import { DEFAULT_LOCATION, forecastUrl, parseLocation } from "@/lib/forecast-location";
 import type { Ciudad, Clima } from "@/lib/open-meteo/types";
@@ -505,7 +505,11 @@ export function HomeDashboard({ initialWeather }: { initialWeather: Clima }) {
           {/* CLIMA ACTUAL */}
 
           {displayedWeather ? (
-            <CurrentWeather city={city} weather={displayedWeather} />
+            <HomeSkyExperience
+              key={`${city.id}:${city.latitud}:${city.longitud}`}
+              city={city}
+              weather={displayedWeather}
+            />
           ) : (
             <div
               role="status"
@@ -539,49 +543,6 @@ export function HomeDashboard({ initialWeather }: { initialWeather: Clima }) {
           )}
         </div>
       </section>
-
-      {/* PRONÓSTICO HORARIO */}
-
-      {displayedWeather && (
-        <section className="space-y-4">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <p
-                className="mb-1 text-[11px] font-bold tracking-[0.14em] uppercase"
-                style={{ color: "var(--accent)" }}
-              >
-                PRÓXIMAS HORAS
-              </p>
-
-              <h2 className="text-2xl font-bold tracking-tight" style={{ color: "var(--ink)" }}>
-                Así evolucionará el clima
-              </h2>
-
-              <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
-                Horarios locales · {displayedWeather.zonaHoraria}
-              </p>
-            </div>
-
-            <Link
-              href={forecastUrl(city)}
-              className="group inline-flex min-h-11 items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition-colors"
-              style={{
-                background: "var(--surface)",
-                borderColor: "var(--line)",
-                color: "var(--accent)",
-              }}
-            >
-              Ver pronóstico
-              <Icon
-                name="arrow"
-                className="size-4 transition-transform group-hover:translate-x-1"
-              />
-            </Link>
-          </div>
-
-          <HourlyForecast weather={displayedWeather} limit={6} />
-        </section>
-      )}
 
       {/* ACCESOS RÁPIDOS */}
 

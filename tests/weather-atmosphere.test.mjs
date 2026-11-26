@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { clasificarAmbiente } from "../src/lib/weather-atmosphere.ts";
+import { capasAmbiente, clasificarAmbiente } from "../src/lib/weather-atmosphere.ts";
 import { rellenoFavorito } from "../src/lib/favorite-presentation.ts";
 
 test("clasifica ambientes con códigos WMO y datos diurnos", () => {
@@ -19,6 +19,31 @@ test("clasifica ambientes con códigos WMO y datos diurnos", () => {
     [0, null, "neutral"],
   ])
     assert.equal(clasificarAmbiente(code, day), expected);
+});
+
+test("las capas respetan condiciones reales y distinguen intensidades de precipitación", () => {
+  const layers = (code, day) => capasAmbiente(clasificarAmbiente(code, day));
+  assert.deepEqual(layers(0, false), {
+    nubes: false,
+    estrellas: true,
+    luna: true,
+    sol: false,
+    lluvia: null,
+  });
+  assert.equal(layers(0, true).sol, true);
+  assert.equal(layers(2, true).nubes, true);
+  assert.equal(layers(3, false).estrellas, false);
+  assert.equal(layers(51, true).lluvia, "drizzle");
+  assert.equal(layers(63, false).lluvia, "rain");
+  assert.equal(layers(95, true).lluvia, "storm");
+  assert.equal(layers(75, true).lluvia, null);
+  assert.deepEqual(layers(null, null), {
+    nubes: false,
+    estrellas: false,
+    luna: false,
+    sol: false,
+    lluvia: null,
+  });
 });
 
 test("favoritos y movimiento reducido utilizan los estados y tokens previstos", async () => {

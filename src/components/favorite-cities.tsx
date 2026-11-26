@@ -1,88 +1,149 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/icon";
+import { CityPhotoBackground, CityPhotoCredit } from "@/components/city-photo";
+import { ScenePhotoProvider, useScenePhoto } from "@/components/scene-photos";
+import { WeatherAtmosphere } from "@/components/weather-atmosphere";
 import { useFavorites } from "@/hooks/use-favorites";
+import type { ClimaComparable } from "@/lib/comparison";
+import { consultarClimaFavorito } from "@/lib/favorite-weather";
 import { forecastUrl } from "@/lib/forecast-location";
 import { FavoriteHeart } from "@/components/favorite-heart";
 import type { Ciudad } from "@/lib/open-meteo/types";
+import { condicion, valor } from "@/lib/weather-display";
 
-function FavoriteCityCard({ city, onRemove }: { city: Ciudad; onRemove: () => void }) {
+export function FavoriteCityCard({ city, onRemove }: { city: Ciudad; onRemove: () => void }) {
   const location = [city.region, city.pais].filter(Boolean).join(", ") || "Ubicación no disponible";
+  const [state, setState] = useState<
+    { status: "loading" | "error" } | { status: "ready"; weather: ClimaComparable }
+  >({ status: "loading" });
+  const [attempt, setAttempt] = useState(0);
+  const [removing, setRemoving] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { latitud, longitud } = city;
+
+  useEffect(() => {
+    const controller = new AbortController();
+    consultarClimaFavorito({ latitud, longitud }, controller.signal).then(
+      (weather) => {
+        if (!controller.signal.aborted) setState({ status: "ready", weather });
+      },
+      () => {
+        if (!controller.signal.aborted) setState({ status: "error" });
+      },
+    );
+    return () => controller.abort();
+  }, [latitud, longitud, attempt]);
+
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
+
+  function remove() {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      onRemove();
+      return;
+    }
+    setRemoving(true);
+    timer.current = setTimeout(onRemove, 200);
+  }
+
+  const current = state.status === "ready" ? state.weather.actual : null;
+  const cityPhoto = useScenePhoto(
+    city,
+    current?.codigoMeteorologico ?? null,
+    current?.esDeDia ?? null,
+  );
+  const condition = condicion(current?.codigoMeteorologico ?? null, current?.esDeDia ?? null);
 
   return (
     <li
-      className="feature-card group relative flex flex-col overflow-hidden rounded-[24px] border"
-      style={{
-        background: "var(--surface)",
-        borderColor: "var(--line)",
-      }}
+      className={`favorite-weather-card atmosphere-container group min-h-72 overflow-hidden rounded-[24px] border border-white/20 ${removing ? "is-removing" : ""}`}
     >
-      {/* Acento visual de la marca */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-1"
-        style={{
-          background: "linear-gradient(90deg, var(--accent), var(--aqua))",
-        }}
-      />
-
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-16 -right-14 size-48 rounded-full opacity-15 blur-3xl"
-        style={{ background: "var(--aqua)" }}
-      />
-
-      <div className="relative flex flex-1 flex-col p-5 sm:p-6">
-        <div className="flex items-start justify-between gap-3">
-          <span
-            className="flex size-12 shrink-0 items-center justify-center rounded-2xl"
-            style={{
-              background: "var(--surface-soft)",
-              color: "var(--accent)",
-            }}
-          >
-            <Icon name="pin" className="size-6" />
-          </span>
-
-          <FavoriteHeart active label={`${city.nombre}, ${location}`} onClick={onRemove} />
+      <WeatherAtmosphere
+        code={current?.codigoMeteorologico ?? null}
+        isDay={current?.esDeDia ?? null}
+        city={city}
+        landscape={cityPhoto.landscape}
+      >
+        {cityPhoto.photo && (
+          <CityPhotoBackground
+            photo={cityPhoto.photo}
+            loaded={cityPhoto.loaded}
+            onLoad={cityPhoto.onLoad}
+            onError={cityPhoto.onError}
+          />
+        )}
+      </WeatherAtmosphere>
+      <div className="favorite-weather-content atmosphere-content pointer-events-none flex min-h-72 flex-col justify-between p-5 text-white sm:p-6">
+        <div className="pr-14">
+          <p className="text-xs font-bold tracking-[0.14em] uppercase">Ciudad favorita</p>
+          <h3 className="mt-2 text-2xl font-bold break-words">{city.nombre}</h3>
+          <p className="mt-1 text-sm break-words text-white/90">{location}</p>
+          {(!cityPhoto.loaded || cityPhoto.illustrative) && (
+            <p className="mt-2 text-xs text-white/85">Paisaje ilustrativo</p>
+          )}
         </div>
-
-        <div className="mt-5 flex-1">
-          <p
-            className="text-[11px] font-bold tracking-[0.14em] uppercase"
-            style={{ color: "var(--accent)" }}
-          >
-            CIUDAD FAVORITA
+        <div className="mt-6">
+          {state.status === "ready" ? (
+            <>
+              <p className="text-5xl font-bold tracking-tight tabular-nums">
+                {valor(current?.temperatura ?? null, "°C")}
+              </p>
+              <p className="mt-2 flex items-center gap-2 text-sm font-medium">
+                <Icon name={condition.icono} className="size-5" />
+                {condition.descripcion}
+              </p>
+            </>
+          ) : (
+            <div>
+              <p
+                role={state.status === "error" ? "alert" : "status"}
+                className="text-sm font-medium"
+              >
+                {state.status === "loading"
+                  ? "Consultando el clima…"
+                  : "No se pudo consultar el clima."}
+              </p>
+              {state.status === "error" && (
+                <button
+                  type="button"
+                  className="pointer-events-auto mt-3 min-h-11 rounded-xl bg-white px-3 text-sm font-bold text-slate-900"
+                  onClick={() => {
+                    setState({ status: "loading" });
+                    setAttempt((value) => value + 1);
+                  }}
+                >
+                  Reintentar
+                </button>
+              )}
+            </div>
+          )}
+          <p className="mt-5 flex items-center justify-between gap-2 border-t border-white/30 pt-4 text-sm font-semibold">
+            Ver pronóstico completo{" "}
+            <Icon name="arrow" className="size-5 transition-transform group-hover:translate-x-1" />
           </p>
-
-          <h3
-            className="mt-2 text-[23px] leading-tight font-bold tracking-[-0.04em] break-words sm:text-[26px]"
-            style={{ color: "var(--ink)" }}
-          >
-            {city.nombre}
-          </h3>
-
-          <p className="mt-2 text-sm leading-6 break-words" style={{ color: "var(--muted)" }}>
-            {location}
-          </p>
+          <CityPhotoCredit photo={cityPhoto.loaded ? cityPhoto.photo : null} />
         </div>
-
-        <div className="mt-6 border-t pt-4" style={{ borderColor: "var(--line)" }}>
-          <Link
-            href={forecastUrl(city)}
-            aria-label={`Ver pronóstico de ${city.nombre}, ${location}`}
-            className="group/link flex min-h-11 items-center justify-between gap-3 rounded-xl px-3 text-sm font-semibold transition-colors hover:bg-[var(--surface-soft)]"
-            style={{ color: "var(--accent)" }}
-          >
-            <span>Consultar pronóstico</span>
-
-            <Icon
-              name="arrow"
-              className="size-5 shrink-0 transition-transform group-hover/link:translate-x-1"
-            />
-          </Link>
-        </div>
+      </div>
+      <Link
+        href={forecastUrl(city)}
+        prefetch={false}
+        aria-label={`Ver pronóstico de ${city.nombre}, ${location}`}
+        className="favorite-card-link absolute inset-0 z-10 rounded-[24px]"
+      />
+      <div className="absolute top-4 right-4 z-20 rounded-xl bg-slate-950/70 text-white">
+        <FavoriteHeart
+          active
+          disabled={removing}
+          label={`${city.nombre}, ${location}`}
+          onClick={remove}
+        />
       </div>
     </li>
   );
@@ -232,11 +293,13 @@ export function FavoriteCities() {
         </span>
       </div>
 
-      <ul className="grid gap-4 sm:grid-cols-2">
-        {favorites.cities.map((city) => (
-          <FavoriteCityCard key={city.id} city={city} onRemove={() => favorites.remove(city)} />
-        ))}
-      </ul>
+      <ScenePhotoProvider>
+        <ul className="grid gap-4 sm:grid-cols-2">
+          {favorites.cities.map((city) => (
+            <FavoriteCityCard key={city.id} city={city} onRemove={() => favorites.remove(city)} />
+          ))}
+        </ul>
+      </ScenePhotoProvider>
 
       <Link
         href="/buscar"

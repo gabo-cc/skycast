@@ -31,18 +31,20 @@ export default async function PronosticoPage({ searchParams }: PageProps<"/prono
   return (
     <div className="space-y-6 pt-6 sm:pt-8">
       <div>
-        <Link href="/buscar" className="text-sm font-semibold text-sky-700 hover:underline">
+        <Link href="/buscar" className="text-sm font-semibold text-[var(--accent)] hover:underline">
           ← Buscar otra ciudad
         </Link>
-        <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-900">
+        <h1 className="mt-3 text-3xl font-bold tracking-tight text-[var(--ink)]">
           {city.nombre}
           {city.pais ? `, ${city.pais}` : ""}
         </h1>
-        <p className="mt-1 text-sm text-slate-600">Condiciones y pronóstico de tu ubicación.</p>
+        <p className="mt-1 text-sm text-[var(--muted)]">
+          Condiciones y pronóstico de tu ubicación.
+        </p>
       </div>
       <CurrentWeather city={city} weather={weather} />
       <ForecastInteractive weather={weather} />
-      <p className="text-xs leading-5 text-slate-600">
+      <p className="text-xs leading-5 text-[var(--muted)]">
         Fuente: Open-Meteo. Los valores diarios usan el desplazamiento vigente al consultar y pueden
         abarcar horas distintas del día local durante un cambio de horario de verano.
       </p>

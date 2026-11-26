@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ComparisonSelector } from "@/components/comparison-selector";
+import { CityPhotoBackground, CityPhotoCredit } from "@/components/city-photo";
+import { ScenePhotoProvider, useScenePhoto } from "@/components/scene-photos";
 import { WeatherAtmosphere } from "@/components/weather-atmosphere";
 import { Icon } from "@/components/icon";
 import { useFavorites } from "@/hooks/use-favorites";
@@ -33,7 +35,7 @@ function locationLabel(city: Ciudad): string {
 function WeatherMetric({ label, value }: { label: string; value: string }) {
   return (
     <div
-      className="flex min-h-12 items-center justify-between gap-3 border-b py-3 last:border-b-0"
+      className="flex min-h-10 flex-wrap items-center justify-between gap-x-2 gap-y-0.5 border-b py-2 last:border-b-0"
       style={{ borderColor: "var(--line)" }}
     >
       <dt className="text-sm" style={{ color: "var(--muted)" }}>
@@ -82,14 +84,14 @@ function WeatherMetrics({ weather }: { weather: ClimaComparable }) {
 
   return (
     <>
-      <dl className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+      <dl className="grid grid-cols-2 gap-x-4">
         {metrics.map((metric) => (
           <WeatherMetric key={metric.label} label={metric.label} value={metric.value} />
         ))}
       </dl>
 
       <div
-        className="mt-4 rounded-xl px-3 py-3 text-xs leading-5"
+        className="mt-2 rounded-xl px-3 py-2 text-xs leading-5"
         style={{
           background: "var(--surface-soft)",
           color: "var(--muted)",
@@ -151,6 +153,11 @@ function WeatherPanel({
   }, [city, attempt, onResult]);
 
   const current = state.status === "ready" ? state.weather.actual : null;
+  const cityPhoto = useScenePhoto(
+    city,
+    current?.codigoMeteorologico ?? null,
+    current?.esDeDia ?? null,
+  );
 
   const condition = condicion(current?.codigoMeteorologico ?? null, current?.esDeDia ?? null);
 
@@ -162,7 +169,7 @@ function WeatherPanel({
 
   return (
     <article
-      className="min-w-0 overflow-hidden rounded-[26px] border shadow-sm"
+      className="comparison-weather-panel flex min-w-0 flex-col overflow-hidden rounded-[26px] border shadow-sm"
       style={{
         background: "var(--surface)",
         borderColor: "var(--line)",
@@ -170,69 +177,86 @@ function WeatherPanel({
     >
       {/* Paisaje meteorológico */}
 
-      <div className="atmosphere-container min-h-68 sm:min-h-76">
+      <div className="atmosphere-container min-h-56 sm:min-h-60">
         <WeatherAtmosphere
           code={current?.codigoMeteorologico ?? null}
           isDay={current?.esDeDia ?? null}
-        />
+          city={city}
+          landscape={cityPhoto.landscape}
+        >
+          {cityPhoto.photo && (
+            <CityPhotoBackground
+              photo={cityPhoto.photo}
+              loaded={cityPhoto.loaded}
+              onLoad={cityPhoto.onLoad}
+              onError={cityPhoto.onError}
+            />
+          )}
+        </WeatherAtmosphere>
 
-        <div className="atmosphere-content flex min-h-68 flex-col justify-between p-5 text-white sm:min-h-76 sm:p-6">
+        <div className="atmosphere-content flex min-h-56 flex-col justify-between p-4 text-white sm:min-h-60 sm:p-5">
           <div>
             <p className="text-[11px] font-bold tracking-[0.13em] text-white/80 uppercase">
               EL TIEMPO EN
             </p>
 
-            <h3 className="mt-2 text-2xl font-bold tracking-tight break-words text-white sm:text-[29px]">
+            <h3 className="mt-1 text-2xl font-bold tracking-tight break-words text-white">
               {city.nombre}
             </h3>
 
             <p className="mt-1 text-sm leading-5 break-words text-white/85">
               {locationLabel(city)}
             </p>
+            {(!cityPhoto.loaded || cityPhoto.illustrative) && (
+              <p className="mt-1 text-xs text-white/85">Paisaje ilustrativo</p>
+            )}
           </div>
 
-          {state.status === "ready" ? (
-            <div className="mt-6">
-              <div className="flex flex-wrap items-center gap-3">
-                <p className="text-5xl font-bold tracking-[-0.07em] text-white tabular-nums sm:text-6xl">
-                  {valor(current?.temperatura ?? null, "°C")}
+          <div className="mt-3">
+            {state.status === "ready" ? (
+              <div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <p className="text-5xl font-bold tracking-[-0.07em] text-white tabular-nums">
+                    {valor(current?.temperatura ?? null, "°C")}
+                  </p>
+
+                  <Icon name={condition.icono} className="size-9 shrink-0 text-white" />
+                </div>
+
+                <p className="mt-1 text-sm font-medium text-white/90">{condition.descripcion}</p>
+
+                <p className="mt-2 text-[11px] leading-5 text-white/75">
+                  Hora del dato: {instanteLocal(current?.hora ?? null, state.weather.zonaHoraria)}
                 </p>
-
-                <Icon name={condition.icono} className="size-10 shrink-0 text-white" />
               </div>
-
-              <p className="mt-2 text-sm font-medium text-white/90">{condition.descripcion}</p>
-
-              <p className="mt-4 text-[11px] leading-5 text-white/75">
-                Hora del dato: {instanteLocal(current?.hora ?? null, state.weather.zonaHoraria)}
-              </p>
-            </div>
-          ) : state.status === "loading" ? (
-            <div
-              role="status"
-              className="mt-8 rounded-2xl border border-white/20 bg-black/20 p-4 text-sm text-white"
-            >
-              Consultando el clima de esta ciudad…
-            </div>
-          ) : (
-            <div role="alert" className="mt-8 rounded-2xl border border-white/20 bg-black/30 p-4">
-              <p className="text-sm text-white">No se pudo consultar el clima.</p>
-
-              <button
-                type="button"
-                onClick={retry}
-                className="mt-3 min-h-11 rounded-xl bg-white px-4 text-sm font-bold text-slate-900 transition-opacity hover:opacity-90"
+            ) : state.status === "loading" ? (
+              <div
+                role="status"
+                className="rounded-2xl border border-white/20 bg-black/20 p-4 text-sm text-white"
               >
-                Reintentar consulta
-              </button>
-            </div>
-          )}
+                Consultando el clima de esta ciudad…
+              </div>
+            ) : (
+              <div role="alert" className="rounded-2xl border border-white/20 bg-black/30 p-4">
+                <p className="text-sm text-white">No se pudo consultar el clima.</p>
+
+                <button
+                  type="button"
+                  onClick={retry}
+                  className="mt-3 min-h-11 rounded-xl bg-white px-4 text-sm font-bold text-slate-900 transition-opacity hover:opacity-90"
+                >
+                  Reintentar consulta
+                </button>
+              </div>
+            )}
+            <CityPhotoCredit photo={cityPhoto.loaded ? cityPhoto.photo : null} />
+          </div>
         </div>
       </div>
 
       {/* Métricas meteorológicas */}
 
-      <div className="p-5 sm:p-6">
+      <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">
         {state.status === "ready" ? (
           <WeatherMetrics weather={state.weather} />
         ) : (
@@ -245,7 +269,7 @@ function WeatherPanel({
 
         <Link
           href={forecastUrl(city)}
-          className="group mt-5 flex min-h-12 items-center justify-between gap-3 rounded-xl px-4 text-sm font-semibold transition-colors hover:bg-[var(--surface-soft)]"
+          className="group mt-auto flex min-h-11 items-center justify-between gap-3 rounded-xl px-4 text-sm font-semibold transition-colors hover:bg-[var(--surface-soft)]"
           style={{
             background: "var(--surface-soft)",
             color: "var(--accent)",
@@ -277,6 +301,24 @@ export function Comparison() {
 
   // Solo desplazarnos cuando se selecciona una ciudad.
   const pendingScroll = useRef(false);
+  const pendingSwap = useRef(false);
+
+  useEffect(() => {
+    if (!pendingSwap.current) return;
+    pendingSwap.current = false;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    resultsRef.current
+      ?.querySelectorAll<HTMLElement>(".comparison-weather-panel")
+      .forEach((panel, index) => {
+        panel.animate(
+          [
+            { opacity: 0.7, transform: `translateX(${index === 0 ? 12 : -12}px)` },
+            { opacity: 1, transform: "translateX(0)" },
+          ],
+          { duration: 240, easing: "ease-out" },
+        );
+      });
+  }, [cities]);
 
   useEffect(() => {
     if (!pendingScroll.current || !cities[0] || !cities[1]) {
@@ -336,10 +378,23 @@ export function Comparison() {
 
   const secondWeather = second ? weather[second.id] : null;
 
-  const diff =
-    both && first && second
-      ? diferencia(firstWeather?.actual?.temperatura, secondWeather?.actual?.temperatura)
-      : null;
+  const differences = [
+    {
+      label: "Temperatura",
+      unit: "°C",
+      value: diferencia(firstWeather?.actual?.temperatura, secondWeather?.actual?.temperatura),
+    },
+    {
+      label: "Humedad",
+      unit: " puntos porcentuales",
+      value: diferencia(firstWeather?.actual?.humedad, secondWeather?.actual?.humedad),
+    },
+    {
+      label: "Viento",
+      unit: " km/h",
+      value: diferencia(firstWeather?.actual?.viento, secondWeather?.actual?.viento),
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -385,6 +440,7 @@ export function Comparison() {
             disabled={!both}
             onClick={() => {
               setError(null);
+              pendingSwap.current = true;
               setCities((previous) => intercambiar(previous));
             }}
             className="inline-flex min-h-11 items-center gap-2 rounded-full border px-5 text-sm font-semibold shadow-sm transition-all hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0"
@@ -429,47 +485,49 @@ export function Comparison() {
             </p>
           </div>
 
-          <div className="grid items-start gap-4 md:grid-cols-2">
-            <WeatherPanel key={first.id} city={first} onResult={handleWeather} />
+          <ScenePhotoProvider>
+            <div className="grid auto-rows-fr gap-4 md:grid-cols-2">
+              <WeatherPanel key={first.id} city={first} onResult={handleWeather} />
 
-            <WeatherPanel key={second.id} city={second} onResult={handleWeather} />
-          </div>
-
-          {diff !== null && (
-            <div
-              className="rounded-[24px] border p-5 sm:p-6"
-              style={{
-                background: "var(--surface)",
-                borderColor: "var(--line)",
-              }}
-            >
-              <p
-                className="text-xs font-bold tracking-[0.12em] uppercase"
-                style={{ color: "var(--accent)" }}
-              >
-                DIFERENCIA DE TEMPERATURA
-              </p>
-
-              <div className="mt-3 flex flex-wrap items-center gap-4">
-                <span
-                  className="text-4xl font-bold tracking-tight tabular-nums sm:text-5xl"
-                  style={{ color: "var(--ink)" }}
-                >
-                  {diff > 0 ? "+" : ""}
-                  {diff} °C
-                </span>
-
-                <p className="max-w-md text-sm leading-6" style={{ color: "var(--muted)" }}>
-                  {first.nombre} menos {second.nombre}.
-                  {diff === 0
-                    ? " Ambas registran la misma temperatura."
-                    : diff > 0
-                      ? ` ${first.nombre} registra una temperatura mayor.`
-                      : ` ${second.nombre} registra una temperatura mayor.`}
-                </p>
-              </div>
+              <WeatherPanel key={second.id} city={second} onResult={handleWeather} />
             </div>
-          )}
+          </ScenePhotoProvider>
+
+          <section
+            className="rounded-[24px] border p-5 sm:p-6"
+            style={{ background: "var(--surface)", borderColor: "var(--line)" }}
+            aria-labelledby="diferencias-titulo"
+          >
+            <h3
+              id="diferencias-titulo"
+              className="text-xs font-bold tracking-[0.12em] uppercase"
+              style={{ color: "var(--accent)" }}
+            >
+              Diferencias actuales
+            </h3>
+            <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
+              {first.nombre} menos {second.nombre}
+            </p>
+            <dl className="mt-4 grid gap-3 sm:grid-cols-3">
+              {differences.map(({ label, unit, value }) => (
+                <div
+                  key={label}
+                  className="rounded-2xl p-4"
+                  style={{ background: "var(--surface-soft)" }}
+                >
+                  <dt className="text-sm" style={{ color: "var(--muted)" }}>
+                    {label}
+                  </dt>
+                  <dd
+                    className="mt-2 text-xl font-bold tabular-nums"
+                    style={{ color: "var(--ink)" }}
+                  >
+                    {value === null ? "No disponible" : `${value > 0 ? "+" : ""}${value}${unit}`}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </section>
 
           <p className="text-xs leading-5" style={{ color: "var(--muted)" }}>
             Fuente: Open-Meteo. Las observaciones corresponden a la hora del dato de cada ciudad.

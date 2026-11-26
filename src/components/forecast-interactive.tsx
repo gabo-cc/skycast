@@ -6,6 +6,7 @@ import { ForecastSkyScene } from "@/components/forecast-sky-scene";
 import type { Clima } from "@/lib/open-meteo/types";
 import { condicion, fechaLocal, valor } from "@/lib/weather-display";
 import { diaSeleccionado } from "@/lib/forecast-view";
+import { graficaTemperaturas } from "@/lib/forecast-chart";
 import { repeatedLocalHours, weatherHourLabel } from "@/lib/weather-time";
 
 type ForecastProps = {
@@ -17,26 +18,6 @@ type Point = {
   y: number;
 };
 
-function buildSegments(points: Array<Point | null>): Point[][] {
-  const segments: Point[][] = [];
-  let current: Point[] = [];
-
-  for (const point of points) {
-    if (point) {
-      current.push(point);
-    } else if (current.length) {
-      segments.push(current);
-      current = [];
-    }
-  }
-
-  if (current.length) {
-    segments.push(current);
-  }
-
-  return segments;
-}
-
 function formatPoints(points: Point[]): string {
   return points.map((point) => `${point.x},${point.y}`).join(" ");
 }
@@ -44,16 +25,18 @@ function formatPoints(points: Point[]): string {
 function TemperatureChart({
   hours,
   selectedIndex,
+  timeZone,
+  onSelect,
 }: {
   hours: Clima["horas"];
   selectedIndex: number;
+  timeZone: string;
+  onSelect: (index: number) => void;
 }) {
   const gradientId = useId().replace(/:/g, "");
-  const temperatures = hours.flatMap((hour) =>
-    hour.temperatura === null ? [] : [hour.temperatura],
-  );
+  const chart = graficaTemperaturas(hours);
 
-  if (temperatures.length === 0) {
+  if (!chart) {
     return (
       <div
         className="flex min-h-36 items-center justify-center rounded-2xl text-sm"
@@ -67,26 +50,12 @@ function TemperatureChart({
     );
   }
 
-  const min = Math.min(...temperatures);
-  const max = Math.max(...temperatures);
-
-  const points = hours.map((hour, index) => {
-    if (hour.temperatura === null) return null;
-
-    return {
-      x: hours.length < 2 ? 50 : 5 + (index * 90) / (hours.length - 1),
-      y: max === min ? 35 : 52 - ((hour.temperatura - min) / (max - min)) * 34,
-    };
-  });
-
-  const segments = buildSegments(points);
+  const { min, max, points, segments } = chart;
   const selectedPoint = points[selectedIndex];
+  const repeatedHours = repeatedLocalHours(hours, timeZone);
 
   return (
-    <div
-      className="relative mt-5 overflow-hidden rounded-2xl px-2 py-4"
-      style={{ background: "var(--surface-soft)" }}
-    >
+    <div className="forecast-chart">
       <div className="mb-1 flex items-center justify-between gap-3 px-3">
         <span
           className="text-[11px] font-semibold tracking-wide uppercase"
@@ -100,85 +69,122 @@ function TemperatureChart({
         </span>
       </div>
 
-      <svg
-        viewBox="0 0 100 65"
-        preserveAspectRatio="none"
-        className="h-38 w-full"
-        role="img"
-        aria-label={`Evolución de la temperatura. Mínima ${min} grados Celsius y máxima ${max} grados Celsius.`}
+      <div
+        className="forecast-chart-scroll"
+        role="region"
+        tabIndex={0}
+        aria-label="Gráfica horaria desplazable"
       >
-        <defs>
-          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="var(--aqua)" stopOpacity="0.34" />
-            <stop offset="100%" stopColor="var(--aqua)" stopOpacity="0.015" />
-          </linearGradient>
-        </defs>
+        <div
+          className="forecast-chart-plot"
+          style={{ minWidth: `${Math.max(hours.length * 64, 480)}px` }}
+        >
+          <svg
+            viewBox="0 0 100 65"
+            preserveAspectRatio="none"
+            className="forecast-chart-svg"
+            role="img"
+            aria-label={`Evolución de la temperatura. Mínima ${min} grados Celsius y máxima ${max} grados Celsius. Los huecos indican datos ausentes.`}
+          >
+            <defs>
+              <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="var(--aqua)" stopOpacity="0.34" />
+                <stop offset="100%" stopColor="var(--aqua)" stopOpacity="0.015" />
+              </linearGradient>
+            </defs>
 
-        {[18, 35, 52].map((y) => (
-          <line
-            key={y}
-            x1="5"
-            x2="95"
-            y1={y}
-            y2={y}
-            stroke="var(--line)"
-            strokeWidth="0.65"
-            vectorEffect="non-scaling-stroke"
-          />
-        ))}
+            {[18, 35, 52].map((y) => (
+              <line
+                key={y}
+                x1="5"
+                x2="95"
+                y1={y}
+                y2={y}
+                stroke="var(--line)"
+                strokeWidth="0.65"
+                vectorEffect="non-scaling-stroke"
+              />
+            ))}
 
-        {segments.map((segment, index) => {
-          if (segment.length < 2) return null;
+            {segments.map((segment, index) => {
+              if (segment.length < 2) return null;
 
-          const first = segment[0];
-          const last = segment[segment.length - 1];
+              const first = segment[0];
+              const last = segment[segment.length - 1];
 
-          return (
-            <polygon
-              key={`area-${index}`}
-              points={`${formatPoints(segment)} ${last.x},57 ${first.x},57`}
-              fill={`url(#${gradientId})`}
-            />
-          );
-        })}
+              return (
+                <polygon
+                  key={`area-${index}`}
+                  points={`${formatPoints(segment)} ${last.x},57 ${first.x},57`}
+                  fill={`url(#${gradientId})`}
+                />
+              );
+            })}
 
-        {segments.map((segment, index) => (
-          <polyline
-            key={`line-${index}`}
-            points={formatPoints(segment)}
-            fill="none"
-            stroke="var(--accent)"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            vectorEffect="non-scaling-stroke"
-          />
-        ))}
+            {segments.map((segment, index) => (
+              <polyline
+                key={`line-${index}`}
+                className="forecast-chart-line"
+                points={formatPoints(segment)}
+                fill="none"
+                stroke="var(--accent)"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                vectorEffect="non-scaling-stroke"
+              />
+            ))}
 
-        {selectedPoint && (
-          <>
-            <line
-              x1={selectedPoint.x}
-              x2={selectedPoint.x}
-              y1="12"
-              y2="57"
-              stroke="var(--accent)"
-              strokeOpacity="0.55"
-              strokeDasharray="3 4"
-              vectorEffect="non-scaling-stroke"
-            />
-
-            <circle
-              cx={selectedPoint.x}
-              cy={selectedPoint.y}
-              r="2.3"
-              fill="var(--accent)"
-              stroke="var(--surface)"
-              strokeWidth="1.1"
-            />
-          </>
-        )}
-      </svg>
+            {selectedPoint && (
+              <line
+                x1={selectedPoint.x}
+                x2={selectedPoint.x}
+                y1="12"
+                y2="57"
+                stroke="var(--accent)"
+                strokeOpacity="0.55"
+                strokeDasharray="3 4"
+                vectorEffect="non-scaling-stroke"
+              />
+            )}
+          </svg>
+          {points.map((point, index) => {
+            if (!point) return null;
+            const item = hours[index];
+            const label = weatherHourLabel(item.hora, timeZone);
+            const condition = condicion(item.codigoMeteorologico, item.esDeDia ?? null);
+            return (
+              <button
+                key={item.hora}
+                type="button"
+                className="forecast-chart-point"
+                style={{ left: `${point.x}%`, top: `${(point.y / 65) * 100}%` }}
+                aria-label={`Seleccionar ${label.full}: ${valor(item.temperatura, "°C")}, ${condition.descripcion}`}
+                aria-pressed={index === selectedIndex}
+                title={`${label.full} · ${valor(item.temperatura, "°C")}`}
+                onClick={() => onSelect(index)}
+              >
+                <span aria-hidden="true" />
+              </button>
+            );
+          })}
+          {hours.map((item, index) => {
+            const label = weatherHourLabel(item.hora, timeZone);
+            const x = hours.length < 2 ? 50 : 5 + (index * 90) / (hours.length - 1);
+            return (
+              <span
+                className="forecast-chart-tick"
+                key={item.hora}
+                style={{ left: `${x}%` }}
+                aria-hidden="true"
+              >
+                {label.time}
+                {repeatedHours.has(`${label.date}|${label.time}`) && <small>{label.offset}</small>}
+              </span>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
@@ -288,81 +294,44 @@ export function ForecastInteractive({ weather }: ForecastProps) {
             >
               {/* Condiciones seleccionadas */}
 
-              <div
-                className="flex flex-wrap items-center justify-between gap-5"
-                aria-live="polite"
-                aria-atomic="true"
-              >
-                <div>
-                  <p className="text-xs font-medium" style={{ color: "var(--muted)" }}>
-                    {activeLabel?.full}
-                  </p>
-
-                  <div className="mt-2 flex items-center gap-3">
-                    <span
-                      className="text-4xl font-bold tracking-[-0.06em] tabular-nums sm:text-5xl"
-                      style={{ color: "var(--ink)" }}
-                    >
-                      {valor(hour?.temperatura ?? null, "°C")}
-                    </span>
-
-                    <span
-                      className="flex size-11 items-center justify-center rounded-2xl"
-                      style={{
-                        background: "var(--surface-soft)",
-                        color: "var(--accent)",
-                      }}
-                    >
-                      <Icon name={activeCondition.icono} className="size-7" />
-                    </span>
-                  </div>
-
-                  <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
-                    {activeCondition.descripcion}
-                  </p>
-                </div>
-
+              <div className="forecast-selected">
                 <div
-                  className="min-w-44 rounded-2xl px-4 py-3"
-                  style={{
-                    background: "var(--surface-soft)",
-                  }}
+                  className="forecast-selected-sky"
+                  key={`${hour?.codigoMeteorologico}:${hour?.esDeDia}`}
+                  aria-hidden="true"
                 >
-                  <div className="flex items-center gap-2">
-                    <Icon name="rain" className="size-5" />
-
-                    <p
-                      className="text-xs"
-                      style={{
-                        color: "var(--muted)",
-                      }}
-                    >
-                      Probabilidad de lluvia
+                  <ForecastSkyScene
+                    code={hour?.codigoMeteorologico ?? null}
+                    isDay={hour?.esDeDia ?? null}
+                  />
+                </div>
+                <div className="forecast-selected-content" aria-live="polite" aria-atomic="true">
+                  <div>
+                    <p className="forecast-selected-label">PRONÓSTICO PARA</p>
+                    <p className="forecast-selected-time">{activeLabel?.full}</p>
+                    <p className="forecast-selected-temperature">
+                      {valor(hour?.temperatura ?? null, "°C")}
+                    </p>
+                    <p className="forecast-selected-condition">
+                      <Icon name={activeCondition.icono} className="size-7" />{" "}
+                      {activeCondition.descripcion}
                     </p>
                   </div>
-
-                  <p
-                    className="mt-2 text-2xl font-bold tabular-nums"
-                    style={{
-                      color: "var(--accent)",
-                    }}
-                  >
-                    {valor(hour?.probabilidadPrecipitacion ?? null, "%")}
-                  </p>
+                  <div className="forecast-selected-rain">
+                    <span>
+                      <Icon name="rain" className="size-5" /> Probabilidad de precipitación
+                    </span>
+                    <strong>{valor(hour?.probabilidadPrecipitacion ?? null, "%")}</strong>
+                  </div>
                 </div>
               </div>
 
-              {/* Gráfico de temperatura */}
-              {/* Paisaje animado de la hora seleccionada */}
-
-              <div className="mt-5">
-                <ForecastSkyScene
-                  code={hour?.codigoMeteorologico ?? null}
-                  isDay={hour?.esDeDia ?? null}
-                />
-              </div>
-
-              <TemperatureChart hours={hours} selectedIndex={activeHourIndex} />
+              <TemperatureChart
+                hours={hours}
+                selectedIndex={activeHourIndex}
+                timeZone={weather.zonaHoraria}
+                onSelect={setSelectedHour}
+              />
 
               {/* Selector de horas */}
 
@@ -479,11 +448,7 @@ export function ForecastInteractive({ weather }: ForecastProps) {
               <div
                 role="group"
                 aria-label="Seleccionar día del pronóstico"
-                className="overflow-hidden rounded-[24px] border p-2"
-                style={{
-                  background: "var(--surface)",
-                  borderColor: "var(--line)",
-                }}
+                className="forecast-days-grid"
               >
                 {days.map((item, index) => {
                   const condition = condicion(item.codigoMeteorologico);
@@ -496,60 +461,27 @@ export function ForecastInteractive({ weather }: ForecastProps) {
                       type="button"
                       onClick={() => setSelectedDay(index)}
                       aria-pressed={active}
-                      className="mb-1 flex min-h-18 w-full items-center gap-3 rounded-2xl border px-3 py-3 text-left transition-colors last:mb-0 sm:px-4"
-                      style={{
-                        background: active ? "var(--surface-soft)" : "transparent",
-                        borderColor: active ? "var(--aqua)" : "transparent",
-                      }}
+                      className="forecast-day-card"
                     >
-                      <span
-                        className="flex size-11 shrink-0 items-center justify-center rounded-xl"
-                        style={{
-                          background: "var(--surface-soft)",
-                          color: "var(--accent)",
-                        }}
-                      >
+                      <span className="forecast-day-top">
+                        <span className="forecast-day-date">{fechaLocal(item.fecha)}</span>
                         <Icon name={condition.icono} className="size-6" />
                       </span>
-
-                      <span className="min-w-0 flex-1">
-                        <span
-                          className="block text-sm font-bold"
-                          style={{
-                            color: "var(--ink)",
-                          }}
-                        >
-                          {fechaLocal(item.fecha)}
+                      <span className="forecast-day-condition">{condition.descripcion}</span>
+                      <span className="forecast-day-values">
+                        <span>
+                          <span className="sr-only">Máxima </span>
+                          <strong>{valor(item.temperaturaMaxima, "°C")}</strong>
                         </span>
-
-                        <span
-                          className="mt-1 block text-xs leading-5"
-                          style={{
-                            color: "var(--muted)",
-                          }}
-                        >
-                          {condition.descripcion}
+                        <span>
+                          <span className="sr-only">Mínima </span>
+                          {valor(item.temperaturaMinima, "°C")}
                         </span>
                       </span>
-
-                      <span className="shrink-0 text-right tabular-nums">
-                        <strong
-                          className="block text-base"
-                          style={{
-                            color: "var(--ink)",
-                          }}
-                        >
-                          {valor(item.temperaturaMaxima, "°")}
-                        </strong>
-
-                        <span
-                          className="text-sm"
-                          style={{
-                            color: "var(--muted)",
-                          }}
-                        >
-                          {valor(item.temperaturaMinima, "°")}
-                        </span>
+                      <span className="forecast-day-rain">
+                        <Icon name="drop" className="size-4" />
+                        <span className="sr-only">Probabilidad máxima de precipitación </span>
+                        {valor(item.probabilidadPrecipitacionMaxima, "%")}
                       </span>
                     </button>
                   );

@@ -46,7 +46,10 @@ export function datosDelDia(weather: ClimaComparable) {
   const date = fechaEnZona(weather.actual?.hora, weather.zonaHoraria);
   return date ? (weather.dias.find((day) => day.fecha === date) ?? null) : null;
 }
-export async function consultarClima(city: Ciudad, signal: AbortSignal): Promise<ClimaComparable> {
+export async function consultarClima(
+  city: Pick<Ciudad, "latitud" | "longitud">,
+  signal: AbortSignal,
+): Promise<ClimaComparable> {
   const params = new URLSearchParams({
     latitud: String(city.latitud),
     longitud: String(city.longitud),
