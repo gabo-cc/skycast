@@ -18,6 +18,10 @@ const quotedExamples = new Set([
   "- espa\u003fol",
   "- c\u003fdigo",
 ]);
+const historicalExampleFiles = new Set([
+  "VIBE_CODING.md",
+  join("docs", "historial-prompts-originales.md"),
+]);
 const decoder = new TextDecoder("utf-8", { fatal: true });
 let errors = 0;
 
@@ -37,7 +41,7 @@ async function scan(directory) {
         continue;
       }
       for (const [index, line] of contents.split(/\r?\n/).entries()) {
-        const isExample = path === "VIBE_CODING.md" && quotedExamples.has(line);
+        const isExample = historicalExampleFiles.has(path) && quotedExamples.has(line);
         const isProse = /\.(?:md|txt)$/i.test(path);
         if (
           !isExample &&
