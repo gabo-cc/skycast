@@ -5,7 +5,12 @@ import type { ReactNode } from "react";
 import { useCityPhoto } from "@/components/city-photo";
 import type { FotoCiudad } from "@/lib/city-photo";
 import type { Ciudad } from "@/lib/open-meteo/types";
-import { asignarPaisajes, categoriaPaisaje, opcionesPaisaje } from "@/lib/weather-landscapes";
+import {
+  asignarPaisajes,
+  categoriaPaisaje,
+  opcionesPaisaje,
+  type PaisajeAsignado,
+} from "@/lib/weather-landscapes";
 
 type Entry = {
   id: number;
@@ -15,7 +20,7 @@ type Entry = {
 };
 
 type SceneContext = {
-  entries: Record<number, Entry>;
+  assignments: Record<number, PaisajeAsignado>;
   update: (id: number, entry: Entry | null) => void;
 };
 
@@ -49,7 +54,8 @@ export function ScenePhotoProvider({ children }: { children: ReactNode }) {
       return next;
     });
   }, []);
-  const value = useMemo(() => ({ entries, update }), [entries, update]);
+  const assignments = useMemo(() => asignarPaisajes(Object.values(entries)), [entries]);
+  const value = useMemo(() => ({ assignments, update }), [assignments, update]);
   return <Context.Provider value={value}>{children}</Context.Provider>;
 }
 
@@ -87,11 +93,7 @@ export function useScenePhoto(city: Ciudad, code: number | null, isDay: boolean 
     return () => update(city.id, null);
   }, [update, city.id, verified.photo, candidates, locales]);
 
-  const assignments = useMemo(
-    () => asignarPaisajes(Object.values(context?.entries ?? {})),
-    [context?.entries],
-  );
-  const selection = assignments[city.id];
+  const selection = context?.assignments[city.id];
   const photo = selection ? selection.foto : verified.photo;
   const isVerified = photo !== null && photo.url === verified.photo?.url;
   const loaded = isVerified ? verified.loaded : !!photo && loadedUrl === photo.url;

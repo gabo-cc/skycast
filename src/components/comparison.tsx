@@ -6,6 +6,7 @@ import { ComparisonSelector } from "@/components/comparison-selector";
 import { CityPhotoBackground, CityPhotoCredit } from "@/components/city-photo";
 import { ScenePhotoProvider, useScenePhoto } from "@/components/scene-photos";
 import { WeatherAtmosphere } from "@/components/weather-atmosphere";
+import { WeatherAttribution } from "@/components/weather-attribution";
 import { Icon } from "@/components/icon";
 import { useFavorites } from "@/hooks/use-favorites";
 import {
@@ -530,8 +531,9 @@ export function Comparison() {
           </section>
 
           <p className="text-xs leading-5" style={{ color: "var(--muted)" }}>
-            Fuente: Open-Meteo. Las observaciones corresponden a la hora del dato de cada ciudad.
-            Los agregados diarios pueden verse afectados por cambios de horario de verano.
+            Fuente: <WeatherAttribution />. Las observaciones corresponden a la hora del dato de
+            cada ciudad. Los agregados diarios pueden verse afectados por cambios de horario de
+            verano.
           </p>
         </section>
       ) : (

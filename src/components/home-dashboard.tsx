@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Icon } from "@/components/icon";
 import { HomeSkyExperience } from "@/components/home-sky-experience";
+import { WeatherAttribution } from "@/components/weather-attribution";
 import { esBusquedaValida, iniciarBusqueda, type SearchResult } from "@/lib/city-search";
 import { DEFAULT_LOCATION, forecastUrl, parseLocation } from "@/lib/forecast-location";
 import type { Ciudad, Clima } from "@/lib/open-meteo/types";
@@ -617,8 +618,8 @@ export function HomeDashboard({ initialWeather }: { initialWeather: Clima }) {
       </section>
 
       <p className="text-[11px] leading-5" style={{ color: "var(--muted)" }}>
-        Fuente: Open-Meteo. Los valores diarios pueden abarcar horas distintas del día local durante
-        cambios de horario de verano.
+        Fuente: <WeatherAttribution />. Los valores diarios pueden abarcar horas distintas del día
+        local durante cambios de horario de verano.
       </p>
     </div>
   );

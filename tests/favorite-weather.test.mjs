@@ -65,6 +65,7 @@ test("cada tarjeta enlaza al pronóstico de su ciudad y el corazón queda fuera 
       ScenePhotoProvider: ({ children }) => children,
     },
     "@/components/weather-atmosphere": { WeatherAtmosphere: () => null },
+    "@/components/weather-attribution": { WeatherAttribution: () => null },
     "@/components/favorite-heart": {
       FavoriteHeart: ({ onClick }) => React.createElement("button", { onClick }, "Quitar"),
     },

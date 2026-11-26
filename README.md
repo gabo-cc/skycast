@@ -1,60 +1,141 @@
 # SkyCast 2.0
 
-Aplicación meteorológica académica para explorar el tiempo, consultar pronósticos y comparar ciudades. Los datos meteorológicos proceden de Open-Meteo; las fotografías opcionales de Unsplash se presentan como imágenes de archivo.
+**Aplicación meteorológica interactiva desarrollada como proyecto académico mediante Vibe Coding.** Permite consultar el tiempo actual, explorar pronósticos, guardar ciudades favoritas y comparar las condiciones de dos ubicaciones en una interfaz visual y adaptable a diferentes dispositivos.
+
+SkyCast utiliza **Open-Meteo** para obtener datos meteorológicos y, opcionalmente, **Unsplash** para mostrar fotografías de ciudades y paisajes. Incorpora escenas y recursos locales como respaldo.
+
+> **Alcance:** proyecto educativo, sin fines comerciales, previsto para demostraciones controladas y tráfico reducido. Su uso debe respetar los términos, las cuotas y los requisitos de atribución de los proveedores externos.
 
 ## Características principales
 
-- Inicio cinematográfico con ciudad principal configurable y selección de horas.
-- Búsqueda de ciudades y navegación al pronóstico conservando su identidad y coordenadas.
-- Pronósticos horarios y diarios, gráfica interactiva y fechas en la zona horaria de la ciudad.
-- Favoritos persistentes y comparación de dos ciudades con solicitudes y reintentos independientes.
-- Escenas y efectos atmosféricos, temas claro, oscuro y automático, y soporte para movimiento reducido.
-- Fotografías verificadas de ciudades, paisajes ilustrativos y recursos locales de respaldo.
+- **Inicio interactivo:** ciudad principal configurable, condiciones actuales y exploración del pronóstico por horas.
+- **Búsqueda de ciudades:** resultados con ubicación identificable y acceso directo al pronóstico.
+- **Pronósticos:** datos horarios y diarios, gráfica interactiva y presentación de la hora local de cada ciudad.
+- **Favoritos:** ciudades guardadas en el navegador, información meteorológica y acceso rápido a sus pronósticos.
+- **Comparación:** consulta de dos ciudades, intercambio de posiciones y métricas meteorológicas comparables.
+- **Experiencia visual:** ambientes meteorológicos animados, modo claro, oscuro y automático, y compatibilidad con la preferencia de movimiento reducido.
+- **Fotografías y paisajes:** vistas de ciudades verificadas cuando están disponibles, fotografías ambientales identificadas como ilustrativas y fondos WebP locales de respaldo.
 
-La ciudad principal, los favoritos y la preferencia de tema se guardan en el almacenamiento del navegador. No se sincronizan automáticamente entre dispositivos.
+La ciudad principal, los favoritos y la preferencia de tema se almacenan localmente en el navegador. **No se sincronizan automáticamente entre dispositivos.**
 
 ## Tecnologías
 
-Next.js 16, React 19, TypeScript, Tailwind CSS 4 y pnpm. Las pruebas usan el ejecutor integrado de Node.js.
+| Tecnología | Uso |
+| --- | --- |
+| Next.js 16 (App Router) | Aplicación web y rutas API internas |
+| React 19 | Componentes e interactividad |
+| TypeScript | Tipado estático |
+| Tailwind CSS 4 y CSS | Estilos y diseño adaptable |
+| Open-Meteo | Geocodificación y datos meteorológicos |
+| Unsplash (opcional) | Fotografías de ciudades y paisajes |
+| pnpm | Gestión de dependencias |
+| Node.js Test Runner | Pruebas automatizadas |
 
-## Requisitos
+## Requisitos previos
 
-- Node.js 20.9.0 o posterior, requisito de la versión instalada de Next.js. La auditoría local se ejecutó con Node.js 22.14.0.
-- pnpm 12.9.1, especificado en `package.json`.
-- Conexión a Internet para consultar Open-Meteo y, opcionalmente, Unsplash.
+Antes de instalar el proyecto, necesitas:
 
-## Instalación
+- **Git** para clonar el repositorio.
+- **Node.js 20.9.0 o posterior**. El proyecto se verificó localmente con Node.js **22.14.0**.
+- **pnpm 12.9.1**, la versión indicada en `package.json`.
+- Conexión a Internet para las consultas meteorológicas y, si se habilita, las fotografías de Unsplash.
+
+Comprueba las versiones instaladas:
+
+**Windows (PowerShell):**
+
+```powershell
+node --version
+pnpm.cmd --version
+git --version
+```
+
+**Linux o macOS:**
+
+```bash
+node --version
+pnpm --version
+git --version
+```
+
+> En los comandos siguientes se utiliza `pnpm.cmd` en Windows porque PowerShell puede bloquear el script `pnpm.ps1`. En Linux y macOS sustituye `pnpm.cmd` por `pnpm`.
+
+## Instalación y ejecución local
+
+### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/gabo-cc/skycast.git
+cd skycast
+```
+
+### 2. Instalar las dependencias
+
+**Windows (PowerShell):**
 
 ```powershell
 pnpm.cmd install --frozen-lockfile
 ```
 
-En otros sistemas puede utilizarse `pnpm` en lugar de `pnpm.cmd`.
+**Linux o macOS:**
 
-## Variables de entorno
+```bash
+pnpm install --frozen-lockfile
+```
 
-Open-Meteo no necesita clave para la integración actual. Unsplash es opcional: registra una aplicación en [Unsplash Developers](https://unsplash.com/developers) y obtén su Access Key.
+La opción `--frozen-lockfile` instala las versiones registradas en el archivo de bloqueo sin modificarlo.
 
-Si todavía no existe `.env.local`, crea una copia de ejemplo:
+### 3. Configurar las variables de entorno (opcional)
+
+**Open-Meteo no requiere una clave** en la integración actual. Para habilitar fotografías de Unsplash, crea una aplicación en [Unsplash Developers](https://unsplash.com/developers) y obtén su **Access Key**.
+
+Si no existe `.env.local`, cópialo desde el archivo de ejemplo:
+
+**Windows (PowerShell):**
 
 ```powershell
 Copy-Item .env.example .env.local
 ```
 
-Edita `.env.local` y asigna la clave a `UNSPLASH_ACCESS_KEY`; reinicia el servidor después de cambiarla. No sobrescribas un archivo existente con otras variables. La clave solo se usa en el servidor: no la incluyas en el repositorio ni uses el prefijo `NEXT_PUBLIC_`. `.env.local` está excluido por `.gitignore`.
+**Linux o macOS:**
 
-## Desarrollo
+```bash
+cp .env.example .env.local
+```
+
+Edita `.env.local` e incorpora tu clave:
+
+```dotenv
+UNSPLASH_ACCESS_KEY=tu_access_key
+```
+
+**Importante:** no subas `.env.local` a GitHub ni utilices el prefijo `NEXT_PUBLIC_` para esta clave. El archivo está excluido mediante `.gitignore`. Si ya existe, edítalo sin sobrescribir otras configuraciones. Reinicia el servidor después de cambiar las variables de entorno.
+
+Sin la clave de Unsplash, la aplicación puede usar sus paisajes locales de respaldo.
+
+### 4. Iniciar el servidor de desarrollo
+
+**Windows (PowerShell):**
 
 ```powershell
 pnpm.cmd dev
 ```
 
-Abre `http://localhost:3000`. Las rutas principales son Inicio, Buscar, Pronóstico, Favoritos, Comparar y Acerca de.
+**Linux o macOS:**
 
-## Validaciones
+```bash
+pnpm dev
+```
+
+Abre **http://localhost:3000** en el navegador.
+
+Las secciones de SkyCast son **Inicio, Buscar, Pronóstico, Favoritos, Comparar y Acerca de**.
+
+## Comandos de validación
+
+Desde la raíz del proyecto, en Windows:
 
 ```powershell
-pnpm.cmd format
 pnpm.cmd format:check
 pnpm.cmd lint
 pnpm.cmd build
@@ -63,49 +144,86 @@ pnpm.cmd exec tsc --noEmit
 pnpm.cmd test
 ```
 
-`format` modifica los archivos que requieren formato; `format:check` solo comprueba. Las pruebas de servicios externos emplean respuestas simuladas y no sustituyen una revisión en navegador.
+Para aplicar el formato automáticamente:
 
-## Estructura general
-
-```text
-src/app/                 Páginas y Route Handlers
-src/components/          Interfaz y escenas interactivas
-src/hooks/               Hooks compartidos
-src/lib/                 Servicios, transformación y lógica
-public/weather/          Paisajes locales WebP
-tests/                   Pruebas automatizadas
-docs/                    Historial, recursos y auditoría QA
+```powershell
+pnpm.cmd format
 ```
 
-## Open-Meteo y Unsplash
+En Linux o macOS, utiliza `pnpm` en lugar de `pnpm.cmd`.
 
-Open-Meteo proporciona geocodificación, condiciones actuales y pronósticos. El servicio valida entradas y respuestas, fija un tiempo de espera y muestra los datos faltantes como no disponibles. La API gratuita está destinada a uso no comercial; consulta sus [condiciones y límites](https://open-meteo.com/en/terms) antes de publicar.
+Las pruebas automatizadas de integraciones externas utilizan respuestas simuladas cuando corresponde. **Superarlas no sustituye una revisión funcional y visual en el navegador.**
 
-Favoritos y Comparar pueden utilizar una fotografía de archivo de Unsplash como portada. Una vista presentada como fotografía de la ciudad se verifica mediante ciudad, país y, cuando corresponde, región o coordenadas cercanas. Esta validación conservadora puede descartar nombres traducidos o metadatos incompletos.
+## Estructura del proyecto
 
-Cuando no hay una vista verificable, se buscan paisajes genéricos por condición meteorológica, identificados como **«Paisaje ilustrativo»**: no representan la ciudad ni sus condiciones actuales. Las imágenes de Unsplash se sirven desde su CDN y muestran créditos enlazados al fotógrafo y a Unsplash. Se conservan los paisajes locales originales y las [variantes generadas](docs/paisajes-generados.md) en WebP para fallos o ausencia de clave. Inicio y Pronóstico usan sus escenas locales.
+```text
+src/
+  app/             Páginas y Route Handlers de Next.js
+  components/      Componentes de interfaz y escenas meteorológicas
+  hooks/           Hooks compartidos
+  lib/             Servicios, tipos y lógica de negocio
+public/
+  weather/         Paisajes locales en formato WebP
+tests/             Pruebas automatizadas
+docs/              Documentación, recursos e informes de QA
+README.md          Guía de instalación y uso
+VIBE_CODING.md     Bitácora resumida de desarrollo
+AGENTS.md          Convenciones y reglas del proyecto
+```
 
-La selección coordinada intenta evitar imágenes repetidas y es estable con las mismas ciudades y candidatas; puede cambiar si cambia el clima, el conjunto visible o los resultados tras vencer la caché. El servidor deduplica solicitudes, limita dos búsquedas concurrentes y 40 llamadas por hora por proceso, y guarda resultados durante 24 horas o cinco minutos si no hay resultado. El navegador reutiliza consultas durante cinco minutos. Los límites en memoria no se comparten entre instancias ni sobreviven reinicios.
+## Fuentes de datos y fotografías
 
-La [documentación de Unsplash](https://unsplash.com/documentation) describe la cuota del modo de demostración, la atribución y el uso directo de imágenes; revisa sus requisitos y la aprobación de producción antes de publicar.
+### Open-Meteo
 
-## Capturas o demostración
+[Open-Meteo](https://open-meteo.com/) proporciona geocodificación, condiciones actuales y pronósticos. SkyCast valida entradas y respuestas, maneja tiempos de espera y distingue los valores que no están disponibles.
 
-No hay capturas ni una URL de demostración versionadas en el proyecto. La aplicación puede revisarse localmente con el comando de desarrollo.
+Los datos meteorológicos se atribuyen a Open-Meteo conforme a sus [condiciones de uso](https://open-meteo.com/en/terms) y [licencia indicada por el proveedor](https://open-meteo.com/en/license), con referencia a **CC BY 4.0** y a la adaptación de los datos para su presentación. Los datos de geocodificación proceden de GeoNames.
+
+La API gratuita está sujeta a condiciones de uso no comercial y límites de solicitudes. El uso académico no elimina esas condiciones.
+
+### Unsplash
+
+Cuando está configurada, la integración de [Unsplash](https://unsplash.com/) permite mostrar fotografías en **Favoritos** y **Comparar**:
+
+- **Fotografía de ciudad:** se muestra como vista de una ubicación únicamente cuando la información disponible permite verificarla.
+- **Paisaje ilustrativo:** fotografía ambiental relacionada con una categoría meteorológica, pero **no** representa necesariamente la ciudad ni el tiempo real en ella.
+- **Respaldo local:** imágenes WebP utilizadas cuando Unsplash no está configurado, no responde o no ofrece alternativas adecuadas.
+
+Las fotografías procedentes de Unsplash muestran atribución enlazada al fotógrafo y a Unsplash. Se respetan sus [directrices de la API](https://help.unsplash.com/en/articles/2511245-unsplash-api-guidelines).
+
+La selección busca variedad y estabilidad, aunque pueden repetirse imágenes cuando no hay suficientes alternativas. El servidor utiliza caché y un control de solicitudes **por proceso**, que no equivale a una limitación global entre varias instancias. Consulta la [documentación de la API](https://unsplash.com/documentation) para comprobar la cuota y el tipo de acceso aplicables a tu aplicación.
+
+Las variantes de paisajes locales se describen en [docs/paisajes-generados.md](docs/paisajes-generados.md).
 
 ## Despliegue en Vercel
 
-Para preparar un despliegue futuro, importa el repositorio en Vercel y selecciona la configuración de Next.js. En **Project Settings → Environment Variables**, agrega opcionalmente `UNSPLASH_ACCESS_KEY` como variable de servidor para los entornos necesarios. No uses `NEXT_PUBLIC_` ni publiques el valor.
+SkyCast puede desplegarse como aplicación Next.js en [Vercel](https://vercel.com/):
 
-Los cambios de variables se aplican a nuevos despliegues, según la [documentación de Vercel](https://vercel.com/docs/environment-variables/managing-environment-variables). Estas instrucciones no implican que el proyecto esté desplegado ni autorizan un despliegue.
+1. Importa el repositorio de GitHub en un proyecto de Vercel.
+2. Comprueba que el framework detectado sea **Next.js** y que se utilice **pnpm**.
+3. Si deseas fotografías de Unsplash, agrega `UNSPLASH_ACCESS_KEY` en **Project Settings → Environment Variables**, como variable de servidor, para los entornos que correspondan.
+4. Realiza el despliegue y verifica las funcionalidades desde la URL resultante.
+
+Los cambios de variables de entorno se aplican a nuevos despliegues; consulta la [documentación de Vercel](https://vercel.com/docs/environment-variables/managing-environment-variables).
+
+**Importante:** el proyecto está orientado a una **demostración académica controlada**, no a tráfico público elevado. Antes de abrirlo a un número indeterminado de usuarios, habría que revisar las cuotas y condiciones de los proveedores, así como implementar mecanismos adecuados de control de consumo entre instancias. Estas instrucciones no constituyen una autorización ni una confirmación de despliegue.
 
 ## Limitaciones conocidas
 
-- Los agregados diarios de Open-Meteo usan el desplazamiento vigente al consultar y pueden abarcar horas distintas del día local durante una transición de horario de verano.
-- Las fotos verificadas dependen de metadatos completos y la disponibilidad y cuota del proveedor; las fotografías son de archivo, no observaciones actuales.
-- Si no hay suficientes candidatas ambientales o locales, algunas ciudades pueden compartir paisaje. Los límites de Unsplash son por proceso, no globales entre instancias.
-- Los servicios externos pueden fallar o limitar solicitudes; la aplicación muestra estados de error y utiliza respaldos cuando corresponde.
+- Los datos meteorológicos dependen de la disponibilidad y los límites de Open-Meteo.
+- Los agregados diarios del proveedor pueden no coincidir exactamente con los límites del día local durante transiciones de horario de verano.
+- Las fotografías de Unsplash dependen de su disponibilidad, metadatos, condiciones de acceso y cuotas; son imágenes de archivo, no observaciones meteorológicas en vivo.
+- Cuando faltan alternativas, algunas ciudades pueden compartir una imagen de respaldo.
+- La caché y el limitador de fotografías operan por proceso y no proporcionan una cuota global distribuida.
+- Permanecen pendientes algunas verificaciones de accesibilidad y rendimiento en dispositivos y escenarios reales, documentadas en el informe QA.
 
-## Metodología Vibe Coding
+## Documentación y metodología Vibe Coding
 
-La [bitácora de desarrollo](VIBE_CODING.md) resume objetivos, decisiones y pruebas por iteración. Los prompts y anotaciones disponibles antes de su reorganización se conservan en el [historial original](docs/historial-prompts-originales.md). Los resultados y pendientes de esta revisión se documentan en [QA final](docs/qa-final.md).
+SkyCast se desarrolló mediante **Vibe Coding**, con apoyo de herramientas de inteligencia artificial para implementar, revisar y mejorar el código, manteniendo validaciones y pruebas sobre los resultados.
+
+- [Bitácora de desarrollo](VIBE_CODING.md): iteraciones, objetivos, decisiones y resultados.
+- [Historial de prompts originales](docs/historial-prompts-originales.md): registros conservados de etapas anteriores.
+- [Informe de QA final](docs/qa-final.md): hallazgos, pruebas, riesgos y verificaciones pendientes.
+- [Paisajes generados](docs/paisajes-generados.md): recursos visuales locales.
+
+**Estado del proyecto:** apto con observaciones para una demostración académica controlada, según la última auditoría documentada. No se presenta como un servicio meteorológico comercial ni como una plataforma validada para tráfico público masivo.

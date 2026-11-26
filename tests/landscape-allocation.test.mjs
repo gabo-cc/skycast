@@ -76,3 +76,15 @@ test("se permite repetir cuando no hay alternativas suficientes", () => {
   assert.equal(result[1].foto.url, result[2].foto.url);
   assert.deepEqual(result[3], { foto: null, paisaje: null, ilustrativo: true });
 });
+
+test("una lista grande conserva la asignación estable y aprovecha todas las alternativas", () => {
+  const photos = Array.from({ length: 30 }, (_, index) => photo(`landscape-${index}`));
+  const locals = ["/weather/a.webp", "/weather/b.webp"];
+  const entries = Array.from({ length: 60 }, (_, index) => entry(index + 1, photos, locals));
+  const result = asignarPaisajes(entries);
+  const images = new Set(Object.values(result).map((item) => item.foto?.url ?? item.paisaje));
+
+  assert.equal(Object.keys(result).length, 60);
+  assert.equal(images.size, 32);
+  assert.deepEqual(result, asignarPaisajes([...entries].reverse()));
+});

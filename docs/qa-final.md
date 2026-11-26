@@ -64,3 +64,53 @@ La limpieza se limitó a retirar el uso innecesario de `NextResponse` en esa rut
 - Antes de una publicación abierta deben revisarse la cuota y la aprobación de producción de [Unsplash](https://unsplash.com/documentation), los límites distribuidos y las comprobaciones pendientes de accesibilidad y carga.
 
 **Recomendación: APTO CON OBSERVACIONES para una demostración académica controlada.** La publicación abierta todavía no se recomienda hasta revisar los riesgos de cuota y completar las comprobaciones pendientes. Esta auditoría no autoriza ningún despliegue.
+
+## Continuación: verificación previa a publicación abierta
+
+Esta revisión del 26 de noviembre de 2026 se centra en los pendientes anteriores. No implica un despliegue ni sustituye las comprobaciones realizadas en la auditoría inicial.
+
+### Accesibilidad
+
+- Con Edge, axe-core 4.14.1 y una anchura de 375 píxeles se examinaron las seis rutas en temas claro y oscuro. Inicio y Pronóstico usaron respuestas meteorológicas simuladas en el servidor; Favoritos y Comparar, clima y fotos simulados en el navegador. No se detectó desbordamiento horizontal en esas vistas.
+- Se detectaron dos problemas automáticos: el nombre accesible de los botones horarios de Inicio no contenía la etiqueta visible y una etiqueta horaria de Pronóstico en tema oscuro tenía contraste de 1,81:1 frente al mínimo de 4,5:1. Se corrigieron el nombre y la separación textual de los botones, y el color de la hora seleccionada. La relación calculada para esta última es 8,01:1 en claro y 10,33:1 en oscuro; dos pruebas renderizadas cubren ambos casos. Una segunda revisión de Inicio y Pronóstico con axe, en ambos temas y 375 píxeles, no encontró infracciones automáticas.
+- En el barrido no se señalaron infracciones automáticas en Buscar, Favoritos, Comparar ni Acerca de; Pronóstico claro tampoco presentó infracciones. Hasta 35 elementos por vista quedaron con contraste indeterminado por fondos o composiciones, por lo que no se acredita el cumplimiento integral de WCAG 2.2 AA.
+- En Edge con datos simulados, Tab y Enter abrieron el pronóstico desde una tarjeta; Tab y Espacio eliminaron otra con el corazón sin navegar. También se seleccionaron con teclado un punto horario del pronóstico y una opción favorita de Comparar. Este recorrido no cubre todos los controles ni el orden completo del foco.
+- Con emulación de movimiento reducido, `matchMedia` devolvió la preferencia activa y la regla global limita la duración de las animaciones a 0,01 ms. No se verificó individualmente cada animación. Permanecen pendientes una revisión completa del orden de foco y teclado, contraste manual sobre fotografías, lector de pantalla y dispositivo táctil físico.
+
+### Rendimiento y carga controlada
+
+- Una prueba local de 60 ciudades de Favoritos, con 15 ms de latencia artificial por respuesta meteorológica, terminó en 910 ms, con máximo de tres solicitudes simultáneas; la mediana fue 605 ms y el percentil 95, 868 ms. Una segunda ronda desde caché tardó 1 ms y no hizo consultas. Son medidas del simulador, no latencia de Open-Meteo ni garantía de rendimiento en producción.
+- En un proceso local, 50 búsquedas diferentes de Unsplash con 20 ms de latencia artificial terminaron en 804 ms: se efectuaron 40 consultas simuladas, con máximo de dos simultáneas. Repetir una ciudad ya consultada no produjo otra llamada. Una prueba separada con 50 solicitudes concurrentes para una misma ciudad produjo una sola consulta simulada. No se aplicó carga a las APIs públicas.
+- Diez solicitudes meteorológicas simultáneas para la misma coordenada produjeron tres consultas en vuelo antes de que hubiera un resultado en caché; la cola limita la concurrencia, pero no deduplica esas peticiones en curso.
+- Los 21 WebP locales ocupan 1.948.598 bytes en total; el mayor ocupa 208.170 bytes. Las fotografías externas se cargan de forma diferida y se sirven directamente desde Unsplash. No se midieron memoria ni rendimiento de animación en un dispositivo móvil físico.
+- La asignación coordinada de paisajes se calculaba de nuevo por cada tarjeta y ordenaba candidatos repetidamente durante el emparejamiento. Se comparte ahora un cálculo por actualización y se preparan sus listas una sola vez. En un ensayo aislado de Node con 60 tarjetas y 32 opciones, una asignación pasó de 2.880,90 ms y 4.080.632 bytes de aumento temporal de heap antes de la recolección a 63,96 ms y 772.456 bytes; no son mediciones de memoria sostenida ni tiempos de carga en navegador. Se comparó la selección anterior y la nueva en 18 conjuntos, y se añadió una prueba de estabilidad y diversidad.
+- La caché de fotos en el servidor conserva éxitos durante 24 horas y resultados vacíos durante cinco minutos; las búsquedas iguales en curso se deduplican. Los límites y cachés en memoria no son globales ni sobreviven a reinicios.
+
+### Condiciones de proveedores
+
+- [Open-Meteo](https://open-meteo.com/en/terms) limita la API gratuita no comercial a menos de 600 solicitudes por minuto, 5.000 por hora y 10.000 por día; aplica límites por dirección IP y aplicación y advierte de restricciones anticipadas en proveedores de nube. El uso comercial requiere revisar sus [planes](https://open-meteo.com/en/pricing). La [licencia](https://open-meteo.com/en/license) exige atribución y enlace a CC BY 4.0; se añadió atribución enlazada y una indicación de adaptación de los datos. La geocodificación identifica a [GeoNames](https://open-meteo.com/en/docs/geocoding-api) como fuente.
+- [Unsplash](https://unsplash.com/documentation) permite 50 solicitudes API por hora en modo de demostración. Su [ayuda](https://help.unsplash.com/en/articles/3887917-when-should-i-apply-for-a-higher-rate-limit) indica solicitar acceso de producción para aplicaciones públicas. La documentación menciona 1.000 por hora para producción, mientras la [ayuda oficial en español](https://help.unsplash.com/es/articles/3887917-cuando-debo-solicitar-un-limite-de-frecuencia-mas-alto) menciona 5.000: se debe confirmar la cuota efectiva asignada, no asumir ninguna de las dos cifras.
+- Las [directrices de Unsplash](https://help.unsplash.com/en/articles/2511245-unsplash-api-guidelines) requieren usar las URL de imagen devueltas por la API, atribuir al fotógrafo y a Unsplash con enlaces y parámetros de referencia, y mantener las claves confidenciales. También requieren registrar el evento de descarga cuando la aplicación permite una acción equivalente a seleccionar o descargar una imagen; la presentación automática no demuestra por sí sola ese caso. Debe verificarse la aprobación y los términos aplicables a la aplicación concreta.
+- Las [funciones de Vercel](https://vercel.com/docs/functions) pueden ejecutarse en varias instancias. El límite de 40 solicitudes por hora y dos concurrentes de SkyCast se aplica por proceso: varios procesos o reinicios pueden superar juntos la cuota de Unsplash. Las rutas públicas de clima y geocodificación tampoco limitan el acceso por origen, de modo que el tráfico anónimo puede consumir la cuota de Open-Meteo. Se necesita una protección efectiva compartida y revisar el tráfico permitido antes de abrir el servicio; no se ha instalado un servicio nuevo ni se ha verificado el comportamiento en Vercel.
+
+### Seguridad
+
+- `.env.local` está ignorado por Git y la clave de Unsplash se utiliza en el servidor. La búsqueda de la clave configurada en 378 objetos Git alcanzables y 22 archivos estáticos de cliente no encontró coincidencias. Esto no prueba la ausencia de otros secretos ni examina objetos inalcanzables.
+- Diez pruebas locales de Route Handlers, sin red, rechazaron parámetros inválidos o duplicados y devolvieron respaldos vacíos para solicitudes de foto válidas sin clave. No se encontraron claves en las respuestas examinadas. Las APIs públicas siguen expuestas a consumo de cuota, como se explica arriba.
+
+### Validaciones de esta continuación
+
+- Pasaron `pnpm.cmd format:check`, `pnpm.cmd lint`, `pnpm.cmd build`, `pnpm.cmd encoding:check`, `pnpm.cmd exec tsc --noEmit`, `pnpm.cmd test` y `git diff --check`; la suite contiene **69 pruebas aprobadas**. ESLint señaló inicialmente nombres de variables en las pruebas nuevas; se corrigieron y se repitió la comprobación.
+- El archivo `docs/historial-prompts-originales.md` conserva el mismo SHA-256 que al inicio de esta revisión. No se hicieron commits, push ni despliegue.
+
+### Dictamen para publicación abierta
+
+**NO APTO PARA PUBLICAR abiertamente todavía.** Antes de abrir el servicio se deben resolver o aceptar explícitamente los controles de cuota entre instancias y de tráfico anónimo, confirmar la aprobación y cuota de Unsplash y completar las comprobaciones pendientes de accesibilidad. El dictamen anterior para una demostración académica controlada conserva su alcance.
+
+### Alcance confirmado: demostración académica controlada
+
+Se confirma que SkyCast 2.0 se utilizará exclusivamente con fines educativos, sin actividad comercial y con tráfico reducido. Para ese alcance, el dictamen es **APTO CON OBSERVACIONES para una demostración académica controlada**, basado en las comprobaciones y limitaciones registradas arriba. La demostración debe controlar su audiencia y consumo de las API; esta conclusión no autoriza un despliegue ni garantiza disponibilidad frente a tráfico imprevisto.
+
+La **publicación abierta con tráfico no controlado** sigue sin recomendarse: el límite de Unsplash y las cachés son por proceso, las rutas públicas pueden consumir cuotas sin controles por origen y no se ha verificado el comportamiento con múltiples instancias en Vercel. Los límites, atribuciones, condiciones de uso y la aprobación de Unsplash que corresponda siguen siendo aplicables aunque el proyecto sea académico y no comercial.
+
+Siguen pendientes el recorrido completo mediante teclado y la revisión del orden de foco, el contraste manual sobre fotografías, las pruebas con lector de pantalla y dispositivo táctil físico, y la medición de rendimiento y animaciones en un móvil físico. Las pruebas de carga descritas emplearon respuestas simuladas y no sustituyen una evaluación de carga sostenida ni de varias instancias. No se realizaron verificaciones nuevas de accesibilidad o carga por confirmar este alcance.

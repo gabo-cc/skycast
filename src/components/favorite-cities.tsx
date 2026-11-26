@@ -6,6 +6,7 @@ import { Icon } from "@/components/icon";
 import { CityPhotoBackground, CityPhotoCredit } from "@/components/city-photo";
 import { ScenePhotoProvider, useScenePhoto } from "@/components/scene-photos";
 import { WeatherAtmosphere } from "@/components/weather-atmosphere";
+import { WeatherAttribution } from "@/components/weather-attribution";
 import { useFavorites } from "@/hooks/use-favorites";
 import type { ClimaComparable } from "@/lib/comparison";
 import { consultarClimaFavorito } from "@/lib/favorite-weather";
@@ -300,6 +301,10 @@ export function FavoriteCities() {
           ))}
         </ul>
       </ScenePhotoProvider>
+
+      <p className="text-xs leading-5" style={{ color: "var(--muted)" }}>
+        Fuente: <WeatherAttribution />.
+      </p>
 
       <Link
         href="/buscar"

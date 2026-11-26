@@ -55,6 +55,7 @@ function createRenderer(filename, exportName, props) {
     "next/link": { __esModule: true, default: () => null },
     "@/components/icon": { Icon: () => null },
     "@/components/home-sky-experience": { HomeSkyExperience: () => null },
+    "@/components/weather-attribution": { WeatherAttribution: () => null },
     "@/lib/forecast-location": { DEFAULT_LOCATION, forecastUrl: () => "/pronostico" },
     "@/lib/city-search": {
       esBusquedaValida,

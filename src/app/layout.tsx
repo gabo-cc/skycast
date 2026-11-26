@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/site-header";
+import { WeatherAttribution } from "@/components/weather-attribution";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -33,7 +34,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <span>
               <strong className="text-slate-900">SkyCast.</strong> Una mirada más clara al cielo.
             </span>
-            <span>Datos meteorológicos de Open-Meteo.</span>
+            <span>
+              Datos meteorológicos: <WeatherAttribution />. Ubicaciones:{" "}
+              <a href="https://www.geonames.org/" className="underline underline-offset-2">
+                GeoNames
+              </a>
+              .
+            </span>
           </div>
         </footer>
       </body>

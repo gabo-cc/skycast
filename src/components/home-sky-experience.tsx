@@ -128,11 +128,11 @@ export function HomeSkyExperience({ city, weather }: { city: Ciudad; weather: Cl
                 className="home-hour"
                 key={hour.hora}
                 aria-pressed={selected?.hora === hour.hora}
-                aria-label={`${instanteLocal(hour.hora, weather.zonaHoraria)}, ${hourCondition.descripcion}, ${valor(hour.temperatura, "°C")}, probabilidad de precipitación ${valor(hour.probabilidadPrecipitacion, "%")}`}
+                aria-label={`${horaLocal(hour.hora, weather.zonaHoraria)} ${valor(hour.temperatura, "°C")} ${valor(hour.probabilidadPrecipitacion, "%")}. ${instanteLocal(hour.hora, weather.zonaHoraria)}, ${hourCondition.descripcion}, probabilidad de precipitación ${valor(hour.probabilidadPrecipitacion, "%")}`}
                 title={instanteLocal(hour.hora, weather.zonaHoraria)}
                 onClick={() => setSelectedHour(hour.hora)}
               >
-                <span>{horaLocal(hour.hora, weather.zonaHoraria)}</span>
+                <span>{horaLocal(hour.hora, weather.zonaHoraria)}</span>{" "}
                 <Icon name={hourCondition.icono} className="size-7" />
                 <strong>{valor(hour.temperatura, "°C")}</strong>
                 <small>

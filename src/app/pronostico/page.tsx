@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CurrentWeather } from "@/components/weather-view";
 import { ForecastInteractive } from "@/components/forecast-interactive";
+import { WeatherAttribution } from "@/components/weather-attribution";
 import { parseLocation } from "@/lib/forecast-location";
 import { obtenerClima } from "@/lib/open-meteo/service";
 
@@ -45,8 +46,9 @@ export default async function PronosticoPage({ searchParams }: PageProps<"/prono
       <CurrentWeather city={city} weather={weather} />
       <ForecastInteractive weather={weather} />
       <p className="text-xs leading-5 text-[var(--muted)]">
-        Fuente: Open-Meteo. Los valores diarios usan el desplazamiento vigente al consultar y pueden
-        abarcar horas distintas del día local durante un cambio de horario de verano.
+        Fuente: <WeatherAttribution />. Los valores diarios usan el desplazamiento vigente al
+        consultar y pueden abarcar horas distintas del día local durante un cambio de horario de
+        verano.
       </p>
     </div>
   );

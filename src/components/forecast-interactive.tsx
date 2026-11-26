@@ -380,7 +380,7 @@ export function ForecastInteractive({ weather }: ForecastProps) {
                         style={{
                           background: active ? "var(--accent)" : "var(--surface-soft)",
                           borderColor: active ? "var(--accent)" : "var(--line)",
-                          color: active ? "#ffffff" : "var(--ink)",
+                          color: active ? "var(--page)" : "var(--ink)",
                         }}
                       >
                         <span className="text-sm tabular-nums">{label.time}</span>

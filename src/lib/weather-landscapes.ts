@@ -104,26 +104,33 @@ function emparejar<T>(
   const owners = new Map<string, number>();
   const assigned = new Map(initial);
   const byId = new Map(entries.map((entry) => [entry.id, entry]));
+  const candidates = new Map(
+    entries.map((entry) => [
+      entry.id,
+      options(entry)
+        .map((option) => {
+          const candidateKey = key(option);
+          return {
+            option,
+            key: candidateKey,
+            priority: priority(option),
+            rank: hash(`${entry.id}:${candidateKey}`),
+          };
+        })
+        .sort((a, b) => a.priority - b.priority || a.rank - b.rank || a.key.localeCompare(b.key)),
+    ]),
+  );
   for (const [id, option] of initial) owners.set(key(option), id);
 
   function assign(entry: EntradaPaisaje, visited: Set<string>): boolean {
-    const candidates = [...options(entry)].sort((a, b) => {
-      const aKey = key(a);
-      const bKey = key(b);
-      return (
-        priority(a) - priority(b) ||
-        hash(`${entry.id}:${aKey}`) - hash(`${entry.id}:${bKey}`) ||
-        aKey.localeCompare(bKey)
-      );
-    });
-    for (const candidate of candidates) {
-      const candidateKey = key(candidate);
+    for (const candidate of candidates.get(entry.id) ?? []) {
+      const candidateKey = candidate.key;
       if (used.has(candidateKey) || visited.has(candidateKey)) continue;
       visited.add(candidateKey);
       const owner = owners.get(candidateKey);
       if (owner === undefined || assign(byId.get(owner)!, visited)) {
         owners.set(candidateKey, entry.id);
-        assigned.set(entry.id, candidate);
+        assigned.set(entry.id, candidate.option);
         return true;
       }
     }
