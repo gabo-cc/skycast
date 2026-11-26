@@ -2559,3 +2559,1300 @@ Archivos modificados: `src/app/acerca-de/page.tsx`, `src/components/site-header.
 ### Pruebas y limitaciones
 
 La prueba de integración de búsqueda, favoritos, pronóstico, intercambio y eliminación usa un proveedor simulado; no representa interacciones de navegador. El servidor local devolvió HTTP 200 para las seis páginas y HTTP 400 para parámetros inválidos de ambas API. Se intentó iniciar Edge en modo automatizado, pero falló por acceso denegado a sus archivos de perfil; no hubo pruebas visuales ni de interacción en navegador. Quedan pendientes los flujos A–F solicitados, comprobaciones de teclado, consola, persistencia y pestañas, y las siete anchuras indicadas. Se mantiene la limitación documentada de agregados diarios de Open-Meteo durante cambios de horario de verano. Pasaron las 30 pruebas automatizadas y `pnpm.cmd format:check`, `pnpm.cmd lint`, `pnpm.cmd build` y `pnpm.cmd encoding:check`. Node emitió el aviso existente de detección de módulo. La auditoría técnica está realizada, pero la aplicación no está completamente validada para despliegue hasta completar las pruebas de navegador pendientes. No se realizaron commits ni push.
+
+## 14. Iteración 07 — Rediseño integral UI/UX
+
+### Prompt completo
+
+```text
+# ITERACIÓN 07 — REDISEÑO INTEGRAL UI/UX DE SKYCAST
+
+Actúa como Senior Product Designer, UI/UX Designer, Motion Designer y Senior Frontend Engineer especializado en Next.js 16, React 19, TypeScript, Tailwind CSS 4, accesibilidad web, diseño responsive y Clean Code.
+
+Estamos desarrollando SkyCast mediante Vibe Coding con OpenAI Codex en VS Code.
+
+Quiero transformar SkyCast en una aplicación meteorológica moderna, elegante, dinámica y visualmente profesional, con una identidad propia y una experiencia de usuario comparable a la de un producto digital bien diseñado.
+
+## 1. CONTEXTO DEL PROYECTO
+
+Actualmente SkyCast cuenta con:
+
+- Next.js 16 con App Router.
+- React 19.
+- TypeScript estricto.
+- Tailwind CSS 4.
+- API interna conectada a Open-Meteo.
+- Búsqueda interactiva de ciudades.
+- Clima actual y pronósticos reales.
+- Pronóstico horario y de siete días.
+- Manejo de zonas horarias IANA.
+- Favoritos persistentes con localStorage.
+- Comparación meteorológica entre dos ciudades.
+- Seis páginas implementadas.
+- 27 pruebas automatizadas superadas en la Iteración 06.
+- Configuración de Prettier, ESLint y verificación UTF-8.
+- Documentación del desarrollo en VIBE_CODING.md.
+
+La auditoría QA final todavía no se ha realizado y NO debe ejecutarse como una iteración separada en este momento.
+
+Antes de modificar archivos:
+
+1. Lee AGENTS.md.
+2. Revisa VIBE_CODING.md.
+3. Inspecciona las seis páginas.
+4. Analiza los componentes compartidos y los estilos existentes.
+5. Revisa el estado de Git y conserva todos los cambios pendientes.
+6. Identifica las funcionalidades y pruebas que no deben romperse.
+
+## 2. OBJETIVO DEL REDISEÑO
+
+La apariencia actual de SkyCast es demasiado genérica y estática.
+
+Quiero que deje de sentirse como una plantilla generada automáticamente por IA.
+
+Necesito:
+
+- Una interfaz hermosa, moderna y profesional.
+- Una identidad visual coherente.
+- Mayor dinamismo e interactividad.
+- Animaciones sutiles.
+- Una experiencia móvil excelente.
+- Modo claro, oscuro y automático.
+- Gráficos meteorológicos interactivos.
+- Componentes con jerarquía visual.
+- Navegación intuitiva.
+- Excelente accesibilidad.
+- Alto rendimiento.
+
+No quiero únicamente cambiar los colores.
+
+Quiero mejorar realmente la composición, tipografía, navegación, usabilidad, presentación de información e interacciones.
+
+## 3. DISEÑO VISUAL DE REFERENCIA
+
+Utilizar como referencia conceptual la propuesta visual de SkyCast aprobada en la conversación.
+
+Estética deseada:
+
+- Premium.
+- Editorial.
+- Moderna.
+- Elegante.
+- Limpia.
+- Meteorológica.
+- Visualmente atractiva.
+- Profesional.
+
+Paleta inicial del modo claro:
+
+- Fondo principal: #F8FAFC.
+- Superficies: #FFFFFF.
+- Azul noche: #101C35.
+- Azul real: #2847A1.
+- Turquesa: #51B9CE.
+- Superficie secundaria: #EAF3F7.
+
+Paleta inicial del modo oscuro:
+
+- Fondo principal: #0B1220.
+- Superficies: #17263E.
+- Bordes: #24344D.
+- Texto principal: #F3F7FC.
+- Texto secundario: #AFC1D5.
+- Turquesa: #7DD3E8.
+
+Se permite ajustar estos colores para lograr mejor contraste y armonía.
+
+Crear un sistema de diseño reutilizable mediante variables CSS semánticas.
+
+Cuidar:
+
+- Tipografía.
+- Jerarquía.
+- Alineación.
+- Espaciados.
+- Proporciones.
+- Contraste.
+- Sombras.
+- Bordes.
+- Estados de interacción.
+- Consistencia visual.
+
+Evitar:
+
+- Tarjetas gigantes.
+- Iconos SVG desproporcionados.
+- Gradientes excesivos.
+- Glassmorphism exagerado.
+- Elementos decorativos innecesarios.
+- Diseños recargados.
+- Apariencia genérica de dashboard.
+- Animaciones exageradas.
+
+## 4. MODO CLARO, OSCURO Y AUTOMÁTICO
+
+Implementar tres opciones:
+
+1. Claro.
+2. Oscuro.
+3. Automático.
+
+El modo automático debe ser la opción predeterminada.
+
+Requisitos:
+
+- Respetar prefers-color-scheme.
+- Guardar la preferencia en localStorage.
+- Conservarla después de recargar.
+- Evitar errores de hidratación.
+- Minimizar el parpadeo del tema incorrecto.
+- Detectar cambios del sistema en modo automático.
+- Sincronizar cambios entre pestañas cuando corresponda.
+- Proporcionar un selector accesible en el header.
+- Permitir cambiar el modo también desde móvil.
+
+Aplicar correctamente ambos temas a todas las páginas y componentes.
+
+No limitarse a cambiar el fondo: diseñar tarjetas, botones, campos, bordes, textos e iconos específicamente para ambos modos.
+
+No agregar librerías de temas si las herramientas actuales son suficientes.
+
+## 5. INTERFAZ DINÁMICA SEGÚN EL CLIMA
+
+La presentación meteorológica debe reaccionar visualmente al clima real.
+
+Estados:
+
+SOLEADO:
+- Azules luminosos.
+- Acentos cálidos.
+- Sensación visual despejada.
+
+NUBLADO:
+- Azules grisáceos.
+- Composición más suave.
+
+LLUVIOSO:
+- Azules profundos.
+- Elementos visuales relacionados con lluvia.
+
+TORMENTA:
+- Tonos oscuros controlados.
+- Contraste adecuado.
+
+NOCHE:
+- Azul marino.
+- Iconografía nocturna.
+
+Utilizar únicamente los códigos meteorológicos y datos reales disponibles.
+
+Los cambios meteorológicos deben afectar principalmente las secciones de clima, sin sobrescribir la preferencia global de tema.
+
+Priorizar CSS y SVG ligeros.
+
+Evitar efectos pesados o animaciones permanentes innecesarias.
+
+## 6. PÁGINA DE INICIO
+
+Rediseñar la ruta /.
+
+Debe sentirse como la pantalla principal de una aplicación meteorológica de calidad.
+
+Mostrar:
+
+- Ciudad predeterminada: San Salvador, El Salvador.
+- Temperatura actual destacada.
+- Condición meteorológica.
+- Iconografía apropiada.
+- Sensación térmica.
+- Humedad.
+- Viento.
+- Hora local.
+- Pronóstico resumido.
+- Acceso directo a búsqueda.
+- Acceso al pronóstico completo.
+
+Crear una composición atractiva con un bloque meteorológico principal y secciones secundarias bien organizadas.
+
+No utilizar datos meteorológicos ficticios.
+
+## 7. PÁGINA DE BÚSQUEDA
+
+Rediseñar /buscar.
+
+Mantener:
+
+- Búsqueda mediante API.
+- Debounce.
+- Cancelación de solicitudes obsoletas.
+- Estados de carga.
+- Manejo de errores.
+- Resultados vacíos.
+- Identificación de ciudades homónimas.
+
+CORRECCIÓN OBLIGATORIA:
+
+Actualmente el usuario selecciona una ciudad y después debe desplazarse para encontrar otro botón que lo lleve al pronóstico.
+
+Eliminar esa fricción.
+
+Al seleccionar una ciudad, navegar directamente a /pronostico.
+
+No exigir una segunda confirmación.
+
+No obligar al usuario a desplazarse.
+
+Conservar correctamente la identidad de la ciudad y las coordenadas.
+
+Usar la navegación de Next.js App Router.
+
+Evitar que pulsar el botón de favoritos active la navegación.
+
+## 8. CORAZONES DE FAVORITOS
+
+Implementar un corazón moderno e interactivo.
+
+ESTADO NO GUARDADO:
+
+- Corazón con contorno.
+- Sin relleno.
+- Etiqueta accesible: Agregar a favoritos.
+
+ESTADO GUARDADO:
+
+- Corazón completamente relleno.
+- Color visible y elegante.
+- Etiqueta accesible: Quitar de favoritos.
+
+Al pulsarlo:
+
+- Guardar o quitar la ciudad.
+- Actualizar el estado visual cuando la operación tenga éxito.
+- Aplicar una microanimación discreta.
+- Mantener el estado tras recargar.
+- Sincronizarlo con localStorage.
+- Evitar duplicados.
+- No activar la navegación de la ciudad.
+- Mostrar un estado correcto si el almacenamiento falla.
+
+El corazón debe ser coherente en ambos temas.
+
+Respetar prefers-reduced-motion.
+
+## 9. PÁGINA DE PRONÓSTICO
+
+Rediseñar /pronostico.
+
+Mostrar:
+
+- Ciudad seleccionada.
+- Temperatura actual.
+- Condición meteorológica.
+- Sensación térmica.
+- Humedad.
+- Viento.
+- Pronóstico horario.
+- Pronóstico de siete días.
+
+Implementar un pronóstico horario visualmente más atractivo.
+
+Crear una visualización interactiva de temperaturas con SVG responsive cuando sea adecuado.
+
+Permitir interactuar con las horas usando mouse, teclado y pantalla táctil.
+
+Mostrar temperatura y probabilidad de precipitación cuando estén disponibles.
+
+Permitir seleccionar un día del pronóstico.
+
+Al seleccionar el día:
+
+- Resaltarlo visualmente.
+- Actualizar los detalles del día.
+- Mostrar máxima y mínima.
+- Mostrar probabilidad de precipitación.
+- Mostrar condición meteorológica.
+
+No inventar datos.
+
+Conservar los instantes UTC y la conversión mediante zonas horarias IANA.
+
+No romper las correcciones realizadas sobre horario de verano.
+
+Mantener documentada la limitación de Open-Meteo respecto a agregados diarios durante transiciones de horario de verano.
+
+## 10. PÁGINA DE FAVORITOS
+
+Rediseñar /favoritos como una colección personal.
+
+- Tarjetas elegantes.
+- Nombre y país destacados.
+- Corazón relleno cuando una ciudad está guardada.
+- Eliminación intuitiva.
+- Acceso al pronóstico.
+- Estado vacío atractivo y útil.
+- Persistencia.
+- Sincronización entre pestañas.
+
+No mostrar datos meteorológicos ficticios.
+
+No eliminar información guardada por el usuario.
+
+## 11. PÁGINA DE COMPARACIÓN
+
+Rediseñar /comparar.
+
+Mantener todas las funcionalidades actuales:
+
+- Buscar ciudades.
+- Elegir favoritos.
+- Distinguir homónimos.
+- Intercambiar ciudades.
+- Comparar condiciones.
+- Reintentar errores.
+- Abrir pronósticos individuales.
+
+Mejorar:
+
+- Distribución visual.
+- Jerarquía.
+- Claridad de métricas.
+- Diferencias de temperatura.
+- Tarjetas.
+- Estados de interacción.
+- Presentación móvil.
+
+Utilizar una composición clara en escritorio y móvil.
+
+No alterar los cálculos existentes sin necesidad.
+
+## 12. PÁGINA ACERCA DE
+
+Rediseñar /acerca-de.
+
+Presentar claramente:
+
+- Qué es SkyCast.
+- Qué funcionalidades ofrece.
+- Qué tecnologías utiliza.
+- De dónde obtiene los datos.
+
+No inventar funcionalidades.
+
+Mantener un estilo coherente con el resto del proyecto.
+
+## 13. NAVEGACIÓN GLOBAL
+
+Rediseñar:
+
+- Header.
+- Navegación.
+- Menú móvil.
+- Footer.
+- Estados activos.
+- Selector de tema.
+- Botones principales.
+
+Mejorar la usabilidad y la consistencia visual.
+
+Mantener accesibilidad mediante teclado y estados focus visibles.
+
+No permitir que el menú móvil permanezca abierto después de navegar.
+
+## 14. MICROINTERACCIONES Y ANIMACIONES
+
+Agregar interacciones sutiles con propósito:
+
+- Transiciones suaves de tarjetas.
+- Hover elegante.
+- Animación breve del corazón.
+- Cambio de tema.
+- Resaltado de día seleccionado.
+- Feedback visual de acciones.
+- Aparición discreta de contenido.
+- Indicadores de carga.
+- Cambios visuales según condiciones meteorológicas.
+
+No añadir animaciones permanentes innecesarias.
+
+No provocar desplazamientos inesperados ni cambios bruscos de layout.
+
+Respetar prefers-reduced-motion.
+
+## 15. RESPONSIVE DESIGN
+
+Diseñar y verificar las siguientes resoluciones:
+
+- 320 px.
+- 375 px.
+- 430 px.
+- 768 px.
+- 1024 px.
+- 1440 px.
+- 1920 px.
+
+Prestar especial atención a:
+
+- Menú móvil.
+- Buscador.
+- Tarjetas.
+- Pronóstico por horas.
+- Gráficos.
+- Favoritos.
+- Comparación.
+- Selector de tema.
+
+No permitir desbordamientos horizontales de la página.
+
+Mantener tamaños adecuados de iconos y botones.
+
+## 16. ACCESIBILIDAD
+
+Verificar:
+
+- Navegación por teclado.
+- Orden lógico del foco.
+- Etiquetas de formularios.
+- Nombres accesibles de botones.
+- Contraste.
+- Estados focus.
+- Mensajes de carga.
+- Mensajes de error.
+- Compatibilidad táctil.
+- Respeto a prefers-reduced-motion.
+
+Las animaciones no deben ser necesarias para comprender la información.
+
+## 17. ARQUITECTURA Y RENDIMIENTO
+
+- Mantener Next.js 16 App Router.
+- Mantener React 19.
+- Mantener TypeScript estricto.
+- Mantener Tailwind CSS 4.
+- Mantener la API existente.
+- Conservar Server Components cuando corresponda.
+- Crear Client Components solo para interactividad real.
+- Reutilizar servicios y tipos.
+- Evitar duplicación.
+- No agregar una base de datos.
+- No introducir dependencias innecesarias.
+- Priorizar CSS y SVG.
+- Evitar solicitudes duplicadas.
+- Mantener buen rendimiento.
+
+## 18. PRUEBAS AUTOMATIZADAS
+
+Actualizar las pruebas existentes y agregar las necesarias para:
+
+- Navegación directa al seleccionar una ciudad.
+- Interacción independiente del corazón.
+- Corazón relleno y sin relleno.
+- Persistencia de favoritos.
+- Modo claro.
+- Modo oscuro.
+- Modo automático.
+- Persistencia del tema.
+- Selección de días.
+- Pronóstico horario.
+- Adaptación visual según el clima.
+- Datos ausentes.
+- Regresión de búsqueda, pronóstico, favoritos y comparación.
+
+No afirmar que se realizaron pruebas de navegador si no se ejecutaron.
+
+## 19. DOCUMENTACIÓN VIBE CODING
+
+Registrar este prompt completo en VIBE_CODING.md como:
+
+Iteración 07 — Rediseño integral UI/UX.
+
+Documentar:
+
+- Objetivo.
+- Prompt original.
+- Problemas identificados.
+- Decisiones de diseño.
+- Paleta aplicada.
+- Componentes creados.
+- Archivos modificados.
+- Problemas técnicos.
+- Soluciones.
+- Pruebas realizadas.
+- Resultados verificables.
+- Limitaciones pendientes.
+
+No inventar resultados ni alterar el historial previo.
+
+## 20. VALIDACIONES OBLIGATORIAS
+
+Ejecutar:
+
+pnpm.cmd format:check
+pnpm.cmd lint
+pnpm.cmd build
+pnpm.cmd encoding:check
+
+Ejecutar también todas las pruebas automatizadas.
+
+Corregir los errores introducidos antes de finalizar.
+
+## 21. RESTRICCIONES
+
+- No ejecutar todavía la auditoría QA final.
+- No implementar autenticación.
+- No introducir una base de datos.
+- No eliminar funcionalidades.
+- No sustituir datos reales por ejemplos.
+- No modificar innecesariamente la lógica de Open-Meteo.
+- No cambiar de gestor de paquetes.
+- No añadir dependencias innecesarias.
+- No hacer commits.
+- No realizar push.
+- No desplegar todavía.
+- No sobrescribir cambios pendientes.
+- No avanzar a la siguiente iteración.
+
+RESULTADO ESPERADO:
+
+Quiero que SkyCast se convierta en una aplicación meteorológica de apariencia premium, moderna, dinámica, profesional y visualmente atractiva.
+
+Debe incluir:
+
+- Nueva identidad visual coherente.
+- Modo claro, oscuro y automático.
+- Interfaz que responda visualmente al clima.
+- Pronósticos interactivos.
+- Corazones completamente rellenos al guardar ciudades.
+- Navegación directa al seleccionar ciudades.
+- Experiencia responsive.
+- Excelente accesibilidad.
+- Buen rendimiento.
+- Conservación de todas las funcionalidades actuales.
+
+No considerar el trabajo terminado únicamente porque el código compile.
+
+Al finalizar, entregar un resumen de mejoras visuales, interacciones implementadas, archivos modificados, resultados de pruebas y comprobaciones visuales pendientes.
+```
+
+### Objetivo, diseño y archivos
+
+Actualizar la experiencia sin alterar las APIs ni reemplazar datos reales. Se introdujeron variables semánticas con fondos `#F8FAFC` y `#0B1220`, superficies claras y oscuras, azul nocturno y acentos turquesa. Se reorganizó el inicio y la jerarquía tipográfica; los estilos compartidos aplican la paleta a las seis rutas. Las condiciones reales seleccionan tratamientos visuales específicos sin cambiar el tema global.
+
+Se modificaron `src/app/globals.css`, `layout.tsx`, `page.tsx`, `pronostico/page.tsx`, `src/components/city-search.tsx`, `favorite-cities.tsx`, `site-header.tsx`, `ui.tsx`, `weather-view.tsx` y `src/lib/weather-display.ts`. Se crearon `src/components/theme-selector.tsx`, `favorite-heart.tsx`, `forecast-interactive.tsx`, `src/lib/theme.ts`, `forecast-view.ts` y `tests/ui-preferences.test.mjs`. Se conserva la configuración y el historial existente.
+
+### Decisiones y limitaciones
+
+El tema automático sigue la preferencia del sistema, se guarda en `localStorage`, escucha cambios entre pestañas y se inicializa antes de hidratar. El corazón es un botón independiente con relleno según el estado persistido; los resultados enlazan directamente al pronóstico. El pronóstico usa botones accesibles para seleccionar hora y día y dibuja una línea SVG sin interpolar valores ausentes. Se mantiene la advertencia sobre los agregados diarios del proveedor y se respeta movimiento reducido. La referencia visual conceptual no estaba disponible como imagen en esta sesión; se utilizó la descripción y la paleta proporcionadas.
+
+Las pruebas de lógica cubren tema, persistencia simulada, selección de día, estados de clima y regresiones existentes. No comprueban visualmente el corazón, la navegación, el gráfico ni los eventos de tema en navegador. El navegador automatizado no estaba disponible en el entorno; quedan pendientes la revisión visual y la interacción en las resoluciones solicitadas. No se desplegó ni se realizaron commits o push.
+
+### Estado final
+
+Pasaron las 32 pruebas automatizadas, `pnpm.cmd format:check`, `pnpm.cmd lint`, `pnpm.cmd build` y `pnpm.cmd encoding:check`. Node emitió el aviso existente de detección de módulo. La implementación está disponible localmente; su aceptación visual, la interacción real del corazón y del gráfico, la sincronización del tema y el contraste en las resoluciones solicitadas quedan pendientes de comprobar en navegador. No se desplegó ni se realizaron commits o push.
+
+## 15. Corrección visual de la iteración de rediseño
+
+### Prompt completo
+
+```text
+# SKYCAST — CORRECCIÓN DEL REDISEÑO SEGÚN REFERENCIA VISUAL
+
+Actúa como Senior UI/UX Designer y Senior Frontend Engineer especializado en Next.js 16, React 19, TypeScript y Tailwind CSS 4.
+
+Te adjunto una imagen de referencia que muestra cómo quiero que se vea SkyCast.
+
+IMPORTANTE:
+
+Esta imagen no es únicamente una inspiración de colores. Es la referencia principal para la composición, distribución, proporciones, jerarquía visual y estilo de la aplicación.
+
+Quiero que reproduzcas su lenguaje visual con la mayor fidelidad posible, adaptándolo a los componentes y datos reales de SkyCast.
+
+No quiero que interpretes libremente el diseño ni que generes otra propuesta diferente.
+
+## 1. ANALIZA LA IMAGEN ANTES DE MODIFICAR CÓDIGO
+
+La imagen contiene ejemplos de:
+
+- Inicio.
+- Buscar.
+- Pronóstico.
+- Favoritos.
+- Comparar.
+- Acerca de.
+- Modo claro.
+- Modo oscuro.
+- Selector de apariencia.
+
+Identifica:
+
+- Distribución de elementos.
+- Tamaño y proporción de tarjetas.
+- Espaciado.
+- Bordes y sombras.
+- Tipografía.
+- Paleta de colores.
+- Diseño de navegación.
+- Jerarquía de información.
+- Presentación de temperaturas.
+- Iconos meteorológicos.
+- Estados de interacción.
+
+No copies literalmente textos o datos meteorológicos ficticios de la imagen.
+
+## 2. FIDELIDAD VISUAL
+
+Recrear una interfaz visualmente muy cercana a la referencia.
+
+Características obligatorias:
+
+- Header compacto y elegante.
+- Logo SkyCast.
+- Navegación horizontal limpia en escritorio.
+- Navegación móvil adaptada.
+- Fondo claro azul grisáceo.
+- Tarjetas blancas y azul hielo.
+- Bordes finos y redondeados.
+- Sombras suaves.
+- Temperaturas destacadas.
+- Iconos meteorológicos proporcionados.
+- Tarjetas compactas.
+- Distribución equilibrada.
+- Espacios bien aprovechados.
+
+Evitar componentes gigantes, exceso de espacios vacíos o diseños genéricos.
+
+## 3. PALETA
+
+Modo claro:
+
+- Fondo: #F8FAFC.
+- Superficies: #FFFFFF.
+- Azul principal: #2847A1.
+- Azul oscuro: #101C35.
+- Turquesa: #51B9CE.
+- Azul hielo: #EAF3F7.
+
+Modo oscuro:
+
+- Fondo: #0B1220.
+- Superficies: #17263E.
+- Bordes: #24344D.
+- Texto principal: #F3F7FC.
+- Texto secundario: #AFC1D5.
+- Acento turquesa: #7DD3E8.
+
+Ajustar los tonos cuando sea necesario para reproducir la referencia y mantener accesibilidad.
+
+## 4. DISTRIBUCIÓN DE CADA PÁGINA
+
+INICIO:
+
+Seguir la composición de la esquina superior izquierda de la imagen.
+
+- Encabezado meteorológico atractivo.
+- Buscador integrado o acceso destacado a búsqueda.
+- Tarjeta principal de clima.
+- Temperatura grande.
+- Condiciones actuales.
+- Sensación térmica, humedad y viento.
+- Pronóstico horario compacto.
+
+BUSCAR:
+
+Seguir la composición superior central.
+
+- Título y descripción breves.
+- Buscador destacado.
+- Lista de resultados compacta.
+- Nombre, región y país.
+- Corazón de favoritos alineado a la derecha.
+- Filas con hover y selección claros.
+
+Seleccionar una ciudad debe abrir directamente su pronóstico.
+
+PRONÓSTICO:
+
+Seguir la composición superior derecha.
+
+- Encabezado de ciudad.
+- Tarjeta meteorológica destacada.
+- Temperatura principal.
+- Indicadores secundarios.
+- Pronóstico horario.
+- Pronóstico de siete días.
+- Gráficos interactivos cuando corresponda.
+
+FAVORITOS:
+
+Seguir la composición de la segunda fila izquierda.
+
+- Lista visual de ciudades.
+- Tarjetas compactas.
+- Corazones rellenos.
+- Acceso rápido al pronóstico.
+- Estado vacío bien diseñado.
+
+COMPARAR:
+
+Seguir la composición de la segunda fila central.
+
+- Dos ciudades alineadas.
+- Tarjetas meteorológicas comparables.
+- Botón de intercambio central.
+- Métricas en filas claras.
+- Diferencias fáciles de interpretar.
+
+ACERCA DE:
+
+Seguir la composición de la segunda fila derecha.
+
+- Diseño limpio.
+- Información breve y bien jerarquizada.
+- Iconografía de funcionalidades.
+- Consistencia con el resto de la aplicación.
+
+## 5. MODO OSCURO
+
+Recrear la estética de la tercera fila de la imagen.
+
+No limitarse a invertir colores.
+
+El modo oscuro debe incluir:
+
+- Fondos azul marino.
+- Tarjetas azul profundo.
+- Acentos turquesa.
+- Textos de alto contraste.
+- Bordes sutiles.
+- Estados activos visibles.
+
+Implementar también el selector Claro, Oscuro y Automático.
+
+Conservar la preferencia del usuario.
+
+## 6. EXPERIENCIA DINÁMICA
+
+Aunque la imagen sea estática, la aplicación no debe sentirse estática.
+
+Implementar:
+
+- Microinteracciones elegantes.
+- Corazones que se rellenan.
+- Transiciones suaves.
+- Estados hover y focus.
+- Pronóstico horario interactivo.
+- Selección de días.
+- Cambios visuales según el clima real.
+- Estados de carga cuidados.
+
+Respetar prefers-reduced-motion.
+
+Evitar animaciones exageradas y efectos que dificulten la lectura.
+
+## 7. PRESERVAR FUNCIONALIDADES
+
+No romper:
+
+- Open-Meteo.
+- Búsqueda.
+- Pronósticos.
+- Zonas horarias IANA.
+- Favoritos.
+- Persistencia.
+- Comparación.
+- Manejo de errores.
+- Pruebas existentes.
+
+No reemplazar datos reales por datos de la imagen.
+
+## 8. CALIDAD Y DOCUMENTACIÓN
+
+Leer AGENTS.md.
+
+Actualizar VIBE_CODING.md y registrar esta corrección visual dentro de la iteración de rediseño.
+
+No reescribir ni eliminar el historial anterior.
+
+Mantener Clean Code, TypeScript estricto, UTF-8 y pnpm.
+
+## 9. VALIDACIONES
+
+Ejecutar:
+
+pnpm.cmd format:check
+pnpm.cmd lint
+pnpm.cmd build
+pnpm.cmd encoding:check
+
+Ejecutar todas las pruebas automatizadas.
+
+Si puedes inspeccionar la aplicación en un navegador, comparar visualmente cada página con la imagen adjunta.
+
+Si no puedes, indicar qué verificaciones visuales quedan pendientes.
+
+## 10. RESTRICCIONES
+
+- No ejecutar todavía QA final.
+- No agregar funcionalidades ajenas al rediseño.
+- No añadir una base de datos.
+- No agregar dependencias innecesarias.
+- No realizar commits ni push.
+- No desplegar.
+
+RESULTADO ESPERADO:
+
+SkyCast debe verse lo más parecido posible a la imagen adjunta, tanto en modo claro como oscuro, conservando toda su funcionalidad real y añadiendo las interacciones dinámicas acordadas.
+
+Priorizar fidelidad visual, calidad de experiencia, accesibilidad y rendimiento.
+
+Al finalizar, explicar las diferencias que permanezcan entre la referencia y la implementación.
+```
+
+### Objetivo, decisiones y archivos
+
+Acercar la composición a la imagen de referencia sin sustituir datos reales. Se compactaron cabecera, títulos y tarjetas; Inicio utiliza un paisaje decorativo generado, acceso a búsqueda y seis horas reales; búsqueda y favoritos presentan filas; el pronóstico tiene vistas seleccionables por horas y días; Acerca de presenta las funciones en una cuadrícula y Comparar centra el intercambio. Se conservaron las funcionalidades y el tema existente. El paisaje se generó para este proyecto y se convirtió a WebP para reducir su tamaño; es decorativo y no representa las condiciones reales.
+
+Se modificaron `src/app/layout.tsx`, `page.tsx`, `pronostico/page.tsx`, `acerca-de/page.tsx`, `globals.css`, `src/components/site-header.tsx`, `theme-selector.tsx`, `ui.tsx`, `city-search.tsx`, `favorite-cities.tsx`, `weather-view.tsx`, `forecast-interactive.tsx`, `comparison.tsx` y esta bitácora; se creó `public/skycast-paisaje.webp`.
+
+### Pruebas y diferencias pendientes
+
+La referencia contiene fotografías específicas de ciudades, temperaturas en favoritos y una comparación con métricas en una única tabla. La implementación usa un paisaje genérico decorativo, no inventa temperaturas para favoritos y mantiene las métricas en tarjetas independientes para preservar las consultas y errores por ciudad. La selección de tema conserva un selector nativo accesible. No se realizó una comparación visual en navegador; quedan pendientes proporciones, contraste, responsividad y funcionamiento táctil en modos claro y oscuro. Pasaron las 32 pruebas automatizadas y `pnpm.cmd format:check`, `pnpm.cmd lint`, `pnpm.cmd build` y `pnpm.cmd encoding:check`. No se realizaron commits, push ni despliegue.
+
+## 16. Refinamiento visual y ambientes
+
+### Prompt completo
+
+```text
+# SKYCAST — REFINAMIENTO VISUAL PREMIUM Y PAISAJES METEOROLÓGICOS ANIMADOS
+
+Actúa como Senior Product Designer, UI/UX Designer, Motion Designer y Frontend Engineer especializado en Next.js 16, React 19, TypeScript, Tailwind CSS 4, CSS/SVG y accesibilidad.
+
+## CONTEXTO
+
+SkyCast ya tiene implementadas sus principales funcionalidades y recibió un primer rediseño visual.
+
+Sin embargo, el resultado actual todavía se siente demasiado sencillo, plano y alejado de la imagen de referencia que adjunto.
+
+Quiero realizar una segunda mejora visual, incorporando también paisajes meteorológicos animados mediante CSS y SVG.
+
+IMPORTANTE:
+
+La imagen adjunta es nuestra referencia visual principal, no una inspiración genérica.
+
+No quiero comenzar desde cero. Quiero mejorar la implementación actual y acercarla a la referencia.
+
+Antes de modificar código:
+- Leer AGENTS.md.
+- Revisar VIBE_CODING.md.
+- Inspeccionar las seis páginas.
+- Revisar componentes, temas y estilos existentes.
+- Revisar git status.
+- Preservar todos los cambios pendientes.
+
+## 1. OBJETIVO PRINCIPAL
+
+Convertir SkyCast en una aplicación meteorológica visualmente atractiva, premium, dinámica y profesional.
+
+Priorizar:
+
+- Fidelidad a la referencia visual.
+- Mejor composición.
+- Mayor profundidad visual.
+- Mejor jerarquía de información.
+- Colores de marca coherentes.
+- Paisajes meteorológicos animados.
+- Interacciones fluidas.
+- Accesibilidad.
+- Rendimiento.
+
+Evitar una interfaz de cajas blancas genéricas, exceso de espacios vacíos o elementos sobredimensionados.
+
+## 2. IDENTIDAD VISUAL
+
+Mantener la paleta aprobada:
+
+Modo claro:
+- Fondo: #F8FAFC.
+- Superficie: #FFFFFF.
+- Azul noche: #101C35.
+- Azul principal: #2847A1.
+- Turquesa: #51B9CE.
+- Azul hielo: #EAF3F7.
+
+Modo oscuro:
+- Fondo: #0B1220.
+- Superficie: #17263E.
+- Bordes: #24344D.
+- Texto: #F3F7FC.
+- Texto secundario: #AFC1D5.
+- Acento: #7DD3E8.
+
+Crear o reutilizar tokens semánticos CSS.
+
+La apariencia debe tener más profundidad, pero sin exceso de gradientes, sombras o transparencia.
+
+El modo oscuro debe sentirse diseñado intencionalmente.
+
+## 3. PAISAJES METEOROLÓGICOS ANIMADOS
+
+Implementar fondos atmosféricos dinámicos mediante CSS y SVG.
+
+PROHIBIDO utilizar:
+- Vídeos.
+- GIF.
+- Imágenes externas para los fondos meteorológicos.
+- Canvas.
+- WebGL.
+- Bibliotecas de animaciones innecesarias.
+
+Crear un componente reutilizable, por ejemplo WeatherAtmosphere.
+
+El componente debe generar ambientes según el código WMO y el indicador esDeDia que devuelve Open-Meteo.
+
+AMBIENTES:
+
+A. Soleado
+- Cielo azul luminoso.
+- Sol con iluminación suave.
+- Nubes blancas desplazándose lentamente.
+- Capas de paisaje o siluetas SVG discretas.
+
+B. Parcialmente nublado
+- Cielo azul.
+- Nubes de distintos tamaños y profundidades.
+- Movimiento horizontal lento.
+
+C. Nublado
+- Cielo azul grisáceo.
+- Nubes superpuestas.
+- Movimiento ambiental sutil.
+
+D. Llovizna
+- Nubes suaves.
+- Gotas pequeñas con caída discreta.
+- Ambiente azul frío.
+
+E. Lluvia
+- Cielo azul profundo.
+- Nubes densas.
+- Gotas animadas con intensidad moderada.
+- Sensación de profundidad.
+
+F. Tormenta
+- Cielo oscuro.
+- Nubes densas.
+- Iluminación ambiental muy sutil.
+- Sin destellos intensos ni parpadeos agresivos.
+
+G. Noche despejada
+- Cielo azul marino profundo.
+- Luna SVG.
+- Estrellas con variaciones suaves de opacidad.
+- Siluetas de paisaje.
+
+H. Noche nublada
+- Cielo nocturno.
+- Nubes oscuras moviéndose.
+- Luz lunar tenue.
+
+Los paisajes deben sentirse elegantes y cinematográficos, pero sin recargar la interfaz.
+
+No utilizar datos inventados.
+
+Los estados deben seleccionarse mediante reglas deterministas basadas en la información meteorológica real.
+
+Si los datos están ausentes, utilizar un ambiente neutral.
+
+## 4. IMPLEMENTACIÓN Y RENDIMIENTO
+
+Utilizar:
+
+- CSS gradients.
+- SVG optimizados.
+- CSS keyframes.
+- transform.
+- opacity.
+- Capas decorativas controladas.
+
+Evitar:
+
+- Animaciones continuas en JavaScript.
+- Cientos de partículas.
+- Filtros visuales costosos.
+- Animaciones de propiedades que produzcan layout shifts.
+- Renderizados innecesarios.
+
+Crear pocos elementos animados y reutilizables.
+
+Respetar prefers-reduced-motion.
+
+Cuando el usuario prefiera movimiento reducido, mostrar una versión estática equivalente.
+
+Marcar los SVG decorativos como aria-hidden.
+
+No bloquear el contenido meteorológico si falla algún efecto.
+
+## 5. DÓNDE APLICAR LOS PAISAJES
+
+INICIO:
+Incorporar el paisaje animado detrás del encabezado y tarjeta principal del clima.
+
+PRONÓSTICO:
+Aplicar un ambiente atmosférico coherente en el bloque meteorológico principal.
+
+COMPARAR:
+Aplicar fondos diferenciados a las tarjetas de las dos ciudades, utilizando sus condiciones meteorológicas reales.
+
+No colocar paisajes animados detrás de formularios, listas extensas o textos que pierdan legibilidad.
+
+Aplicar overlays cuando sea necesario para mantener contraste.
+
+El tema claro/oscuro controla la interfaz general; la condición meteorológica controla el ambiente de las tarjetas.
+
+## 6. MEJORAR LA PÁGINA DE INICIO
+
+Acercarla a la composición de la referencia.
+
+- Hero más atractivo.
+- Paisaje meteorológico integrado.
+- Temperatura destacada.
+- Métricas secundarias mejor distribuidas.
+- Pronóstico horario visualmente más cuidado.
+- Menos espacios vacíos.
+- Tarjetas proporcionadas.
+- Acceso a búsqueda visible.
+
+No utilizar imágenes meteorológicas ficticias como datos.
+
+## 7. MEJORAR BÚSQUEDA
+
+Rediseñar la lista de resultados para acercarla a la maqueta aprobada.
+
+- Filas compactas.
+- Mejor contraste.
+- Hover atractivo.
+- Espaciado coherente.
+- Nombre, región y país claramente diferenciados.
+- Iconos proporcionados.
+- Corazones integrados.
+
+Al seleccionar una ciudad, navegar directamente a su pronóstico, sin exigir desplazamiento ni pulsar un segundo botón.
+
+Conservar debounce, cancelaciones, errores y manejo de homónimos.
+
+## 8. CORAZÓN DE FAVORITOS
+
+El corazón actual utiliza rojo y rompe la identidad visual.
+
+Cambiarlo para que use exclusivamente tonos coherentes con SkyCast.
+
+NO GUARDADO:
+- Corazón con contorno.
+- Azul o turquesa según el tema.
+- Hover visible.
+
+GUARDADO:
+- Corazón completamente relleno.
+- Modo claro: turquesa #169DB6 o una variante accesible.
+- Modo oscuro: turquesa #7DD3E8.
+- Animación breve de escala al guardar.
+
+Debe:
+- Mostrar correctamente el estado persistido.
+- Evitar duplicados.
+- Mantener sincronización entre pestañas.
+- No activar la navegación de ciudad.
+- Manejar fallos de almacenamiento.
+- Tener etiqueta accesible.
+
+No usar rojo o rosa para los favoritos en ninguna página.
+
+Utilizar tokens de color compartidos.
+
+## 9. MEJORAR PRONÓSTICO
+
+Acercar la composición a la referencia.
+
+- Cabecera meteorológica más rica.
+- Paisaje animado.
+- Temperatura destacada.
+- Pestañas visualmente cuidadas.
+- Gráfico horario interactivo.
+- Selección de días.
+- Datos secundarios bien organizados.
+
+Conservar el manejo de zonas horarias IANA y fechas UTC.
+
+No introducir datos simulados.
+
+## 10. MEJORAR FAVORITOS
+
+Convertir /favoritos en una colección visual más atractiva.
+
+- Filas o tarjetas compactas con profundidad.
+- Mejor jerarquía.
+- Corazón turquesa relleno.
+- Acceso sencillo al pronóstico.
+- Estados vacíos bien diseñados.
+- Menor cantidad de espacio desperdiciado.
+
+Mostrar información meteorológica adicional únicamente si se consulta realmente a Open-Meteo y puede hacerse sin exceso de solicitudes.
+
+## 11. MEJORAR COMPARACIÓN
+
+La comparación actual parece demasiado similar a un formulario.
+
+Quiero que, una vez seleccionadas las ciudades, aparezca una comparación visual mucho más rica.
+
+- Tarjetas meteorológicas enfrentadas.
+- Paisajes dinámicos de cada ciudad.
+- Temperaturas grandes.
+- Métricas alineadas.
+- Intercambio visualmente integrado.
+- Diferencias legibles.
+- Buen comportamiento responsive.
+
+Mantener la selección de ciudades, favoritos, errores independientes y reintentos.
+
+## 12. MEJORAR ACERCA DE
+
+Mantener una composición limpia, pero más cuidada.
+
+- Iconografía refinada.
+- Mejor jerarquía de títulos.
+- Tarjetas equilibradas.
+- Secciones con mayor personalidad.
+- Menos sensación de plantilla genérica.
+
+## 13. INTERACCIONES
+
+Mejorar:
+
+- Hover y focus.
+- Transiciones de tarjetas.
+- Corazón.
+- Selector de tema.
+- Pestañas.
+- Selección de días.
+- Estados de carga.
+- Navegación móvil.
+
+Evitar animaciones exageradas.
+
+Respetar prefers-reduced-motion.
+
+## 14. RESPONSIVE
+
+Comprobar:
+
+320, 375, 430, 768, 1024, 1440 y 1920 px.
+
+Evitar:
+
+- Desbordamientos horizontales.
+- Tarjetas enormes.
+- SVG gigantes.
+- Textos recortados.
+- Animaciones que dificulten el uso móvil.
+- Controles demasiado pequeños.
+
+## 15. PRUEBAS
+
+Agregar o actualizar pruebas para:
+
+- Clasificación de ambientes meteorológicos.
+- Día y noche.
+- Código WMO desconocido.
+- Fondos estáticos con movimiento reducido.
+- Colores y estados del corazón.
+- Navegación directa.
+- Persistencia de favoritos.
+- Regresión de búsqueda, pronóstico y comparación.
+
+No afirmar que se realizaron pruebas visuales de navegador si no se ejecutaron.
+
+## 16. DOCUMENTACIÓN
+
+Registrar este prompt completo como una corrección de la iteración de rediseño UI/UX en VIBE_CODING.md.
+
+Documentar:
+
+- Problemas del diseño anterior.
+- Mejoras visuales.
+- Decisión de usar CSS/SVG en lugar de vídeo.
+- Ambientes implementados.
+- Paleta final.
+- Corrección del corazón.
+- Pruebas y resultados reales.
+- Limitaciones pendientes.
+
+## 17. VALIDACIONES
+
+Ejecutar:
+
+pnpm.cmd format:check
+pnpm.cmd lint
+pnpm.cmd build
+pnpm.cmd encoding:check
+
+Ejecutar todas las pruebas automatizadas.
+
+Corregir los errores introducidos.
+
+## 18. RESTRICCIONES
+
+- No ejecutar QA final todavía.
+- No borrar funcionalidades.
+- No reemplazar datos reales por simulaciones.
+- No usar vídeos, GIF ni imágenes externas para paisajes.
+- No introducir una base de datos.
+- No cambiar pnpm.
+- No instalar dependencias innecesarias.
+- No realizar commits ni push.
+- No desplegar.
+
+RESULTADO ESPERADO:
+
+SkyCast debe acercarse mucho más a la referencia visual aprobada y contar con paisajes meteorológicos CSS/SVG animados que reaccionen a las condiciones reales.
+
+Quiero una aplicación premium, atractiva, moderna, fluida y profesional, sin sacrificar rendimiento ni accesibilidad.
+
+Al finalizar, informar:
+- Páginas refinadas.
+- Ambientes meteorológicos implementados.
+- Mejoras de diseño.
+- Color final del corazón.
+- Pruebas realizadas.
+- Diferencias pendientes respecto a la imagen de referencia.
+```
+
+### Aclaración posterior del usuario
+
+```text
+usa la ultima imagen de como lo quiero
+```
+
+El usuario adjuntó además capturas de la implementación actual; se utilizó su distribución como referencia para conservar la estructura, cabecera y navegación.
+
+### Objetivo, decisiones y archivos
+
+Se sustituyó el fondo fotográfico por el componente `src/components/weather-atmosphere.tsx` y reglas CSS/SVG sin vídeo, GIF, canvas ni recursos externos. La clasificación determinista está en `src/lib/weather-atmosphere.ts`: soleado, parcialmente nublado, nublado, llovizna, lluvia, tormenta, noche despejada, noche nublada y neutral. Los códigos de nieve se representan como nublado para no simular lluvia. Se aplicó a Inicio, Pronóstico y Comparar; el tema global sigue siendo independiente. Las animaciones decorativas se desactivan con movimiento reducido.
+
+Se modificaron `src/app/page.tsx`, `src/app/globals.css`, `src/app/acerca-de/page.tsx`, `src/components/weather-view.tsx`, `comparison.tsx`, `city-search.tsx`, `favorite-cities.tsx`, `favorite-heart.tsx` y esta bitácora. Se crearon `weather-atmosphere.tsx`, `src/lib/weather-atmosphere.ts`, `src/lib/favorite-presentation.ts` y `tests/weather-atmosphere.test.mjs`. El antiguo archivo de paisaje pendiente se conservó sin uso para no sobrescribir cambios previos. El corazón usa `#087f95` en claro y `#7dd3e8` en oscuro. Se añadieron acentos y transiciones discretas a filas, tarjetas y temperatura comparada.
+
+### Pruebas y limitaciones
+
+Las pruebas incluyen clasificación, día y noche, valores desconocidos, relleno y tokens del corazón, reglas de movimiento reducido y regresiones existentes. Las 34 pruebas automatizadas pasaron, al igual que `pnpm.cmd format:check`, `pnpm.cmd lint`, `pnpm.cmd build` y `pnpm.cmd encoding:check`. Las reglas CSS se verificaron como texto, no mediante preferencias reales de navegador. No se ha hecho una revisión visual ni de interacción en navegador; quedan pendientes contraste, animaciones y las anchuras solicitadas. Node emitió el aviso existente de detección de módulo. No se realizaron commits, push ni despliegue.
+
+## 17. Aclaración de la referencia visual
+
+### Prompt completo
+
+```text
+ es esa
+```
+
+El usuario adjuntó la imagen compuesta de referencia y aclaró que era el diseño deseado. La respuesta anterior había interpretado erróneamente las capturas de la implementación como referencia. Se ajustaron la jerarquía del bloque principal, el icono junto a la temperatura, la banda horaria, el buscador destacado y las capas de paisaje para acercarlos a la imagen, manteniendo los ambientes CSS/SVG y las funciones existentes. Archivos: `src/app/page.tsx`, `src/app/globals.css`, `src/components/weather-view.tsx`, `src/components/city-search.tsx` y esta bitácora.
+
+### Pruebas y estado
+
+Pasaron las 34 pruebas automatizadas y `pnpm.cmd format:check`, `pnpm.cmd lint`, `pnpm.cmd build` y `pnpm.cmd encoding:check`. La comparación visual e interactiva en navegador continúa pendiente; no se realizaron commits, push ni despliegue.

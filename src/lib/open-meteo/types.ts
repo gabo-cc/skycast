@@ -10,8 +10,16 @@ export type Ciudad = {
 export type Clima = {
   zonaHoraria: string;
   desfaseUtcSegundos: number;
-  unidades: { temperatura: "°C"; viento: "km/h"; humedad: "%"; precipitacion: "%" };
-  // Los instantes son ISO 8601 en UTC; las fechas diarias son etiquetas YYYY-MM-DD.
+
+  unidades: {
+    temperatura: "°C";
+    viento: "km/h";
+    humedad: "%";
+    precipitacion: "%";
+  };
+
+  // Los instantes son ISO 8601 UTC.
+  // Las fechas diarias son etiquetas YYYY-MM-DD.
   actual: {
     hora: string | null;
     temperatura: number | null;
@@ -21,12 +29,18 @@ export type Clima = {
     codigoMeteorologico: number | null;
     esDeDia: boolean | null;
   } | null;
+
   horas: {
     hora: string;
     temperatura: number | null;
     probabilidadPrecipitacion: number | null;
     codigoMeteorologico: number | null;
+
+    // Indicador de Open-Meteo para cada hora.
+    // true: día, false: noche, null: desconocido.
+    esDeDia?: boolean | null;
   }[];
+
   dias: {
     fecha: string;
     temperaturaMaxima: number | null;

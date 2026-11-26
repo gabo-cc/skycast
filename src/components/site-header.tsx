@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { Icon } from "@/components/icon";
+import { ThemeSelector } from "@/components/theme-selector";
+import { usePathname } from "next/navigation";
 
 const links = [
   ["Inicio", "/"],
@@ -13,17 +15,16 @@ const links = [
 ];
 
 export function SiteHeader() {
+  const pathname = usePathname();
   return (
     <header className="border-b border-slate-200/80 bg-white/85">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-4 px-5 py-4 sm:px-8 lg:px-12">
+      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-2 sm:px-8">
         <Link
           href="/"
-          className="flex w-fit items-center gap-2.5 text-xl font-bold tracking-tight text-slate-900"
+          className="flex w-fit items-center gap-1.5 text-xl font-bold tracking-tight text-sky-800"
         >
-          <span className="flex size-9 items-center justify-center rounded-xl bg-sky-100 text-sky-700">
-            <Icon name="sun" className="size-5" />
-          </span>
-          SkyCast<span className="text-sky-600">.</span>
+          <Icon name="cloud" className="size-7 text-sky-600" />
+          SkyCast
         </Link>
         <details className="group relative lg:hidden">
           <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-slate-700 marker:content-none hover:bg-sky-50 [&::-webkit-details-marker]:hidden">
@@ -41,6 +42,7 @@ export function SiteHeader() {
                 <li key={href}>
                   <Link
                     href={href}
+                    aria-current={pathname === href ? "page" : undefined}
                     onClick={(event) =>
                       event.currentTarget.closest("details")?.removeAttribute("open")
                     }
@@ -59,7 +61,8 @@ export function SiteHeader() {
               <li key={href}>
                 <Link
                   href={href}
-                  className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-sky-50 hover:text-sky-800"
+                  aria-current={pathname === href ? "page" : undefined}
+                  className="block rounded-none border-b-2 border-transparent px-3 py-3 text-sm font-medium text-slate-600 transition hover:text-sky-800"
                 >
                   {label}
                 </Link>
@@ -67,6 +70,7 @@ export function SiteHeader() {
             ))}
           </ul>
         </nav>
+        <ThemeSelector />
       </div>
     </header>
   );

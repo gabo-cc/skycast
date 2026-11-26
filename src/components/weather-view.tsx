@@ -1,140 +1,270 @@
 import { Icon } from "@/components/icon";
 import { SectionHeading } from "@/components/ui";
-import { condicion, fechaLocal, instanteLocal, valor } from "@/lib/weather-display";
+import { WeatherAtmosphere } from "@/components/weather-atmosphere";
+import { condicion, estiloClima, fechaLocal, instanteLocal, valor } from "@/lib/weather-display";
 import type { Ciudad, Clima } from "@/lib/open-meteo/types";
+
+/* =========================================
+   CLIMA ACTUAL
+   ========================================= */
 
 export function CurrentWeather({ city, weather }: { city: Ciudad; weather: Clima }) {
   const current = weather.actual;
+
   const condition = condicion(current?.codigoMeteorologico ?? null, current?.esDeDia ?? null);
+
   return (
     <section
       aria-labelledby="actual-titulo"
-      className="rounded-3xl border border-sky-100 bg-white p-6 shadow-sm sm:p-8"
+      className={`weather-hero atmosphere-container ${estiloClima(
+        current?.codigoMeteorologico ?? null,
+        current?.esDeDia ?? null,
+      )}`}
     >
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-sm text-slate-600">
-            {[city.region, city.pais].filter(Boolean).join(", ") || "Ubicación seleccionada"}
-          </p>
-          <h2 id="actual-titulo" className="mt-1 text-2xl font-semibold text-slate-900">
-            {city.nombre}
-          </h2>
-          <p className="mt-2 text-xs text-slate-600">
-            Hora del dato: {instanteLocal(current?.hora ?? null, weather.zonaHoraria)} ·{" "}
-            {weather.zonaHoraria}
-          </p>
+      <WeatherAtmosphere
+        code={current?.codigoMeteorologico ?? null}
+        isDay={current?.esDeDia ?? null}
+      />
+
+      <div className="weather-hero-content atmosphere-content">
+        <div className="weather-hero-top">
+          <div>
+            <p className="weather-eyebrow">
+              <Icon name="pin" className="size-4" />
+              El tiempo en
+            </p>
+
+            <h2 id="actual-titulo" className="weather-city">
+              {city.nombre}
+            </h2>
+
+            {city.pais && <p className="weather-country">{city.pais}</p>}
+          </div>
+
+          <span className="weather-live-label">Condiciones actuales</span>
         </div>
-        <Icon name={condition.icono} className="size-12 shrink-0 text-sky-700" />
+
+        {current ? (
+          <>
+            <div className="weather-hero-main">
+              <div className="weather-temperature-block">
+                <div className="weather-temperature-row">
+                  <span className="weather-temperature">{valor(current.temperatura, "°C")}</span>
+                </div>
+
+                <div className="weather-condition">
+                  <Icon name={condition.icono} className="size-7 shrink-0" />
+
+                  <span>{condition.descripcion}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="weather-hero-bottom">
+              <dl className="weather-metrics">
+                <div className="weather-metric">
+                  <dt>Sensación térmica</dt>
+                  <dd>{valor(current.sensacionTermica, "°C")}</dd>
+                </div>
+
+                <div className="weather-metric">
+                  <dt>Humedad</dt>
+                  <dd>{valor(current.humedad, "%")}</dd>
+                </div>
+
+                <div className="weather-metric">
+                  <dt>Viento</dt>
+                  <dd>{valor(current.viento, " km/h")}</dd>
+                </div>
+              </dl>
+
+              <p className="weather-update">
+                Última actualización: {instanteLocal(current.hora, weather.zonaHoraria)}
+              </p>
+            </div>
+          </>
+        ) : (
+          <div className="weather-unavailable">
+            <p>Las condiciones actuales no están disponibles.</p>
+          </div>
+        )}
       </div>
-      {current ? (
-        <>
-          <p className="mt-6 text-5xl font-semibold tracking-tight text-slate-900">
-            {valor(current.temperatura, "°C")}
-          </p>
-          <p className="mt-2 text-slate-600">{condition.descripcion}</p>
-          <dl className="mt-6 grid gap-4 border-t border-slate-100 pt-5 text-sm sm:grid-cols-3">
-            <div>
-              <dt className="text-slate-500">Sensación térmica</dt>
-              <dd className="mt-1 font-semibold">{valor(current.sensacionTermica, "°C")}</dd>
-            </div>
-            <div>
-              <dt className="text-slate-500">Humedad</dt>
-              <dd className="mt-1 font-semibold">{valor(current.humedad, "%")}</dd>
-            </div>
-            <div>
-              <dt className="text-slate-500">Viento</dt>
-              <dd className="mt-1 font-semibold">{valor(current.viento, " km/h")}</dd>
-            </div>
-          </dl>
-        </>
-      ) : (
-        <p className="mt-5 text-slate-600">Las condiciones actuales no están disponibles.</p>
-      )}
     </section>
   );
 }
 
-export function HourlyForecast({ weather }: { weather: Clima }) {
+/* =========================================
+   PRONÓSTICO POR HORAS
+   ========================================= */
+
+export function HourlyForecast({ weather, limit = 24 }: { weather: Clima; limit?: number }) {
   const now = weather.actual?.hora;
-  const currentHour = now ? Math.floor(Date.parse(now) / 3_600_000) * 3_600_000 : null;
+
+  const parsedNow = now ? Date.parse(now) : NaN;
+
+  const currentHour = Number.isFinite(parsedNow)
+    ? Math.floor(parsedNow / 3_600_000) * 3_600_000
+    : null;
+
   const hours = (
     currentHour !== null
       ? weather.horas.filter((hour) => Date.parse(hour.hora) >= currentHour)
       : weather.horas
-  ).slice(0, 24);
+  ).slice(0, limit);
+
+  const compact = hours.length <= 8;
+
+  const labels = hours.map((hour) => {
+    const date = new Date(hour.hora);
+
+    if (!Number.isFinite(date.getTime())) {
+      return {
+        time: "--:--",
+        date: "",
+        offset: "",
+      };
+    }
+
+    try {
+      const parts = new Intl.DateTimeFormat("es-419", {
+        timeZone: weather.zonaHoraria,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23",
+        timeZoneName: "shortOffset",
+      }).formatToParts(date);
+
+      const part = (type: string) => parts.find((item) => item.type === type)?.value ?? "";
+
+      return {
+        time: `${part("hour")}:${part("minute")}`,
+        date: `${part("year")}-${part("month")}-${part("day")}`,
+        offset: part("timeZoneName"),
+      };
+    } catch {
+      return {
+        time: "--:--",
+        date: "",
+        offset: "",
+      };
+    }
+  });
+
+  const counts = new Map<string, number>();
+
+  for (const label of labels) {
+    const key = `${label.date}|${label.time}`;
+
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+
   return (
-    <section className="space-y-5">
-      <SectionHeading
-        title="Pronóstico por horas"
-        description={`Horas locales del proveedor · ${weather.zonaHoraria}`}
-      />
-      {hours.length ? (
-        <div
-          tabIndex={0}
-          role="region"
-          aria-label="Pronóstico por horas, desplazable horizontalmente"
-          className="flex gap-3 overflow-x-auto pb-3"
-        >
-          {hours.map((hour) => {
-            const condition = condicion(hour.codigoMeteorologico);
-            return (
-              <article
-                key={hour.hora}
-                className="w-36 shrink-0 rounded-2xl border border-slate-200 bg-white p-4"
-              >
-                <p className="text-xs text-slate-600">
-                  {instanteLocal(hour.hora, weather.zonaHoraria)}
-                </p>
-                <Icon name={condition.icono} className="my-4 size-7 text-sky-700" />
-                <p className="text-xl font-semibold">{valor(hour.temperatura, "°C")}</p>
-                <p className="mt-2 text-xs text-slate-600">{condition.descripcion}</p>
-                <p className="mt-2 text-xs text-slate-600">
-                  Precipitación: {valor(hour.probabilidadPrecipitacion, "%")}
-                </p>
-              </article>
-            );
-          })}
+    <section className="weather-section">
+      {hours.length > 0 ? (
+        <div className="hourly-panel">
+          <div
+            tabIndex={0}
+            role="region"
+            aria-label="Pronóstico por horas, desplazable horizontalmente"
+            className={`hourly-scroll ${compact ? "hourly-scroll-fill" : ""}`}
+          >
+            {hours.map((hour, index) => {
+              const condition = condicion(hour.codigoMeteorologico, hour.esDeDia ?? null);
+
+              const label = labels[index];
+
+              const repeated = (counts.get(`${label.date}|${label.time}`) ?? 0) > 1;
+
+              return (
+                <article
+                  key={hour.hora}
+                  className={`hourly-item ${index === 0 ? "hourly-item-first" : ""}`}
+                  title={instanteLocal(hour.hora, weather.zonaHoraria)}
+                >
+                  <div className="hourly-time">
+                    <span>{label.time}</span>
+
+                    {repeated && <span className="block text-[10px]">{label.offset}</span>}
+                  </div>
+
+                  <div className="hourly-icon">
+                    <Icon name={condition.icono} className="size-7" />
+                  </div>
+
+                  <p className="hourly-temperature">{valor(hour.temperatura, "°C")}</p>
+
+                  <p className="hourly-condition">{condition.descripcion}</p>
+
+                  <p className="hourly-rain">
+                    <Icon name="rain" className="size-4 shrink-0" />
+
+                    {valor(hour.probabilidadPrecipitacion, "%")}
+                  </p>
+                </article>
+              );
+            })}
+          </div>
         </div>
       ) : (
-        <p className="text-slate-600">No hay datos horarios disponibles.</p>
+        <p className="weather-empty">No hay datos horarios disponibles.</p>
       )}
     </section>
   );
 }
 
+/* =========================================
+   PRONÓSTICO DIARIO
+   ========================================= */
+
 export function DailyForecast({ weather, limit }: { weather: Clima; limit?: number }) {
   const days = weather.dias.slice(0, limit ?? 7);
+
   return (
-    <section className="space-y-5">
+    <section className="weather-section">
       <SectionHeading
         title={limit ? "Resumen del pronóstico" : "Próximos siete días"}
-        description={`Fechas locales del proveedor · ${weather.zonaHoraria}`}
+        description={`Previsión diaria · ${weather.zonaHoraria}`}
       />
-      {days.length ? (
-        <div className="divide-y divide-slate-100 rounded-3xl border border-slate-200 bg-white px-5">
+
+      {days.length > 0 ? (
+        <div className="daily-panel">
           {days.map((day) => {
             const condition = condicion(day.codigoMeteorologico);
+
             return (
-              <article
-                key={day.fecha}
-                className="grid gap-2 py-4 sm:grid-cols-[1fr_1.5fr_1fr] sm:items-center"
-              >
-                <h3 className="font-semibold">{fechaLocal(day.fecha)}</h3>
-                <p className="flex items-center gap-2 text-sm text-slate-600">
-                  <Icon name={condition.icono} className="size-6 shrink-0 text-sky-700" />{" "}
-                  {condition.descripcion}
-                </p>
-                <p className="text-sm text-slate-700">
-                  Máx. {valor(day.temperaturaMaxima, "°C")} · Mín.{" "}
-                  {valor(day.temperaturaMinima, "°C")} · Lluvia{" "}
-                  {valor(day.probabilidadPrecipitacionMaxima, "%")}
-                </p>
+              <article key={day.fecha} className="daily-item">
+                <div className="daily-date">
+                  <h3>{fechaLocal(day.fecha)}</h3>
+
+                  <p className="daily-description">{condition.descripcion}</p>
+                </div>
+
+                <div className="daily-icon">
+                  <Icon name={condition.icono} className="size-7" />
+                </div>
+
+                <div className="daily-values">
+                  <div className="daily-temperatures">
+                    <span className="daily-max">{valor(day.temperaturaMaxima, "°C")}</span>
+
+                    <span className="daily-min">{valor(day.temperaturaMinima, "°C")}</span>
+                  </div>
+
+                  <p className="daily-precipitation">
+                    <Icon name="rain" className="size-4 shrink-0" />
+
+                    {valor(day.probabilidadPrecipitacionMaxima, "%")}
+                  </p>
+                </div>
               </article>
             );
           })}
         </div>
       ) : (
-        <p className="text-slate-600">No hay pronóstico diario disponible.</p>
+        <p className="weather-empty">No hay pronóstico diario disponible.</p>
       )}
     </section>
   );

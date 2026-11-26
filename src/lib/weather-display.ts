@@ -38,6 +38,14 @@ export function condicion(
   if (!entry) return { descripcion: "Condición no disponible", icono: "cloud" };
   return { descripcion: entry[0], icono: entry[1] === "sun" && day === false ? "moon" : entry[1] };
 }
+export function estiloClima(code: number | null, day: boolean | null): string {
+  if (day === false) return "weather-night";
+  const icon = condicion(code, day).icono;
+  if (icon === "storm") return "weather-storm";
+  if (icon === "rain" || icon === "snow") return "weather-rainy";
+  if (icon === "sun") return "weather-sunny";
+  return "weather-cloudy";
+}
 export function valor(value: number | null, unit: string): string {
   return value === null ? "No disponible" : `${value}${unit}`;
 }

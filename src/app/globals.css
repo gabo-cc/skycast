@@ -1,17 +1,1529 @@
 @import "tailwindcss";
 
+/* =========================================
+   SKYCAST — DESIGN SYSTEM
+   ========================================= */
+
 :root {
   color-scheme: light;
-  background: #f5f7fb;
-  color: #17243b;
+
+  --page: #f8fafc;
+  --surface: #ffffff;
+  --surface-soft: #eaf3f7;
+  --ink: #101c35;
+  --muted: #52647b;
+  --line: #d8e2eb;
+  --accent: #2847a1;
+  --aqua: #51b9ce;
+
+  --favorite: #087f95;
+  --favorite-hover: #e2f5f8;
+
+  --card-shadow: 0 12px 35px rgba(15, 45, 75, 0.07);
+  --card-shadow-hover: 0 18px 45px rgba(15, 45, 75, 0.12);
+
+  background: var(--page);
+  color: var(--ink);
 }
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --page: #0b1220;
+  --surface: #17263e;
+  --surface-soft: #1c3048;
+  --ink: #f3f7fc;
+  --muted: #afc1d5;
+  --line: #344a65;
+  --accent: #a9bfff;
+  --aqua: #7dd3e8;
+
+  --favorite: #7dd3e8;
+  --favorite-hover: #24465a;
+
+  --card-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
+  --card-shadow-hover: 0 18px 45px rgba(0, 0, 0, 0.28);
+}
+
+/* =========================================
+   BASE
+   ========================================= */
+
+html {
+  background: var(--page);
+}
+
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:
+    "Segoe UI",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  background:
+    radial-gradient(ellipse at 85% 0%, rgba(81, 185, 206, 0.075), transparent 40%), var(--page);
+  color: var(--ink);
+  min-height: 100vh;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
 }
+
 ::selection {
-  background: #c8e8f6;
+  background: #b8e8f1;
+  color: #101c35;
 }
+
 :focus-visible {
-  outline: 3px solid #0284a7;
+  outline: 3px solid var(--aqua);
   outline-offset: 3px;
+}
+
+/* =========================================
+   COMPATIBILIDAD CON TAILWIND EXISTENTE
+   ========================================= */
+
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] .bg-white\/85,
+[data-theme="dark"] .bg-white\/60 {
+  background-color: var(--surface);
+}
+
+[data-theme="dark"] .bg-slate-50,
+[data-theme="dark"] .bg-sky-50,
+[data-theme="dark"] .bg-sky-50\/50,
+[data-theme="dark"] .bg-sky-100,
+[data-theme="dark"] .bg-\[\#dceef6\] {
+  background-color: var(--surface-soft);
+}
+
+[data-theme="dark"] .text-slate-900,
+[data-theme="dark"] .text-slate-800,
+[data-theme="dark"] .text-slate-700 {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .text-slate-600,
+[data-theme="dark"] .text-slate-500 {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .text-sky-950,
+[data-theme="dark"] .text-sky-900,
+[data-theme="dark"] .text-sky-800,
+[data-theme="dark"] .text-sky-700,
+[data-theme="dark"] .text-sky-600 {
+  color: var(--aqua);
+}
+
+[data-theme="dark"] .border-slate-100,
+[data-theme="dark"] .border-slate-200,
+[data-theme="dark"] .border-slate-200\/80,
+[data-theme="dark"] .border-slate-300,
+[data-theme="dark"] .border-sky-100,
+[data-theme="dark"] .border-sky-200 {
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .hover\:bg-sky-50:hover,
+[data-theme="dark"] .hover\:bg-sky-50\/50:hover,
+[data-theme="dark"] .hover\:bg-sky-100:hover {
+  background: #304d67;
+}
+
+[data-theme="dark"] .hover\:text-sky-800:hover,
+[data-theme="dark"] .hover\:text-sky-900:hover {
+  color: #bcefff;
+}
+
+[data-theme="dark"] input {
+  color: var(--ink);
+}
+
+[data-theme="dark"] input::placeholder {
+  color: var(--muted);
+}
+
+/* =========================================
+   TARJETAS GENERALES
+   ========================================= */
+
+.feature-card {
+  box-shadow: var(--card-shadow);
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    border-color 200ms ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--card-shadow-hover);
+}
+
+.surface-row {
+  transition:
+    background-color 180ms ease,
+    transform 180ms ease;
+}
+
+.surface-row:hover {
+  background: var(--surface-soft);
+}
+
+nav a[aria-current="page"] {
+  color: var(--accent);
+  border-color: var(--aqua);
+}
+
+/* =========================================
+   FAVORITOS
+   ========================================= */
+
+.favorite-heart {
+  color: var(--favorite);
+  transition:
+    color 180ms ease,
+    background-color 180ms ease,
+    transform 180ms ease;
+}
+
+.favorite-heart:hover {
+  background: var(--favorite-hover);
+}
+
+.favorite-heart[aria-pressed="true"] {
+  color: var(--favorite);
+}
+
+.favorite-heart[aria-pressed="true"] svg {
+  fill: currentColor;
+  stroke: currentColor;
+  animation: heart-settle 240ms ease-out;
+}
+
+.favorite-heart[aria-pressed="false"] svg {
+  fill: none;
+  stroke: currentColor;
+}
+
+.favorite-heart:active {
+  transform: scale(0.91);
+}
+
+@keyframes heart-settle {
+  50% {
+    transform: scale(1.14);
+  }
+}
+
+/* =========================================
+   COLORES DE RESPALDO METEOROLÓGICOS
+   ========================================= */
+
+.weather-sunny {
+  border-color: #a8d7e7;
+  background: #edf8fc;
+}
+
+.weather-cloudy {
+  border-color: #cedbe4;
+  background: #eef3f6;
+}
+
+.weather-rainy {
+  border-color: #b5cedd;
+  background: #e7f0f7;
+}
+
+.weather-storm {
+  border-color: #7d99b0;
+  background: #dce7f0;
+}
+
+.weather-night {
+  border-color: #7e9ab4;
+  background: #e1eaf3;
+}
+
+[data-theme="dark"] .weather-sunny {
+  background: #203d52;
+  border-color: #385f75;
+}
+
+[data-theme="dark"] .weather-cloudy {
+  background: #27384b;
+  border-color: #42576a;
+}
+
+[data-theme="dark"] .weather-rainy {
+  background: #1b354b;
+  border-color: #375870;
+}
+
+[data-theme="dark"] .weather-storm {
+  background: #1c2941;
+  border-color: #485977;
+}
+
+[data-theme="dark"] .weather-night {
+  background: #182c49;
+  border-color: #40587a;
+}
+
+/* =========================================
+   ATMÓSFERA FOTOGRÁFICA
+   ========================================= */
+
+.sky-hero {
+  background: var(--surface-soft);
+}
+
+.atmosphere-container {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.atmosphere-content {
+  position: relative;
+  z-index: 2;
+}
+
+.weather-atmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: #638da6;
+}
+
+.weather-photo {
+  position: absolute;
+  inset: -3%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transform: scale(1.03);
+  animation: weather-camera 35s ease-in-out infinite alternate;
+}
+
+/* Fotografías locales en public/weather */
+
+.atmosphere-sunny .weather-photo {
+  background-color: #75badb;
+  background-image: url("/weather/sunny.webp");
+}
+
+.atmosphere-partly-cloudy .weather-photo {
+  background-color: #81aebf;
+  background-image: url("/weather/partly-cloudy.webp");
+}
+
+.atmosphere-cloudy .weather-photo {
+  background-color: #748fa2;
+  background-image: url("/weather/cloudy.webp");
+}
+
+.atmosphere-drizzle .weather-photo {
+  background-color: #5e8195;
+  background-image: url("/weather/drizzle.webp");
+}
+
+.atmosphere-rain .weather-photo {
+  background-color: #425f78;
+  background-image: url("/weather/rain.webp");
+}
+
+.atmosphere-storm .weather-photo {
+  background-color: #293d5b;
+  background-image: url("/weather/storm.webp");
+}
+
+.atmosphere-clear-night .weather-photo {
+  background-color: #142c4d;
+  background-image: url("/weather/clear-night.webp");
+}
+
+.atmosphere-cloudy-night .weather-photo {
+  background-color: #263b58;
+  background-image: url("/weather/cloudy-night.webp");
+}
+
+.atmosphere-neutral .weather-photo {
+  background: linear-gradient(135deg, #729bb8, #a3c8d7);
+}
+
+/* Iluminación */
+
+.weather-ambient-light {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 78% 14%, rgba(255, 255, 255, 0.14), transparent 60%);
+}
+
+.atmosphere-sunny .weather-ambient-light {
+  background: radial-gradient(ellipse at 78% 15%, rgba(255, 220, 135, 0.38), transparent 60%);
+}
+
+/* Neblina */
+
+.weather-mist {
+  position: absolute;
+  inset: 10% -25% -10%;
+  opacity: 0.35;
+  background: linear-gradient(
+    100deg,
+    transparent 10%,
+    rgba(220, 237, 244, 0.4) 48%,
+    transparent 80%
+  );
+  animation: weather-mist-drift 22s ease-in-out infinite alternate;
+}
+
+/* Lluvia */
+
+.weather-rainfall {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.rain-layer {
+  position: absolute;
+  inset: -60% 0 0;
+  background-image: repeating-linear-gradient(
+    104deg,
+    transparent 0 34px,
+    rgba(230, 246, 255, 0.3) 35px,
+    transparent 37px,
+    transparent 62px
+  );
+  background-size: 110px 180px;
+  animation: weather-rain-fall 1.25s linear infinite;
+}
+
+.rain-layer-back {
+  opacity: 0.25;
+  animation-duration: 1.65s;
+}
+
+.rain-layer-front {
+  opacity: 0.45;
+  background-size: 150px 220px;
+  animation-duration: 0.95s;
+}
+
+.atmosphere-drizzle .rain-layer {
+  opacity: 0.14;
+  animation-duration: 2s;
+}
+
+.atmosphere-storm .rain-layer {
+  opacity: 0.55;
+}
+
+/* Contraste para la fotografía */
+
+.weather-photo-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(8, 28, 48, 0.84) 0%,
+    rgba(12, 40, 65, 0.65) 48%,
+    rgba(10, 35, 56, 0.24) 100%
+  );
+}
+
+[data-theme="dark"] .weather-photo-overlay {
+  background: linear-gradient(
+    90deg,
+    rgba(5, 16, 33, 0.89) 0%,
+    rgba(8, 25, 44, 0.71) 50%,
+    rgba(5, 20, 38, 0.32) 100%
+  );
+}
+
+/* =========================================
+   HERO METEOROLÓGICO
+   ========================================= */
+
+.weather-hero {
+  position: relative;
+  min-height: 380px;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 24px 55px rgba(10, 35, 60, 0.18);
+  color: #ffffff;
+}
+
+.weather-hero-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 380px;
+  padding: clamp(20px, 4vw, 38px);
+  color: #ffffff;
+}
+
+.weather-hero .weather-hero-content,
+.weather-hero .weather-hero-content h2,
+.weather-hero .weather-hero-content p,
+.weather-hero .weather-hero-content dt,
+.weather-hero .weather-hero-content dd {
+  color: #ffffff;
+}
+
+.weather-hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.weather-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.88;
+}
+
+.weather-city {
+  margin-top: 7px;
+  font-size: clamp(23px, 3.5vw, 34px);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1.15;
+}
+
+.weather-country {
+  margin-top: 5px;
+  font-size: 14px;
+  opacity: 0.82;
+}
+
+.weather-live-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  backdrop-filter: blur(8px);
+}
+
+.weather-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #87edce;
+  box-shadow: 0 0 0 3px rgba(135, 237, 206, 0.15);
+}
+
+.weather-hero-main {
+  padding: 26px 0;
+}
+
+.weather-temperature-row {
+  display: flex;
+  align-items: flex-start;
+}
+
+.weather-temperature {
+  font-size: clamp(64px, 10vw, 108px);
+  font-weight: 650;
+  letter-spacing: -0.085em;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+
+.weather-condition {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 5px;
+  font-size: clamp(14px, 2vw, 17px);
+  font-weight: 500;
+}
+
+.weather-hero-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.weather-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 15px 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.17);
+  background: rgba(7, 29, 51, 0.32);
+  backdrop-filter: blur(10px);
+}
+
+.weather-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.weather-metric dt {
+  font-size: 12px;
+  opacity: 0.78;
+}
+
+.weather-metric dd {
+  font-size: clamp(15px, 2vw, 19px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.weather-update {
+  font-size: 11px;
+  opacity: 0.75;
+}
+
+.weather-unavailable {
+  padding: 28px 0;
+  font-size: 15px;
+}
+
+/* =========================================
+   SECCIONES DE PRONÓSTICO
+   ========================================= */
+
+.weather-section {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+}
+
+.weather-empty {
+  padding: 24px;
+  border: 1px dashed var(--line);
+  border-radius: 16px;
+  color: var(--muted);
+  background: var(--surface);
+}
+
+/* Pronóstico horario */
+
+.hourly-panel {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.hourly-scroll {
+  display: flex;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+  padding: 10px;
+}
+
+.hourly-scroll:focus-visible {
+  outline-offset: -3px;
+}
+
+.hourly-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 0 0 124px;
+  gap: 12px;
+  padding: 16px 12px;
+  border-right: 1px solid var(--line);
+  text-align: center;
+  transition: background-color 180ms ease;
+}
+
+.hourly-item:last-child {
+  border-right: 0;
+}
+
+.hourly-item:hover {
+  background: var(--surface-soft);
+}
+
+.hourly-item-first {
+  background: var(--surface-soft);
+  border-radius: 14px;
+}
+
+.hourly-time {
+  min-height: 32px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.hourly-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 15px;
+  background: var(--surface-soft);
+  color: var(--accent);
+}
+
+.hourly-temperature {
+  font-size: 21px;
+  font-weight: 750;
+  letter-spacing: -0.05em;
+  color: var(--ink);
+}
+
+.hourly-condition {
+  min-height: 32px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.hourly-rain {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* Pronóstico diario */
+
+.daily-panel {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.daily-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  padding: 17px 20px;
+  border-bottom: 1px solid var(--line);
+  transition: background-color 180ms ease;
+}
+
+.daily-item:last-child {
+  border-bottom: 0;
+}
+
+.daily-item:hover {
+  background: var(--surface-soft);
+}
+
+.daily-date h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.daily-description {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.daily-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  color: var(--accent);
+  background: var(--surface-soft);
+}
+
+.daily-values {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.daily-temperatures {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.daily-max {
+  font-size: 17px;
+  font-weight: 750;
+  color: var(--ink);
+}
+
+.daily-min {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.daily-precipitation {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* =========================================
+   ANIMACIONES ATMOSFÉRICAS
+   ========================================= */
+
+@keyframes weather-camera {
+  from {
+    transform: scale(1.03) translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: scale(1.1) translate3d(-0.8%, -0.5%, 0);
+  }
+}
+
+@keyframes weather-mist-drift {
+  from {
+    transform: translate3d(-5%, 0, 0);
+  }
+
+  to {
+    transform: translate3d(8%, 0, 0);
+  }
+}
+
+@keyframes weather-rain-fall {
+  to {
+    transform: translate3d(-20px, 180px, 0);
+  }
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 640px) {
+  .weather-hero,
+  .weather-hero-content {
+    min-height: 410px;
+  }
+
+  .weather-hero {
+    border-radius: 22px;
+  }
+
+  .weather-hero-top {
+    flex-wrap: wrap;
+  }
+
+  .weather-live-label {
+    padding: 7px 10px;
+  }
+
+  .weather-metrics {
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .weather-metric dt {
+    font-size: 10px;
+  }
+
+  .weather-metric dd {
+    font-size: 14px;
+  }
+
+  .weather-photo-overlay {
+    background: linear-gradient(
+      180deg,
+      rgba(8, 28, 48, 0.62) 0%,
+      rgba(8, 28, 48, 0.28) 35%,
+      rgba(8, 28, 48, 0.88) 100%
+    );
+  }
+
+  .daily-item {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 15px;
+  }
+
+  .daily-icon {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .daily-values {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--line);
+    padding-top: 10px;
+  }
+}
+
+/* =========================================
+   ACCESIBILIDAD Y MOVIMIENTO REDUCIDO
+   ========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .weather-photo,
+  .weather-mist,
+  .rain-layer,
+  .favorite-heart[aria-pressed="true"] svg {
+    animation: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =========================================
+   SKYCAST — REFINAMIENTO DEL MODO CLARO
+   ========================================= */
+
+/* El contenedor principal conserva la identidad
+   luminosa del tema, independientemente del clima. */
+
+.sky-hero {
+  background:
+    radial-gradient(ellipse at 85% 12%, rgba(113, 204, 234, 0.28), transparent 55%),
+    linear-gradient(145deg, #f5fbff 0%, #eaf5fb 48%, #f8fafc 100%);
+  color: var(--ink);
+}
+
+/* Evita que el paisaje nocturno oscurezca también
+   el encabezado externo de Inicio. */
+
+.sky-hero > .weather-atmosphere {
+  display: none;
+}
+
+/* Conserva la fotografía dentro de la tarjeta
+   meteorológica real. */
+
+.sky-hero .weather-hero > .weather-atmosphere {
+  display: block;
+}
+
+/* Mejora la separación entre la tarjeta fotográfica
+   y la superficie luminosa que la rodea. */
+
+.sky-hero .weather-hero {
+  box-shadow:
+    0 20px 45px rgba(35, 75, 110, 0.14),
+    0 4px 12px rgba(35, 75, 110, 0.07);
+}
+
+/* En modo oscuro recuperamos una superficie
+   profunda y coherente con la identidad visual. */
+
+[data-theme="dark"] .sky-hero {
+  background:
+    radial-gradient(ellipse at 85% 12%, rgba(55, 120, 175, 0.18), transparent 58%),
+    linear-gradient(145deg, #101e32, #15263d);
+  color: var(--ink);
+}
+
+/* =========================================
+   SKYCAST — INICIO COMPACTO
+   ========================================= */
+
+/* Solo afecta al hero meteorológico de Inicio. */
+
+.sky-hero .weather-hero {
+  min-height: 315px;
+  border-radius: 22px;
+  box-shadow:
+    0 16px 36px rgba(13, 36, 61, 0.16),
+    0 3px 10px rgba(13, 36, 61, 0.06);
+}
+
+.sky-hero .weather-hero-content {
+  min-height: 315px;
+  padding: 23px 27px;
+}
+
+.sky-hero .weather-city {
+  font-size: clamp(23px, 3vw, 29px);
+}
+
+.sky-hero .weather-hero-main {
+  padding: 12px 0;
+}
+
+.sky-hero .weather-temperature {
+  font-size: clamp(62px, 7.5vw, 86px);
+  line-height: 1;
+}
+
+.sky-hero .weather-condition {
+  margin-top: 7px;
+  font-size: 15px;
+}
+
+.sky-hero .weather-metrics {
+  gap: 10px;
+  padding: 12px 16px;
+}
+
+.sky-hero .weather-metric dt {
+  font-size: 11px;
+}
+
+.sky-hero .weather-metric dd {
+  font-size: 17px;
+}
+
+.sky-hero .weather-update {
+  font-size: 10px;
+}
+
+/* Mantener una buena experiencia en móviles. */
+
+@media (max-width: 640px) {
+  .sky-hero .weather-hero,
+  .sky-hero .weather-hero-content {
+    min-height: 350px;
+  }
+
+  .sky-hero .weather-hero-content {
+    padding: 20px;
+  }
+
+  .sky-hero .weather-temperature {
+    font-size: clamp(58px, 14vw, 76px);
+  }
+
+  .sky-hero .weather-metrics {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .sky-hero .weather-metric dd {
+    font-size: 14px;
+  }
+}
+
+/* =========================================
+   SKYCAST — PRONÓSTICO HORARIO ADAPTABLE
+   ========================================= */
+
+.hourly-scroll-fill {
+  width: 100%;
+}
+
+.hourly-scroll-fill .hourly-item {
+  flex: 1 0 0;
+  min-width: 0;
+}
+
+.hourly-scroll-fill .hourly-time {
+  min-height: auto;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.hourly-scroll-fill .hourly-condition {
+  min-height: 36px;
+  max-width: 130px;
+  line-height: 1.4;
+}
+
+.hourly-scroll-fill .hourly-temperature {
+  font-size: clamp(18px, 2vw, 23px);
+}
+
+/* En pantallas pequeñas conservamos el scroll. */
+
+@media (max-width: 640px) {
+  .hourly-scroll-fill .hourly-item {
+    flex: 0 0 118px;
+  }
+}
+
+/* =========================================
+   SKYCAST — ESCENAS DEL PRONÓSTICO
+   ========================================= */
+
+.fsky-scene {
+  position: relative;
+  isolation: isolate;
+  height: 124px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #294b6b;
+  color: #fff;
+}
+
+.fsky-photo {
+  position: absolute;
+  inset: -8%;
+  z-index: 0;
+  background-position: center 48%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  animation: fsky-camera 32s ease-in-out infinite alternate;
+}
+
+.fsky-sunny .fsky-photo {
+  background-image: url("/weather/sunny.webp");
+  background-color: #72b9dc;
+}
+
+.fsky-cloudy .fsky-photo {
+  background-image: url("/weather/cloudy.webp");
+  background-color: #8ca8b8;
+}
+
+.fsky-rain .fsky-photo {
+  background-image: url("/weather/rain.webp");
+  background-color: #496982;
+}
+
+.fsky-storm .fsky-photo {
+  background-image: url("/weather/storm.webp");
+  background-color: #293e59;
+}
+
+.fsky-clear-night .fsky-photo {
+  background-image: url("/weather/clear-night.webp");
+  background-color: #0e2545;
+}
+
+.fsky-cloudy-night .fsky-photo {
+  background-image: url("/weather/cloudy-night.webp");
+  background-color: #243d60;
+}
+
+.fsky-neutral .fsky-photo {
+  background: linear-gradient(120deg, #558ba9, #9fc6d6);
+}
+
+.fsky-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(90deg, rgba(8, 25, 47, 0.4), rgba(8, 25, 47, 0.06) 75%);
+}
+
+/* Luz solar */
+
+.fsky-sunlight {
+  position: absolute;
+  z-index: 2;
+  top: -80px;
+  right: 10%;
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 236, 160, 0.48) 0%,
+    rgba(255, 214, 127, 0.17) 35%,
+    transparent 70%
+  );
+  animation: fsky-sun-glow 7s ease-in-out infinite alternate;
+}
+
+/* Estrellas */
+
+.fsky-stars {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.fsky-star {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 8px 2px rgba(196, 229, 255, 0.5);
+  animation: fsky-twinkle 3.5s ease-in-out infinite alternate;
+}
+
+.fsky-star-1 {
+  top: 18%;
+  left: 12%;
+}
+.fsky-star-2 {
+  top: 34%;
+  left: 27%;
+  animation-delay: -1s;
+}
+.fsky-star-3 {
+  top: 15%;
+  left: 43%;
+  animation-delay: -2s;
+}
+.fsky-star-4 {
+  top: 45%;
+  left: 59%;
+  animation-delay: -0.5s;
+}
+.fsky-star-5 {
+  top: 20%;
+  left: 75%;
+  animation-delay: -2.5s;
+}
+.fsky-star-6 {
+  top: 60%;
+  left: 81%;
+  animation-delay: -1.5s;
+}
+.fsky-star-7 {
+  top: 31%;
+  left: 90%;
+  animation-delay: -3s;
+}
+.fsky-star-8 {
+  top: 65%;
+  left: 37%;
+  animation-delay: -1.8s;
+}
+.fsky-star-9 {
+  top: 12%;
+  left: 62%;
+  animation-delay: -0.8s;
+}
+
+/* Estrellas fugaces decorativas */
+
+.fsky-meteor {
+  position: absolute;
+  top: 12%;
+  right: 10%;
+  width: 90px;
+  height: 2px;
+  border-radius: 999px;
+  opacity: 0;
+  background: linear-gradient(90deg, transparent, rgba(189, 226, 255, 0.55), #ffffff);
+  box-shadow: 0 0 9px rgba(172, 221, 255, 0.45);
+  transform: rotate(-25deg);
+  animation: fsky-shooting-star 9s linear infinite;
+}
+
+.fsky-meteor-two {
+  top: 30%;
+  right: 35%;
+  width: 65px;
+  animation-delay: -4s;
+  animation-duration: 13s;
+}
+
+/* Nubes */
+
+.fsky-clouds {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.fsky-cloud {
+  position: absolute;
+  width: 190px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(220, 235, 245, 0.16);
+  filter: blur(16px);
+  animation: fsky-cloud-drift 22s ease-in-out infinite alternate;
+}
+
+.fsky-cloud-one {
+  top: 12%;
+  right: 12%;
+}
+
+.fsky-cloud-two {
+  top: 46%;
+  right: 52%;
+  width: 250px;
+  opacity: 0.6;
+  animation-duration: 29s;
+}
+
+/* Lluvia */
+
+.fsky-rain {
+  position: absolute;
+  inset: -100% 0 0;
+  z-index: 2;
+  opacity: 0.35;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    105deg,
+    transparent 0 23px,
+    rgba(226, 246, 255, 0.55) 24px,
+    transparent 26px,
+    transparent 45px
+  );
+  background-size: 120px 160px;
+  animation: fsky-rainfall 1.25s linear infinite;
+}
+
+/* Texto de la escena */
+
+.fsky-caption {
+  position: absolute;
+  z-index: 3;
+  bottom: 13px;
+  left: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100% - 30px);
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(9, 27, 50, 0.52);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+}
+
+.fsky-caption-dot {
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #8be4ed;
+}
+
+/* Animaciones */
+
+@keyframes fsky-camera {
+  from {
+    transform: scale(1.02) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.1) translate3d(-1%, -1%, 0);
+  }
+}
+
+@keyframes fsky-twinkle {
+  0% {
+    opacity: 0.25;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+}
+
+@keyframes fsky-shooting-star {
+  0%,
+  76% {
+    opacity: 0;
+    transform: rotate(-25deg) translate3d(0, 0, 0);
+  }
+  79% {
+    opacity: 0.95;
+  }
+  85%,
+  100% {
+    opacity: 0;
+    transform: rotate(-25deg) translate3d(-190px, 0, 0);
+  }
+}
+
+@keyframes fsky-cloud-drift {
+  to {
+    transform: translate3d(-40px, 0, 0);
+  }
+}
+
+@keyframes fsky-rainfall {
+  to {
+    transform: translate3d(-15px, 160px, 0);
+  }
+}
+
+@keyframes fsky-sun-glow {
+  to {
+    opacity: 0.6;
+    transform: scale(1.15);
+  }
+}
+
+/* Móviles */
+
+@media (max-width: 640px) {
+  .fsky-scene {
+    height: 105px;
+  }
+
+  .fsky-caption {
+    font-size: 10px;
+  }
+}
+
+/* Accesibilidad */
+
+@media (prefers-reduced-motion: reduce) {
+  .fsky-photo,
+  .fsky-sunlight,
+  .fsky-star,
+  .fsky-meteor,
+  .fsky-cloud,
+  .fsky-rain {
+    animation: none !important;
+  }
+
+  .fsky-meteor {
+    opacity: 0;
+  }
+}
+
+/* =========================================
+   SKYCAST — ENFOQUE DEL BUSCADOR
+   ========================================= */
+
+/* Quitar el segundo contorno del campo interior. */
+#ciudad:focus,
+#ciudad:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Mantener un único indicador de enfoque en el contenedor. */
+.city-search-field {
+  border: 1px solid var(--line);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.city-search-field:focus-within {
+  border-color: var(--aqua);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--aqua) 18%, transparent);
+}
+
+/* =========================================
+   SKYCAST — ENFOQUE EN COMPARAR
+   ========================================= */
+
+/* Eliminar el contorno adicional del input. */
+.comparison-search-input:focus,
+.comparison-search-input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Un único indicador de enfoque en el contenedor. */
+.comparison-search-field {
+  border: 1px solid var(--line);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.comparison-search-field:focus-within {
+  border-color: var(--aqua);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--aqua) 18%, transparent);
+}
+
+/* =========================================
+   SKYCAST — BUSCADOR DE CIUDAD PRINCIPAL
+   ========================================= */
+
+.home-city-search-input,
+.home-city-search-input:focus,
+.home-city-search-input:focus-visible {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
+.home-city-search-field {
+  border: 1px solid var(--line);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.home-city-search-field:focus-within {
+  border-color: var(--aqua);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--aqua) 18%, transparent);
+}
+
+/* =========================================
+   SKYCAST — CORRECCIÓN DEFINITIVA DE INPUTS
+   ========================================= */
+
+/* Evita que los inputs dibujen un segundo
+   contorno dentro de sus contenedores. */
+
+input#home-city-search,
+input#home-city-search:focus,
+input#home-city-search:focus-visible,
+input#ciudad,
+input#ciudad:focus,
+input#ciudad:focus-visible,
+input.comparison-search-input,
+input.comparison-search-input:focus,
+input.comparison-search-input:focus-visible {
+  outline: 0 !important;
+  outline-offset: 0;
+  box-shadow: none !important;
+  border: 0;
+}
+
+/* El contenedor muestra un único borde
+   turquesa al escribir. */
+
+.home-city-search-field,
+.city-search-field,
+.comparison-search-field {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.home-city-search-field:focus-within,
+.city-search-field:focus-within,
+.comparison-search-field:focus-within {
+  border-color: var(--aqua);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--aqua) 18%, transparent);
 }

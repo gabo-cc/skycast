@@ -1,53 +1,131 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 import { Icon } from "@/components/icon";
-import { PageIntro } from "@/components/ui";
 
-export const metadata: Metadata = { title: "Acerca de" };
-export default function AcercaDePage() {
+export const metadata: Metadata = {
+  title: "Acerca de",
+  description:
+    "Conoce SkyCast, una aplicación para consultar el clima, explorar pronósticos y comparar ciudades.",
+};
+
+const features = [
+  {
+    title: "Buscar ciudades",
+    description: "Explora el clima en cualquier lugar.",
+    icon: "search",
+    href: "/buscar",
+  },
+  {
+    title: "Guardar favoritas",
+    description: "Mantén tus ciudades siempre cerca.",
+    icon: "heart",
+    href: "/favoritos",
+  },
+  {
+    title: "Pronósticos detallados",
+    description: "Consulta el tiempo por horas y días.",
+    icon: "clock",
+    href: "/pronostico",
+  },
+  {
+    title: "Comparar ciudades",
+    description: "Descubre las diferencias entre dos cielos.",
+    icon: "compare",
+    href: "/comparar",
+  },
+] as const;
+
+export default function AboutPage() {
   return (
-    <div className="space-y-10 pt-12 sm:pt-16">
-      <PageIntro
-        eyebrow="Detrás del proyecto"
-        title="Un poco sobre SkyCast"
-        description="Un proyecto para explorar cómo la tecnología puede hacer que la información del tiempo sea más clara y accesible."
-      />
-      <div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
-        <section className="rounded-3xl border border-slate-200 bg-white p-7 sm:p-9">
-          <Icon name="sun" className="size-8 text-sky-700" />
-          <h2 className="mt-6 text-2xl font-semibold text-slate-900">
-            Hecho para mirar hacia arriba
-          </h2>
-          <p className="mt-4 leading-7 text-slate-600">
-            SkyCast es una aplicación meteorológica que consulta datos de Open-Meteo para mostrar
-            condiciones actuales y pronósticos.
-          </p>
-          <p className="mt-4 leading-7 text-slate-600">
-            Puedes buscar ciudades, guardar favoritos en este navegador y comparar las condiciones
-            de dos ubicaciones. La disponibilidad de los datos depende del proveedor meteorológico.
-          </p>
-        </section>
-        <section className="rounded-3xl bg-slate-900 p-7 text-white sm:p-9">
-          <Icon name="spark" className="size-7 text-sky-300" />
-          <h2 className="mt-6 text-xl font-semibold">Construido paso a paso</h2>
-          <p className="mt-4 text-sm leading-7 text-slate-300">
-            Con Vibe Coding, el desarrollo combina instrucciones, iteraciones y verificación. Cada
-            paso queda documentado para aprender y mejorar.
-          </p>
-          <h3 className="mt-8 text-xs font-bold tracking-[0.16em] text-sky-300 uppercase">
-            Tecnologías
-          </h3>
-          <ul className="mt-4 flex flex-wrap gap-2">
-            {["Next.js", "React", "TypeScript", "Tailwind CSS", "pnpm"].map((technology) => (
-              <li
-                key={technology}
-                className="rounded-full border border-slate-600 px-3 py-1.5 text-xs font-medium text-slate-200"
+    <div className="mx-auto max-w-4xl space-y-10 py-12 sm:py-16">
+      <section className="mx-auto max-w-2xl text-center">
+        <div
+          className="mx-auto mb-6 flex size-16 items-center justify-center rounded-2xl"
+          style={{
+            background: "var(--surface-soft)",
+            color: "var(--accent)",
+          }}
+        >
+          <Icon name="cloud" className="size-9" />
+        </div>
+
+        <p
+          className="mb-3 text-xs font-bold tracking-[0.18em] uppercase"
+          style={{ color: "var(--accent)" }}
+        >
+          CONOCE SKYCAST
+        </p>
+
+        <h1
+          className="text-4xl font-bold tracking-tight sm:text-5xl"
+          style={{ color: "var(--ink)" }}
+        >
+          Una mirada más clara al cielo
+        </h1>
+
+        <p className="mx-auto mt-5 max-w-xl text-base leading-7" style={{ color: "var(--muted)" }}>
+          SkyCast te permite consultar las condiciones meteorológicas actuales, explorar
+          pronósticos, guardar tus lugares favoritos y comparar el clima entre distintas ciudades.
+        </p>
+      </section>
+
+      <section aria-labelledby="funciones-titulo">
+        <h2 id="funciones-titulo" className="sr-only">
+          Explora las funcionalidades
+        </h2>
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {features.map((feature) => (
+            <Link
+              key={feature.href}
+              href={feature.href}
+              className="feature-card group flex min-h-48 flex-col items-center justify-center rounded-3xl border p-5 text-center transition-colors"
+              style={{
+                background: "var(--surface)",
+                borderColor: "var(--line)",
+                color: "var(--ink)",
+              }}
+            >
+              <div
+                className="mb-4 flex size-14 items-center justify-center rounded-2xl transition-transform group-hover:-translate-y-1"
+                style={{
+                  background: "var(--surface-soft)",
+                  color: "var(--accent)",
+                }}
               >
-                {technology}
-              </li>
-            ))}
-          </ul>
-        </section>
-      </div>
+                <Icon name={feature.icon} className="size-7" />
+              </div>
+
+              <h3 className="font-semibold">{feature.title}</h3>
+
+              <p className="mt-2 text-xs leading-5" style={{ color: "var(--muted)" }}>
+                {feature.description}
+              </p>
+
+              <span className="mt-4 text-xs font-semibold" style={{ color: "var(--accent)" }}>
+                Explorar →
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section
+        className="rounded-3xl border p-6 sm:p-8"
+        style={{
+          background: "var(--surface)",
+          borderColor: "var(--line)",
+        }}
+      >
+        <h2 className="text-xl font-bold" style={{ color: "var(--ink)" }}>
+          Datos y tecnología
+        </h2>
+
+        <p className="mt-3 text-sm leading-7" style={{ color: "var(--muted)" }}>
+          Los datos meteorológicos proceden de Open-Meteo. SkyCast está desarrollado con Next.js,
+          React, TypeScript y Tailwind CSS mediante Vibe Coding.
+        </p>
+      </section>
     </div>
   );
 }

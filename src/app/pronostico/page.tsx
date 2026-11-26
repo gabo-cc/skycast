@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { PageIntro } from "@/components/ui";
-import { CurrentWeather, DailyForecast, HourlyForecast } from "@/components/weather-view";
+import { CurrentWeather } from "@/components/weather-view";
+import { ForecastInteractive } from "@/components/forecast-interactive";
 import { parseLocation } from "@/lib/forecast-location";
 import { obtenerClima } from "@/lib/open-meteo/service";
 
@@ -29,15 +29,19 @@ export default async function PronosticoPage({ searchParams }: PageProps<"/prono
     );
   const weather = await obtenerClima(city.latitud, city.longitud);
   return (
-    <div className="space-y-10 pt-12 sm:pt-16">
-      <PageIntro
-        eyebrow="Planea con calma"
-        title="El cielo que viene"
-        description="Consulta las condiciones y el pronóstico para tu ubicación."
-      />
+    <div className="space-y-6 pt-6 sm:pt-8">
+      <div>
+        <Link href="/buscar" className="text-sm font-semibold text-sky-700 hover:underline">
+          ← Buscar otra ciudad
+        </Link>
+        <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-900">
+          {city.nombre}
+          {city.pais ? `, ${city.pais}` : ""}
+        </h1>
+        <p className="mt-1 text-sm text-slate-600">Condiciones y pronóstico de tu ubicación.</p>
+      </div>
       <CurrentWeather city={city} weather={weather} />
-      <HourlyForecast weather={weather} />
-      <DailyForecast weather={weather} />
+      <ForecastInteractive weather={weather} />
       <p className="text-xs leading-5 text-slate-600">
         Fuente: Open-Meteo. Los valores diarios usan el desplazamiento vigente al consultar y pueden
         abarcar horas distintas del día local durante un cambio de horario de verano.

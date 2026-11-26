@@ -10,9 +10,9 @@ export function PageIntro({
 }) {
   return (
     <div className="max-w-2xl">
-      <p className="mb-3 text-xs font-bold tracking-[0.2em] text-sky-700 uppercase">{eyebrow}</p>
-      <h1 className="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">{title}</h1>
-      <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">{description}</p>
+      <p className="mb-2 text-xs font-bold tracking-wider text-sky-700 uppercase">{eyebrow}</p>
+      <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">{title}</h1>
+      <p className="mt-2 text-base leading-6 text-slate-600">{description}</p>
     </div>
   );
 }
