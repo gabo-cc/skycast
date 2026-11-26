@@ -54,8 +54,11 @@ export function ComparisonSelector({
   function update(value: string) {
     const next = value.trim();
 
-    revision.current += 1;
     setTerm(value);
+
+    if (next === query) return;
+
+    revision.current += 1;
 
     setState({
       status: esBusquedaValida(next) ? "loading" : "initial",

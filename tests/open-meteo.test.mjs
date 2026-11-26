@@ -2,6 +2,7 @@ import test, { afterEach } from "node:test";
 import assert from "node:assert/strict";
 import { GET as ciudades } from "../src/app/api/ciudades/route.ts";
 import { GET as clima } from "../src/app/api/clima/route.ts";
+import { GET as climaInicio } from "../src/app/api/clima-inicio/route.ts";
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {
@@ -136,4 +137,36 @@ test("tiempo de espera agotado", async () => {
   } finally {
     AbortSignal.timeout = originalTimeout;
   }
+});
+
+test("clima de inicio conserva códigos seguros sin revelar detalles del proveedor", async () => {
+  const url = request("/api/clima-inicio?latitud=0&longitud=0");
+  globalThis.fetch = async () => {
+    throw new Error("detalle privado del proveedor");
+  };
+  const unavailable = await climaInicio(url);
+  assert.equal(unavailable.status, 503);
+  assert.deepEqual(await unavailable.json(), { error: "No se pudo consultar el clima." });
+
+  globalThis.fetch = async () => new Response("detalle privado", { status: 500 });
+  const rejected = await climaInicio(url);
+  assert.equal(rejected.status, 502);
+  assert.deepEqual(await rejected.json(), { error: "No se pudo consultar el clima." });
+
+  const originalTimeout = AbortSignal.timeout;
+  AbortSignal.timeout = () => AbortSignal.abort();
+  try {
+    globalThis.fetch = async (_url, { signal }) => {
+      throw signal.reason;
+    };
+    const timeout = await climaInicio(url);
+    assert.equal(timeout.status, 504);
+    assert.deepEqual(await timeout.json(), { error: "No se pudo consultar el clima." });
+  } finally {
+    AbortSignal.timeout = originalTimeout;
+  }
+
+  const invalid = await climaInicio(request("/api/clima-inicio?latitud=91&longitud=0"));
+  assert.equal(invalid.status, 400);
+  assert.deepEqual(await invalid.json(), { error: "Coordenadas inválidas." });
 });

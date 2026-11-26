@@ -1,38 +1,111 @@
-# SkyCast
+# SkyCast 2.0
 
-Aplicación meteorológica académica construida con Next.js, React, TypeScript y Tailwind CSS. Permite buscar ciudades, consultar el pronóstico de Open-Meteo, guardar favoritos en el navegador y comparar dos ubicaciones.
+Aplicación meteorológica académica para explorar el tiempo, consultar pronósticos y comparar ciudades. Los datos meteorológicos proceden de Open-Meteo; las fotografías opcionales de Unsplash se presentan como imágenes de archivo.
+
+## Características principales
+
+- Inicio cinematográfico con ciudad principal configurable y selección de horas.
+- Búsqueda de ciudades y navegación al pronóstico conservando su identidad y coordenadas.
+- Pronósticos horarios y diarios, gráfica interactiva y fechas en la zona horaria de la ciudad.
+- Favoritos persistentes y comparación de dos ciudades con solicitudes y reintentos independientes.
+- Escenas y efectos atmosféricos, temas claro, oscuro y automático, y soporte para movimiento reducido.
+- Fotografías verificadas de ciudades, paisajes ilustrativos y recursos locales de respaldo.
+
+La ciudad principal, los favoritos y la preferencia de tema se guardan en el almacenamiento del navegador. No se sincronizan automáticamente entre dispositivos.
+
+## Tecnologías
+
+Next.js 16, React 19, TypeScript, Tailwind CSS 4 y pnpm. Las pruebas usan el ejecutor integrado de Node.js.
+
+## Requisitos
+
+- Node.js 20.9.0 o posterior, requisito de la versión instalada de Next.js. La auditoría local se ejecutó con Node.js 22.14.0.
+- pnpm 12.9.1, especificado en `package.json`.
+- Conexión a Internet para consultar Open-Meteo y, opcionalmente, Unsplash.
+
+## Instalación
+
+```powershell
+pnpm.cmd install --frozen-lockfile
+```
+
+En otros sistemas puede utilizarse `pnpm` en lugar de `pnpm.cmd`.
+
+## Variables de entorno
+
+Open-Meteo no necesita clave para la integración actual. Unsplash es opcional: registra una aplicación en [Unsplash Developers](https://unsplash.com/developers) y obtén su Access Key.
+
+Si todavía no existe `.env.local`, crea una copia de ejemplo:
+
+```powershell
+Copy-Item .env.example .env.local
+```
+
+Edita `.env.local` y asigna la clave a `UNSPLASH_ACCESS_KEY`; reinicia el servidor después de cambiarla. No sobrescribas un archivo existente con otras variables. La clave solo se usa en el servidor: no la incluyas en el repositorio ni uses el prefijo `NEXT_PUBLIC_`. `.env.local` está excluido por `.gitignore`.
 
 ## Desarrollo
 
-Se utiliza exclusivamente pnpm. Open-Meteo no requiere clave; las fotografías de ciudades son opcionales.
-
-```sh
-pnpm install
-pnpm dev
+```powershell
+pnpm.cmd dev
 ```
 
-Abrir `http://localhost:3000`. Para verificar el proyecto:
+Abre `http://localhost:3000`. Las rutas principales son Inicio, Buscar, Pronóstico, Favoritos, Comparar y Acerca de.
 
-```sh
-pnpm format:check
-pnpm lint
-pnpm test
-pnpm build
-pnpm encoding:check
+## Validaciones
+
+```powershell
+pnpm.cmd format
+pnpm.cmd format:check
+pnpm.cmd lint
+pnpm.cmd build
+pnpm.cmd encoding:check
+pnpm.cmd exec tsc --noEmit
+pnpm.cmd test
 ```
 
-Los favoritos se almacenan en `localStorage` del navegador. Los agregados diarios de Open-Meteo usan el desplazamiento vigente al consultar y pueden abarcar horas distintas del día local durante una transición de horario de verano. El proceso de desarrollo y sus verificaciones se documentan en `VIBE_CODING.md`.
+`format` modifica los archivos que requieren formato; `format:check` solo comprueba. Las pruebas de servicios externos emplean respuestas simuladas y no sustituyen una revisión en navegador.
 
-## Fotografías de ciudades
+## Estructura general
 
-Favoritos y Comparar pueden mostrar como fondo una fotografía de archivo verificable de la ciudad o un paisaje ambiental de Unsplash relacionado con el clima, ambos con créditos visibles. Los paisajes ambientales se identifican como ilustrativos y no representan la ciudad ni las condiciones actuales. Si no hay fotografías disponibles, se usan los recursos originales y las [variantes generadas por IA](docs/paisajes-generados.md) optimizadas en WebP. Inicio y Pronóstico conservan sus paisajes existentes.
+```text
+src/app/                 Páginas y Route Handlers
+src/components/          Interfaz y escenas interactivas
+src/hooks/               Hooks compartidos
+src/lib/                 Servicios, transformación y lógica
+public/weather/          Paisajes locales WebP
+tests/                   Pruebas automatizadas
+docs/                    Historial, recursos y auditoría QA
+```
 
-La selección coordinada considera la identidad de las ciudades, la condición meteorológica y el día o la noche, incluida la nieve. Da prioridad a vistas verificadas y distribuye las alternativas ambientales y locales para evitar repeticiones cuando es posible; puede utilizar un recurso local para reservar una imagen compartida a otra ciudad. La asignación es estable con el mismo conjunto de ciudades y candidatos, y puede cambiar cuando cambian el clima o los resultados tras vencer la caché. Si faltan alternativas suficientes, algunas ciudades pueden coincidir. Sin condición o indicador de día se usa el fondo neutro.
+## Open-Meteo y Unsplash
 
-Para habilitarlas, registra una aplicación en [Unsplash Developers](https://unsplash.com/developers), copia `.env.example` a `.env.local`, configura `UNSPLASH_ACCESS_KEY` con la clave de acceso y reinicia el servidor. La clave permanece en el servidor; no uses el prefijo `NEXT_PUBLIC_`. Si no hay una coincidencia verificable se buscan paisajes genéricos; sin clave o ante errores se conserva el respaldo local.
+Open-Meteo proporciona geocodificación, condiciones actuales y pronósticos. El servicio valida entradas y respuestas, fija un tiempo de espera y muestra los datos faltantes como no disponibles. La API gratuita está destinada a uso no comercial; consulta sus [condiciones y límites](https://open-meteo.com/en/terms) antes de publicar.
 
-La búsqueda de vistas urbanas incluye ciudad, región y país; se revisan como máximo tres resultados y se consulta su ubicación detallada. Se comprueba la ciudad y el país; cuando existe región, debe coincidir con el nombre de ubicación. Si la ubicación no menciona otra zona, también se puede corroborar con coordenadas próximas. Si la ubicación incluye coordenadas, deben encontrarse a menos de 50 km. Esta comprobación es deliberadamente conservadora: los nombres traducidos o los metadatos incompletos pueden impedir mostrar una fotografía. Para paisajes ilustrativos se comparten candidatos buscados en inglés por categoría meteorológica, sin atribuirles la ubicación de la ciudad.
+Favoritos y Comparar pueden utilizar una fotografía de archivo de Unsplash como portada. Una vista presentada como fotografía de la ciudad se verifica mediante ciudad, país y, cuando corresponde, región o coordenadas cercanas. Esta validación conservadora puede descartar nombres traducidos o metadatos incompletos.
 
-El servidor reutiliza respuestas del proveedor durante 24 horas, deduplica consultas simultáneas y conserva resultados en memoria durante 24 horas (o cinco minutos si no hay resultado). Limita a dos búsquedas concurrentes y 40 llamadas por hora por proceso; estos límites de memoria no son globales entre instancias ni sobreviven reinicios. El navegador también reutiliza consultas durante cinco minutos. Las imágenes usan la variante regular entregada directamente por Unsplash, o la reducida si la primera no está disponible, y muestran enlaces al fotógrafo y al servicio.
+Cuando no hay una vista verificable, se buscan paisajes genéricos por condición meteorológica, identificados como **«Paisaje ilustrativo»**: no representan la ciudad ni sus condiciones actuales. Las imágenes de Unsplash se sirven desde su CDN y muestran créditos enlazados al fotógrafo y a Unsplash. Se conservan los paisajes locales originales y las [variantes generadas](docs/paisajes-generados.md) en WebP para fallos o ausencia de clave. Inicio y Pronóstico usan sus escenas locales.
 
-La [API de Unsplash](https://unsplash.com/documentation) requiere una clave, limita inicialmente el modo de demostración a 50 solicitudes por hora y exige atribución y enlace directo a las imágenes, según sus [directrices](https://help.unsplash.com/en/articles/2511245-unsplash-api-guidelines). Para producción se debe revisar su aprobación y condiciones. [Pexels](https://www.pexels.com/api/documentation/) es una alternativa con clave y límites predeterminados de 200 solicitudes por hora y 20 000 al mes; exige un enlace visible a Pexels y recomienda acreditar al fotógrafo. Esta implementación utiliza únicamente Unsplash.
+La selección coordinada intenta evitar imágenes repetidas y es estable con las mismas ciudades y candidatas; puede cambiar si cambia el clima, el conjunto visible o los resultados tras vencer la caché. El servidor deduplica solicitudes, limita dos búsquedas concurrentes y 40 llamadas por hora por proceso, y guarda resultados durante 24 horas o cinco minutos si no hay resultado. El navegador reutiliza consultas durante cinco minutos. Los límites en memoria no se comparten entre instancias ni sobreviven reinicios.
+
+La [documentación de Unsplash](https://unsplash.com/documentation) describe la cuota del modo de demostración, la atribución y el uso directo de imágenes; revisa sus requisitos y la aprobación de producción antes de publicar.
+
+## Capturas o demostración
+
+No hay capturas ni una URL de demostración versionadas en el proyecto. La aplicación puede revisarse localmente con el comando de desarrollo.
+
+## Despliegue en Vercel
+
+Para preparar un despliegue futuro, importa el repositorio en Vercel y selecciona la configuración de Next.js. En **Project Settings → Environment Variables**, agrega opcionalmente `UNSPLASH_ACCESS_KEY` como variable de servidor para los entornos necesarios. No uses `NEXT_PUBLIC_` ni publiques el valor.
+
+Los cambios de variables se aplican a nuevos despliegues, según la [documentación de Vercel](https://vercel.com/docs/environment-variables/managing-environment-variables). Estas instrucciones no implican que el proyecto esté desplegado ni autorizan un despliegue.
+
+## Limitaciones conocidas
+
+- Los agregados diarios de Open-Meteo usan el desplazamiento vigente al consultar y pueden abarcar horas distintas del día local durante una transición de horario de verano.
+- Las fotos verificadas dependen de metadatos completos y la disponibilidad y cuota del proveedor; las fotografías son de archivo, no observaciones actuales.
+- Si no hay suficientes candidatas ambientales o locales, algunas ciudades pueden compartir paisaje. Los límites de Unsplash son por proceso, no globales entre instancias.
+- Los servicios externos pueden fallar o limitar solicitudes; la aplicación muestra estados de error y utiliza respaldos cuando corresponde.
+
+## Metodología Vibe Coding
+
+La [bitácora de desarrollo](VIBE_CODING.md) resume objetivos, decisiones y pruebas por iteración. Los prompts y anotaciones disponibles antes de su reorganización se conservan en el [historial original](docs/historial-prompts-originales.md). Los resultados y pendientes de esta revisión se documentan en [QA final](docs/qa-final.md).

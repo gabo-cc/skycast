@@ -198,9 +198,11 @@ export function HomeDashboard({ initialWeather }: { initialWeather: Clima }) {
   }, [query, valid, attempt, pickerOpen]);
 
   function changeTerm(value: string) {
-    searchRevision.current += 1;
-
     setTerm(value);
+
+    if (value.trim() === query) return;
+
+    searchRevision.current += 1;
     setSearchState({
       status: esBusquedaValida(value.trim()) ? "loading" : "initial",
     });
