@@ -79,3 +79,42 @@ test("publica errores y resultados tras el debounce", async () => {
   const empty = await new Promise((resolve) => iniciarBusqueda("San", resolve));
   assert.deepEqual(empty, { status: "success", ciudades: [] });
 });
+
+test("reutiliza resultados validados con espacios exteriores y vuelve a consultar al vencer", async () => {
+  const originalNow = Date.now;
+  let now = originalNow();
+  let calls = 0;
+  Date.now = () => now;
+  globalThis.fetch = async () => {
+    calls += 1;
+    return Response.json({ ciudades: cities });
+  };
+  try {
+    const first = await new Promise((resolve) => iniciarBusqueda("Cache City", resolve));
+    const repeated = await new Promise((resolve) => iniciarBusqueda(" Cache City ", resolve));
+    assert.deepEqual(first, repeated);
+    assert.equal(calls, 1);
+    now += 5 * 60 * 1000 + 1;
+    await new Promise((resolve) => iniciarBusqueda("Cache City", resolve));
+    assert.equal(calls, 2);
+  } finally {
+    Date.now = originalNow;
+  }
+});
+
+test("no guarda errores y permite reintentar", async () => {
+  let calls = 0;
+  globalThis.fetch = async () => {
+    calls += 1;
+    return calls === 1 ? new Response(null, { status: 503 }) : Response.json({ ciudades: cities });
+  };
+  assert.equal(
+    (await new Promise((resolve) => iniciarBusqueda("Retry City", resolve))).status,
+    "error",
+  );
+  assert.equal(
+    (await new Promise((resolve) => iniciarBusqueda("Retry City", resolve))).status,
+    "success",
+  );
+  assert.equal(calls, 2);
+});

@@ -8,6 +8,7 @@ import { WeatherAttribution } from "@/components/weather-attribution";
 import { esBusquedaValida, iniciarBusqueda, type SearchResult } from "@/lib/city-search";
 import { DEFAULT_LOCATION, forecastUrl, parseLocation } from "@/lib/forecast-location";
 import type { Ciudad, Clima } from "@/lib/open-meteo/types";
+import { conTiempoLimite } from "@/lib/request-timeout";
 
 const STORAGE_KEY = "skycast:ciudad-principal";
 
@@ -136,7 +137,10 @@ export function HomeDashboard({ initialWeather }: { initialWeather: Clima }) {
       setWeatherState({ status: "loading" });
 
       try {
-        const result = await consultarClimaInicio(nextCity, controller.signal);
+        const result = await conTiempoLimite(
+          (signal) => consultarClimaInicio(nextCity, signal),
+          controller.signal,
+        );
 
         if (controller.signal.aborted || revision !== weatherRevision.current) {
           return;

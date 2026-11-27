@@ -57,6 +57,7 @@ function createRenderer(filename, exportName, props) {
     "@/components/home-sky-experience": { HomeSkyExperience: () => null },
     "@/components/weather-attribution": { WeatherAttribution: () => null },
     "@/lib/forecast-location": { DEFAULT_LOCATION, forecastUrl: () => "/pronostico" },
+    "@/lib/request-timeout": { conTiempoLimite: (operation, signal) => operation(signal) },
     "@/lib/city-search": {
       esBusquedaValida,
       iniciarBusqueda(query, onResult) {

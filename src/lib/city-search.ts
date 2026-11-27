@@ -1,5 +1,10 @@
 import type { Ciudad } from "./open-meteo/types.ts";
 import { esCiudadValida } from "./favorites-storage.ts";
+import { conTiempoLimite } from "./request-timeout.ts";
+
+const CACHE_TTL_MS = 5 * 60 * 1000;
+const CACHE_MAX_ENTRIES = 50;
+const searchCache = new Map<string, { ciudades: Ciudad[]; expires: number }>();
 
 export type SearchResult =
   { status: "success"; ciudades: Ciudad[] } | { status: "error"; message: string };
@@ -30,12 +35,36 @@ export function iniciarBusqueda(
   nombre: string,
   onResult: (result: SearchResult) => void,
 ): () => void {
+  const query = nombre.trim();
   const controller = new AbortController();
   let active = true;
+  const cached = searchCache.get(query);
+
+  if (cached && cached.expires > Date.now()) {
+    queueMicrotask(() => {
+      if (active) onResult({ status: "success", ciudades: cached.ciudades });
+    });
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }
+  if (cached) searchCache.delete(query);
+
   const timer = setTimeout(async () => {
     try {
-      const ciudades = await consultarCiudades(nombre, controller.signal);
-      if (active) onResult({ status: "success", ciudades });
+      const ciudades = await conTiempoLimite(
+        (signal) => consultarCiudades(query, signal),
+        controller.signal,
+      );
+      if (active) {
+        if (searchCache.size >= CACHE_MAX_ENTRIES) {
+          const oldest = searchCache.keys().next().value;
+          if (oldest !== undefined) searchCache.delete(oldest);
+        }
+        searchCache.set(query, { ciudades, expires: Date.now() + CACHE_TTL_MS });
+        onResult({ status: "success", ciudades });
+      }
     } catch {
       if (active && !controller.signal.aborted) {
         onResult({

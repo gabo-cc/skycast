@@ -116,3 +116,11 @@ Las cifras históricas corresponden al momento de cada iteración, no a la cober
 - **Decisiones y pendientes:** se confirmó el alcance exclusivamente académico, sin fines comerciales y con tráfico reducido: SkyCast se destina a demostraciones educativas controladas. Se mantienen las condiciones y atribuciones de Open-Meteo y Unsplash. Las cuotas y cachés de Unsplash son por proceso; los endpoints de Open-Meteo no limitan el tráfico por origen. Antes de una publicación abierta con tráfico no controlado se necesita protección efectiva entre instancias, confirmar el acceso de producción y la cuota de Unsplash y completar las comprobaciones pendientes de accesibilidad y carga. No se añadió infraestructura externa.
 - **Archivos principales:** `src/components/weather-attribution.tsx`, componentes de clima y escenas, `src/lib/weather-landscapes.ts`, pruebas relacionadas, `README.md` y `docs/qa-final.md`.
 - **Estado:** para el ajuste documental de alcance pasaron `pnpm.cmd format:check`, `pnpm.cmd lint`, `pnpm.cmd build`, `pnpm.cmd encoding:check`, `pnpm.cmd exec tsc --noEmit`, `pnpm.cmd test` (69 pruebas) y `git diff --check`. El dictamen y las limitaciones constan en la continuación del informe QA. No se realizaron commits, push ni despliegue.
+
+# Mantenimiento de carga y búsqueda (26 de noviembre de 2026)
+
+- Objetivo: investigar la carga de Inicio y la búsqueda lenta sin alterar datos reales ni el diseño.
+- Acciones y decisiones: se inspeccionaron PPR, el límite del proveedor y el manejo de errores; se mantuvo el debounce de 350 ms y se agregó una caché limitada de resultados validados y un límite de espera para solicitudes del navegador. Se conservaron la cancelación y las ciudades homónimas.
+- Problemas: Open-Meteo y el despliegue público no fueron accesibles desde este entorno; no se dispone de registros de Vercel ni de una prueba de hidratación. Las causas en producción siguen sin confirmar.
+- Archivos: `src/lib/city-search.ts`, `src/lib/request-timeout.ts`, `src/components/home-dashboard.tsx`, pruebas de búsqueda y tiempo de espera y `docs/qa-final.md`.
+- Verificación: build de producción local y pruebas controladas; las mediciones, resultados y limitaciones se detallan en `docs/qa-final.md`. Se requiere desplegar y verificar con el navegador y los registros antes de declarar solucionado el incidente.
