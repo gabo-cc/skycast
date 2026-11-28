@@ -1,4 +1,4 @@
-# SkyCast 2.0
+# SkyCast 
 
 **Aplicación meteorológica interactiva desarrollada como proyecto académico mediante Vibe Coding.** Permite consultar el tiempo actual, explorar pronósticos, guardar ciudades favoritas y comparar las condiciones de dos ubicaciones en una interfaz visual y adaptable a diferentes dispositivos.
 
