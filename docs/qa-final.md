@@ -115,6 +115,15 @@ La **publicación abierta con tráfico no controlado** sigue sin recomendarse: e
 
 Siguen pendientes el recorrido completo mediante teclado y la revisión del orden de foco, el contraste manual sobre fotografías, las pruebas con lector de pantalla y dispositivo táctil físico, y la medición de rendimiento y animaciones en un móvil físico. Las pruebas de carga descritas emplearon respuestas simuladas y no sustituyen una evaluación de carga sostenida ni de varias instancias. No se realizaron verificaciones nuevas de accesibilidad o carga por confirmar este alcance.
 
+# Página 404 y recuperación de errores (28 de noviembre de 2026)
+
+- En `next start` local, `/favoritas` devolvió HTTP 404 con el texto de la nueva página. `/`, `/buscar`, `/comparar`, `/favoritos`, `/pronostico` y `/acerca-de` respondieron HTTP 200. El servidor registró indisponibilidad del proveedor meteorológico (503) durante las solicitudes, por lo que esas respuestas no demuestran una carga completa de datos ni verifican todos los flujos.
+- Las pruebas de componentes verifican el encabezado y los destinos de los enlaces de la 404; comprueban que el botón de ambos límites de error invoca el callback de reintento, que hay un enlace al inicio y que no se muestra el mensaje técnico de ejemplo. No simulan una recuperación completa de Next.js en el navegador.
+- Next.js 16.4.6 entrega `retry` y `reset`; la documentación instalada recomienda `retry` para volver a obtener y renderizar el contenido. Los límites existentes ya usan `retry`, por lo que se conserva. `reset` solo limpia el estado y vuelve a renderizar sin volver a obtener el contenido.
+- La 404 reutiliza los tokens de tema, el foco global y una disposición adaptable. No se verificaron visualmente los temas, el teclado ni el ancho móvil: el intento de Edge sin interfaz falló al iniciar el proceso de GPU. Queda pendiente probar también la navegación y un error recuperable real en un navegador.
+- Pasaron 75 pruebas, lint, build, TypeScript y encoding. `format:check` señaló un formato preexistente en `README.md`; Prettier aprobó los archivos de código y pruebas de esta iteración. La comprobación final de diferencias se realiza después de actualizar esta documentación.
+- Continuación de temas: los textos y controles de la 404 y del error compartido usan variables del tema existente. Las pruebas del selector simulan claro, oscuro y automático, cambios del sistema y recuperación desde el almacenamiento al recargar; el contraste calculado de los colores comprobados alcanza 4,5:1 en ambos temas. Pasaron 77 pruebas. Estas simulaciones no sustituyen la revisión visual y de navegación en un navegador real, que sigue pendiente.
+
 # Diagnóstico de carga y búsqueda en producción (26 de noviembre de 2026)
 
 - La compilación local de producción identifica Inicio como prerenderizado parcial: `loading.tsx` es el respaldo durante el streaming. La consulta inicial usa `no-store` y un límite de ocho segundos al proveedor; `error.tsx` ofrece reintento. La presencia inicial del respaldo por sí sola no demuestra un fallo ni permite medir la hidratación.

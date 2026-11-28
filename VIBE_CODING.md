@@ -124,3 +124,16 @@ Las cifras históricas corresponden al momento de cada iteración, no a la cober
 - Problemas: Open-Meteo y el despliegue público no fueron accesibles desde este entorno; no se dispone de registros de Vercel ni de una prueba de hidratación. Las causas en producción siguen sin confirmar.
 - Archivos: `src/lib/city-search.ts`, `src/lib/request-timeout.ts`, `src/components/home-dashboard.tsx`, pruebas de búsqueda y tiempo de espera y `docs/qa-final.md`.
 - Verificación: build de producción local y pruebas controladas; las mediciones, resultados y limitaciones se detallan en `docs/qa-final.md`. Se requiere desplegar y verificar con el navegador y los registros antes de declarar solucionado el incidente.
+
+# Página 404 y recuperación de errores (28 de noviembre de 2026)
+
+- **Objetivo y acciones:** integrar una página 404 con la identidad y el layout existentes y facilitar el regreso al inicio desde el componente compartido de errores.
+- **Decisión:** la documentación y el código instalado de Next.js 16.4.6 confirman que el límite recibe `retry` y `reset`. Se conserva `retry`, recomendado para volver a solicitar y renderizar los datos; no se confirmó el defecto supuesto en la solicitud.
+- **Archivos:** `src/app/not-found.tsx`, `src/components/weather-error.tsx`, `tests/error-pages.test.mjs` y `docs/qa-final.md`.
+- **Pruebas y estado:** 75 pruebas aprobadas; `/favoritas` devolvió 404 con el nuevo contenido y las seis rutas existentes respondieron 200 en el servidor local de producción. Pasaron lint, build, TypeScript y encoding. `format:check` señaló el formato preexistente de `README.md`; los archivos de código y pruebas de esta iteración pasan Prettier. La revisión visual en Edge quedó pendiente por un fallo del proceso de GPU del entorno. Los límites de estas comprobaciones se detallan en el informe QA.
+
+### Continuación: temas en pantallas de error
+
+- **Objetivo y acciones:** adaptar textos y botones de la 404 y del componente de error compartido a las variables de SkyCast, manteniendo el selector y la persistencia existentes.
+- **Pruebas:** se ejercitaron el selector y el script inicial con preferencias clara, oscura y automática, cambios simulados del sistema y recarga; se comprobó el contraste de los colores usados en ambos temas. La suite aprobó 77 pruebas. No se verificaron visualmente los temas en un navegador; el informe QA conserva esa limitación.
+- **Archivos:** `src/app/not-found.tsx`, `src/components/weather-error.tsx`, `tests/error-pages.test.mjs` y `docs/qa-final.md`.
