@@ -27,7 +27,7 @@ La ciudad principal, los favoritos y la preferencia de tema se almacenan localme
 | TypeScript | Tipado estático |
 | Tailwind CSS 4 y CSS | Estilos y diseño adaptable |
 | Open-Meteo | Geocodificación y datos meteorológicos |
-| Unsplash (opcional) | Fotografías de ciudades y paisajes |
+| Unsplash  | Fotografías de ciudades y paisajes |
 | pnpm | Gestión de dependencias |
 | Node.js Test Runner | Pruebas automatizadas |
 
